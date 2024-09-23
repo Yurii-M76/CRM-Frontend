@@ -6,6 +6,9 @@ import { Settings } from "./pages/settings/settings.page";
 import { Modal } from "./components/modal/modal";
 import { NotFound } from "./pages/not-found/not-found.page";
 import { Login } from "./pages/login/login.page";
+import { getIsAuthChecked } from "./services/user/reducer";
+import { useSelector } from "./services/store";
+import { Projects } from "./pages/projects/projects.page";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +21,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/projects",
-        element: "Projects",
+        element: <Projects />,
       },
       {
         path: "/mailing",
@@ -38,12 +41,14 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFound />,
   },
-  {
-    path: "/login",
-    element: <Login />,
-  },
 ]);
 
 export function Router() {
-  return <RouterProvider router={router} />;
+  const isAuthenticated = useSelector(getIsAuthChecked);
+
+  if (isAuthenticated) {
+    return <RouterProvider router={router} />;
+  } else {
+    return <Login />;
+  }
 }
