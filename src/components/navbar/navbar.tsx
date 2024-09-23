@@ -1,19 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   IconSettings,
   IconLayoutDashboardFilled,
-  IconError404,
   IconDatabase,
   IconMail,
   IconFolderOpen,
   IconCalendarEvent,
 } from "@tabler/icons-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@mantine/core";
 import classes from "./Navbar.module.css";
-import { useDispatch, useSelector } from "../../services/store";
+import { useDispatch } from "../../services/store";
 import { logout } from "../../services/user/action";
-import { getIsAuthChecked } from "../../services/user/reducer";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: IconLayoutDashboardFilled },
@@ -22,7 +20,6 @@ const tabs = [
   { link: "mailing", label: "Рассылки", icon: IconMail },
   { link: "settings", label: "Настройки", icon: IconSettings },
   { link: "modal", label: "Модалка", icon: IconFolderOpen },
-  { link: "error", label: "Not found", icon: IconError404 },
 ];
 
 export function Navbar() {
@@ -33,14 +30,6 @@ export function Navbar() {
   const handleLogout = () => {
     dispatch(logout());
   };
-
-  const isAuthenticated = useSelector(getIsAuthChecked);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, navigate]);
 
   const links = tabs.map((item) => (
     <Link
