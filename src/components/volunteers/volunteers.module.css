@@ -1,0 +1,26 @@
+.thead:not(:first-child):hover {
+  cursor: pointer;
+  background-color: var(--mantine-color-gray-light);
+}
+
+.rows:hover {
+  background-color: var(--mantine-color-gray-light);
+}
+
+.rows_select {
+  background-color: var(--mantine-primary-color-light);
+}
+
+.search_field {
+  font-weight: 400;
+}
+
+.icon_action_edit:hover {
+  background-color: var(--mantine-color-blue-filled-hover);
+  color: #fff;
+}
+
+.icon_action_remove:hover {
+  background-color: var(--mantine-color-red-filled-hover);
+  color: #fff;
+}

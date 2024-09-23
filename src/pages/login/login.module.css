@@ -1,0 +1,10 @@
+.login_box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login_form {
+  box-shadow: var(--mantine-shadow-md);
+}
