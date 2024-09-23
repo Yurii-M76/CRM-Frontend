@@ -14,14 +14,10 @@ import {
 
 import classes from "./login.module.css";
 import { login } from "../../services/user/action";
-import { useDispatch, useSelector } from "../../services/store";
-import { Navigate } from "react-router-dom";
-import { getIsAuthChecked } from "../../services/user/reducer";
+import { useDispatch } from "../../services/store";
 
 export function Login(props: PaperProps) {
   const dispatch = useDispatch();
-
-  const isAuthenticated = useSelector(getIsAuthChecked);
 
   const form = useForm({
     initialValues: {
@@ -39,10 +35,6 @@ export function Login(props: PaperProps) {
   const handleFormSubmit = () => {
     dispatch(login(form.values));
   };
-
-  if (isAuthenticated) {
-    return <Navigate to={"/"} />;
-  }
 
   return (
     <Box className={classes.login_box}>
