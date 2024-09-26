@@ -1,3 +1,10 @@
+.column_name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+
 .thead:not(:first-child):hover {
   cursor: pointer;
   background-color: var(--mantine-color-gray-light);

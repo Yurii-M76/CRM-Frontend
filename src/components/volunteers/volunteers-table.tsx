@@ -8,6 +8,7 @@ import { Column, Person } from "./types";
 import data from "./mockData.json";
 
 import classes from "./volunteers.module.css";
+import SortedIcon from "./sorted-icon";
 
 export const VolonteersTable = () => {
   const [tableData, setTableData] = useState<Person[]>(data);
@@ -19,23 +20,6 @@ export const VolonteersTable = () => {
   const [sortBy, setSortBy] = useState("");
 
   const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set());
-
-  const sortedColumn = (key: keyof Person) => {
-    if (sortBy === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(key);
-      setSortOrder("desc");
-    }
-
-    const sortedData = tableData.sort((a, b) => {
-      if (sortOrder === "asc") {
-        return a[key] > b[key] ? 1 : -1;
-      }
-      return a[key] < b[key] ? 1 : -1;
-    });
-    setTableData(sortedData);
-  };
 
   const columns: Column[] = [
     { label: "№", accessor: "id", sorted: true },
@@ -66,6 +50,19 @@ export const VolonteersTable = () => {
 
   const indeterminate =
     checkedIds.size > 0 && checkedIds.size < tableData.length;
+
+  const sortedColumn = (key: keyof Person) => {
+    setSortBy(key);
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+
+    const sortedData = tableData.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a[key] > b[key] ? 1 : -1;
+      }
+      return a[key] < b[key] ? 1 : -1;
+    });
+    setTableData(sortedData);
+  };
 
   const rows = dataSlice(tableData, activePage, rangeOnPage).map((element) => (
     <Table.Tr
@@ -116,7 +113,7 @@ export const VolonteersTable = () => {
         <Table verticalSpacing="6px">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>
+              <Table.Th className={classes.thead}>
                 <Checkbox
                   checked={isCheckedAll}
                   indeterminate={indeterminate}
@@ -129,7 +126,14 @@ export const VolonteersTable = () => {
                   className={classes.thead}
                   onClick={() => column.sorted && sortedColumn(column.accessor)}
                 >
-                  {column.label}
+                  <span className={classes.column_name}>
+                    {column.label}
+                    <SortedIcon
+                      sortBy={sortBy}
+                      column={column}
+                      sortOrder={sortOrder}
+                    />
+                  </span>
                 </Table.Th>
               ))}
               <Table.Th></Table.Th>
