@@ -1,14 +1,16 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { Volunteers } from "./pages/volunteers/volunteers.page";
-import { Mailing } from "./pages/mailing/mailing.page";
-import { Settings } from "./pages/settings/settings.page";
 import { Modal } from "./components/modal/modal";
-import { NotFound } from "./pages/not-found/not-found.page";
-import { Login } from "./pages/login/login.page";
 import { getIsAuthChecked } from "./services/user/reducer";
 import { useSelector } from "./services/store";
-import { Projects } from "./pages/projects/projects.page";
+import {
+  Login,
+  Mailing,
+  NotFound,
+  Projects,
+  Settings,
+  Volunteers,
+} from "./pages";
 
 const router = createBrowserRouter([
   {
