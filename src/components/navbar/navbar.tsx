@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   IconSettings,
   IconLayoutDashboardFilled,
@@ -7,7 +6,7 @@ import {
   IconFolderOpen,
   IconCalendarEvent,
 } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@mantine/core";
 import classes from "./Navbar.module.css";
 import { useDispatch } from "../../services/store";
@@ -23,8 +22,7 @@ const tabs = [
 ];
 
 export function Navbar() {
-  const [active, setActive] = useState("Billing");
-
+  const location = useLocation().pathname;
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -35,11 +33,12 @@ export function Navbar() {
     <Link
       to={item.link}
       className={classes.link}
-      data-active={item.label === active || undefined}
+      data-active={
+        location === "/" + (item.link === "/" ? "" : "/") ||
+        location === "/" + item.link ||
+        undefined
+      }
       key={item.label}
-      onClick={() => {
-        setActive(item.label);
-      }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
       <span>{item.label}</span>
