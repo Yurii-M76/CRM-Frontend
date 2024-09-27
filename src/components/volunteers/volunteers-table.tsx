@@ -1,25 +1,53 @@
-import { Table, Checkbox, Group, Flex, Box, ActionIcon } from "@mantine/core";
+import {
+  Table,
+  Checkbox,
+  Group,
+  Flex,
+  Box,
+  ActionIcon,
+  Input,
+  CloseButton,
+} from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dataSlice } from "../../utils/data-slice";
-import { Filters } from "./filters";
-import { Footer } from "./footer";
 import { Column, Person } from "./types";
-import data from "./mockData.json";
-
-import classes from "./volunteers.module.css";
+import volonteers from "./mockData.json";
 import SortedIcon from "./sorted-icon";
+import { CRM_Pagination } from "../pagination/pagination";
+import classes from "./volunteers.module.css";
+import { Form } from "react-router-dom";
 
 export const VolonteersTable = () => {
-  const [tableData, setTableData] = useState<Person[]>(data);
-  const [isCheckedAll, setIsCheckedAll] = useState(false);
-  const [activePage, setPage] = useState(1);
-  const [rangeOnPage, setRangeOnPage] = useState(25);
+  const [data, setData] = useState<Person[]>(volonteers);
 
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortBy, setSortBy] = useState("");
 
   const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set());
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
+
+  const [activePage, setPage] = useState(1);
+  const [rangeOnPage, setRangeOnPage] = useState(25);
+
+  const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    if (!searchValue.length) {
+      setData(volonteers);
+    } else {
+      const serchResult = [...volonteers].filter((elem) => {
+        return (
+          elem.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          elem.birthday.toLowerCase().includes(searchValue.toLowerCase()) ||
+          elem.city.toLowerCase().includes(searchValue.toLowerCase()) ||
+          elem.phone.toLowerCase().includes(searchValue.toLowerCase())
+        );
+      });
+
+      setData(serchResult);
+    }
+  }, [data, searchValue]);
 
   const columns: Column[] = [
     { label: "№", accessor: "id", sorted: true },
@@ -29,42 +57,45 @@ export const VolonteersTable = () => {
     { label: "Телефон", accessor: "phone", sorted: true },
   ];
 
-  const handleChange = (id: number) => {
+  const handleCheckedOne = (id: number) => {
     if (checkedIds.has(id)) {
       checkedIds.delete(id);
     } else {
       checkedIds.add(id);
     }
     setCheckedIds(new Set(checkedIds));
-    console.log(checkedIds);
   };
 
-  const handleChangeAll = () => {
+  const handleCheckedAll = () => {
     if (isCheckedAll) {
       setCheckedIds(new Set());
     } else {
-      setCheckedIds(new Set(tableData.map((person) => person.id)));
+      setCheckedIds(new Set(data.map((person) => person.id)));
     }
     setIsCheckedAll(!isCheckedAll);
   };
 
-  const indeterminate =
-    checkedIds.size > 0 && checkedIds.size < tableData.length;
+  // Статус чекбокса в шапке колонки
+  const indeterminate = checkedIds.size > 0 && checkedIds.size < data.length;
 
   const sortedColumn = (key: keyof Person) => {
     setSortBy(key);
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
 
-    const sortedData = tableData.sort((a, b) => {
+    const sortedData = data.sort((a, b) => {
       if (sortOrder === "asc") {
         return a[key] > b[key] ? 1 : -1;
       }
       return a[key] < b[key] ? 1 : -1;
     });
-    setTableData(sortedData);
+    setData(sortedData);
   };
 
-  const rows = dataSlice(tableData, activePage, rangeOnPage).map((element) => (
+  const handleClearSearchForm = () => {
+    setSearchValue("");
+  };
+
+  const rows = dataSlice(data, activePage, rangeOnPage).map((element) => (
     <Table.Tr
       key={element.id}
       className={`${classes.rows} ${
@@ -74,7 +105,7 @@ export const VolonteersTable = () => {
       <Table.Td>
         <Checkbox
           checked={checkedIds.has(element.id)}
-          onChange={() => handleChange(element.id)}
+          onChange={() => handleCheckedOne(element.id)}
         />
       </Table.Td>
       <Table.Td>{element.id}</Table.Td>
@@ -108,7 +139,23 @@ export const VolonteersTable = () => {
 
   return (
     <Group gap={30}>
-      <Filters tableData={tableData} />
+      <Form>
+        <Input
+          placeholder="Найти..."
+          miw="340px"
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.currentTarget.value)}
+          rightSectionPointerEvents="all"
+          rightSection={
+            <CloseButton
+              aria-label="Поиск"
+              onClick={handleClearSearchForm}
+              style={{ display: searchValue ? undefined : "none" }}
+            />
+          }
+        />
+      </Form>
+
       <Box style={{ overflow: "auto", width: "100%" }}>
         <Table verticalSpacing="6px">
           <Table.Thead>
@@ -117,7 +164,7 @@ export const VolonteersTable = () => {
                 <Checkbox
                   checked={isCheckedAll}
                   indeterminate={indeterminate}
-                  onChange={handleChangeAll}
+                  onChange={handleCheckedAll}
                 />
               </Table.Th>
               {columns.map((column, index) => (
@@ -143,15 +190,16 @@ export const VolonteersTable = () => {
         </Table>
       </Box>
 
-      <Footer
-        tableData={tableData}
-        rangeOnPage={rangeOnPage}
-        activePage={activePage}
-        setPage={setPage}
-        setRangeOnPage={setRangeOnPage}
-        rowsSelect={checkedIds.size}
-        totalRows={tableData.length}
-      />
+      <Flex justify="space-between" align="center" direction="row" w="100%">
+        Всего строк: {data.length} / Выбрано: {checkedIds.size}
+        <CRM_Pagination
+          activePage={activePage}
+          dataLenght={data.length}
+          rangeOnPage={rangeOnPage}
+          setPage={setPage}
+          setRangeOnPage={setRangeOnPage}
+        />
+      </Flex>
     </Group>
   );
 };
