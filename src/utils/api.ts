@@ -1,7 +1,9 @@
 import { getCookie, setCookie } from "./cookie";
 import { TUser } from "./types";
 
-const URL = "http://localhost:3000";
+const HOST = import.meta.env.VITE_API_URL;
+const PORT = import.meta.env.VITE_API_PORT;
+const URL = `${HOST}:${PORT}`;
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
