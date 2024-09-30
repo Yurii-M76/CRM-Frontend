@@ -36,6 +36,7 @@ export const VolonteersTable = () => {
     if (!searchValue.length) {
       setData(volonteers);
     } else {
+      setPage(1);
       const serchResult = [...volonteers].filter((elem) => {
         return (
           elem.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -76,7 +77,7 @@ export const VolonteersTable = () => {
   };
 
   // Статус чекбокса в шапке колонки
-  const indeterminate = checkedIds.size > 0 && checkedIds.size < data.length;
+  const indeterminate = checkedIds.size > 0 && checkedIds.size < volonteers.length;
 
   const sortedColumn = (key: keyof Person) => {
     setSortBy(key);
