@@ -1,11 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUserApi, logoutApi, TLoginData } from "../../utils/api";
+import { TLoginData, getMeApi, loginUserApi, logoutApi } from "../../utils/api";
 import { setIsAuthChecked } from "./reducer";
+import { getCookie } from "../../utils/cookie";
 
 export const checkUserAuth = createAsyncThunk(
   "user/checkUserAuth",
   async (_, { dispatch }) => {
-    if (localStorage.getItem("refreshToken")) {
+    if (getCookie("accessToken")) {
       dispatch(setIsAuthChecked(true));
     } else {
       dispatch(setIsAuthChecked(false));
@@ -21,4 +22,9 @@ export const login = createAsyncThunk(
 export const logout = createAsyncThunk(
   "user/logout",
   async () => await logoutApi()
+);
+
+export const getMe = createAsyncThunk(
+  "me/data",
+  async () => await getMeApi()
 );
