@@ -8,8 +8,6 @@ import { checkUserAuth } from "./services/user/action";
 import "@mantine/core/styles.css";
 
 function App() {
-  // localStorage.clear();
-
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkUserAuth());
