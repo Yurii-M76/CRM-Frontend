@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { Modal } from "./components/modal/modal";
 import { getIsAuthChecked } from "./services/user/reducer";
 import { useSelector } from "./services/store";
 import {
@@ -32,10 +31,6 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <Settings />,
-      },
-      {
-        path: "/modal",
-        element: <Modal />,
       },
     ],
   },
