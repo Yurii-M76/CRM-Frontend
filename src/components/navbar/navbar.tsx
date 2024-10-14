@@ -3,10 +3,9 @@ import {
   IconLayoutDashboardFilled,
   IconDatabase,
   IconMail,
-  IconFolderOpen,
   IconCalendarEvent,
 } from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mantine/core";
 import classes from "./Navbar.module.css";
 import { useDispatch } from "../../services/store";
@@ -18,15 +17,16 @@ const tabs = [
   { link: "projects", label: "Проекты", icon: IconCalendarEvent },
   { link: "mailing", label: "Рассылки", icon: IconMail },
   { link: "settings", label: "Настройки", icon: IconSettings },
-  { link: "modal", label: "Модалка", icon: IconFolderOpen },
 ];
 
 export function Navbar() {
   const location = useLocation().pathname;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate('/');
   };
 
   const links = tabs.map((item) => (
