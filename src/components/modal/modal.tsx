@@ -1,29 +1,30 @@
-import { useDisclosure } from "@mantine/hooks";
-import { Modal as ModalMantine, Button } from "@mantine/core";
-import { FC } from "react";
+import { Modal as ModalMantine, Title } from "@mantine/core";
+import { FC, ReactNode } from "react";
 
-type ModalProps = object;
+type ModalProps = {
+  title: string;
+  open: () => void;
+  close: () => void;
+  opened: boolean;
+  children?: ReactNode;
+};
 
-export const Modal: FC<ModalProps> = () => {
-  const [opened, { open, close }] = useDisclosure(false);
-
+export const Modal: FC<ModalProps> = ({ title, close, opened, children }) => {
   return (
     <>
       <ModalMantine
         opened={opened}
         onClose={close}
-        title="ModalName"
+        title={<Title order={4}>{title}</Title>}
         size="lg"
         overlayProps={{
           backgroundOpacity: 0.55,
-          blur: 3,
         }}
-        centered
+        padding={20}
+        // centered
       >
-        Контент
+        {children}
       </ModalMantine>
-
-      <Button onClick={open}>Показать</Button>
     </>
   );
 };
