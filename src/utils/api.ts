@@ -9,10 +9,10 @@ const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
 type TServerResponse = {
-  success: boolean;
-  refreshToken: string;
+  // success: boolean;
+  // refreshToken: string;
   accessToken: string;
-  user: string;
+  // user: string;
 };
 
 export type TLoginData = {
@@ -21,7 +21,7 @@ export type TLoginData = {
 };
 
 export const loginUserApi = (data: TLoginData) =>
-  fetch(`${URL}/auth/login`, {
+  fetch(`${URL}/api/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
@@ -30,17 +30,17 @@ export const loginUserApi = (data: TLoginData) =>
   })
     .then((res) => checkResponse<TServerResponse>(res))
     .then((data) => {
-      if (data?.success) return data;
+      if (data) return data;
       return Promise.reject(data);
     });
 
 export const logoutApi = () =>
-  fetch(`${URL}/auth/logout`, {
+  fetch(`${URL}/api/auth/logout`, {
     method: "GET",
   }).then((res) => res.status);
 
 export const getMeApi = () =>
-  fetch(`${URL}/user/`, {
+  fetch(`${URL}/api/user/`, {
     method: "GET",
     headers: {
       authorization: getCookie("accessToken"),
