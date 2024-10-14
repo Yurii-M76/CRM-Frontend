@@ -1,13 +1,4 @@
-import {
-  Table,
-  Checkbox,
-  Group,
-  Flex,
-  Box,
-  ActionIcon,
-  Input,
-  CloseButton,
-} from "@mantine/core";
+import { Table, Checkbox, Group, Flex, Box, ActionIcon } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { dataSlice } from "../../utils/data-slice";
@@ -15,8 +6,9 @@ import { Column, Person } from "./types";
 import volonteers from "./mockData.json";
 import SortedIcon from "./sorted-icon";
 import { CRM_Pagination } from "../pagination/pagination";
-import classes from "./volunteers.module.css";
-import { Form } from "react-router-dom";
+
+import classes from "./volunteers-table.module.css";
+import { ControlPanel } from "./control-panel/control-panel";
 
 export const VolonteersTable = () => {
   const [data, setData] = useState<Person[]>(volonteers);
@@ -77,7 +69,8 @@ export const VolonteersTable = () => {
   };
 
   // Статус чекбокса в шапке колонки
-  const indeterminate = checkedIds.size > 0 && checkedIds.size < volonteers.length;
+  const indeterminate =
+    checkedIds.size > 0 && checkedIds.size < volonteers.length;
 
   const sortedColumn = (key: keyof Person) => {
     setSortBy(key);
@@ -90,10 +83,6 @@ export const VolonteersTable = () => {
       return a[key] < b[key] ? 1 : -1;
     });
     setData(sortedData);
-  };
-
-  const handleClearSearchForm = () => {
-    setSearchValue("");
   };
 
   const rows = dataSlice(data, activePage, rangeOnPage).map((element) => (
@@ -140,23 +129,7 @@ export const VolonteersTable = () => {
 
   return (
     <Group gap={30}>
-      <Form>
-        <Input
-          placeholder="Найти..."
-          miw="340px"
-          value={searchValue}
-          onChange={(event) => setSearchValue(event.currentTarget.value)}
-          rightSectionPointerEvents="all"
-          rightSection={
-            <CloseButton
-              aria-label="Поиск"
-              onClick={handleClearSearchForm}
-              style={{ display: searchValue ? undefined : "none" }}
-            />
-          }
-        />
-      </Form>
-
+      <ControlPanel searchValue={searchValue} setSearchValue={setSearchValue} />
       <Box style={{ overflow: "auto", width: "100%" }}>
         <Table verticalSpacing="6px">
           <Table.Thead>
@@ -190,7 +163,6 @@ export const VolonteersTable = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Box>
-
       <Flex justify="space-between" align="center" direction="row" w="100%">
         Всего строк: {data.length} / Выбрано: {checkedIds.size}
         <CRM_Pagination

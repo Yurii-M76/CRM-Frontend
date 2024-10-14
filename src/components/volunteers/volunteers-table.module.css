@@ -6,8 +6,8 @@
 }
 
 .thead:not(:first-child):hover {
-  cursor: pointer;
   background-color: var(--mantine-color-gray-light);
+  cursor: pointer;
 }
 
 .rows:hover {
@@ -23,11 +23,11 @@
 }
 
 .icon_action_edit:hover {
-  background-color: var(--mantine-color-blue-filled-hover);
   color: #fff;
+  background-color: var(--mantine-color-blue-filled-hover);
 }
 
 .icon_action_remove:hover {
-  background-color: var(--mantine-color-red-filled-hover);
   color: #fff;
+  background-color: var(--mantine-color-red-filled-hover);
 }
