@@ -4,23 +4,12 @@ import { Outlet, useLocation } from "react-router-dom";
 import { ColorSchemeToggle } from "../color-sheme-toggle/color-sheme-toggle";
 import { Dashboard } from "../../pages/dashboard/dashboard.page";
 import { Navbar } from "../navbar/navbar";
-
 import classes from "./layout.module.css";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "../../services/store";
-import { getMe } from "../../services/user/action";
-import { getMeData } from "../../services/user/reducer";
 
 export const Layout = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const dispatch = useDispatch();
-  const me = useSelector(getMeData);
   const content = useLocation().pathname === "/" ? <Dashboard /> : <Outlet />;
-
-  useEffect(() => {
-    dispatch(getMe());
-  }, [dispatch]);
 
   return (
     <AppShell
@@ -51,7 +40,7 @@ export const Layout = () => {
               CRM
             </Title>
             <Group ml="xl" gap={16} visibleFrom="sm">
-              <p>{me?.name}</p>
+              <p>user name</p>
               <ColorSchemeToggle />
             </Group>
           </Group>
