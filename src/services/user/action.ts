@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { TLoginData, loginUserApi, logoutApi } from "../../utils/api";
 import { setIsAuthChecked } from "./reducer";
-import { getCookie } from "../../utils/cookie";
+import { loginUserApi, logoutApi, TLoginData } from "@/utils/api";
+import { getCookie } from "@/utils/cookie";
 
 export const checkUserAuth = createAsyncThunk(
   "user/checkUserAuth",

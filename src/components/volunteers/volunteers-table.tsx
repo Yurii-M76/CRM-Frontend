@@ -1,14 +1,13 @@
 import { Table, Checkbox, Group, Flex, Box, ActionIcon } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { dataSlice } from "../../utils/data-slice";
 import { Column, Person } from "./types";
 import volonteers from "./mockData.json";
 import SortedIcon from "./sorted-icon";
-import { CRM_Pagination } from "../pagination/pagination";
-
-import classes from "./volunteers-table.module.css";
 import { ControlPanel } from "./control-panel/control-panel";
+import { dataSlice } from "@/utils/data-slice";
+import { CRM_Pagination } from "../pagination/pagination";
+import classes from "./volunteers-table.module.css";
 
 export const VolonteersTable = () => {
   const [data, setData] = useState<Person[]>(volonteers);

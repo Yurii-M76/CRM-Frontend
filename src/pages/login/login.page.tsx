@@ -11,10 +11,9 @@ import {
   Box,
   Center,
 } from "@mantine/core";
-
+import { login } from "@/services/user/action";
+import { useDispatch } from "@/services/store";
 import classes from "./login.module.css";
-import { login } from "../../services/user/action";
-import { useDispatch } from "../../services/store";
 
 export function Login(props: PaperProps) {
   const dispatch = useDispatch();

@@ -7,9 +7,9 @@ import {
 } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mantine/core";
+import { useDispatch } from "@/services/store";
+import { logout } from "@/services/user/action";
 import classes from "./Navbar.module.css";
-import { useDispatch } from "../../services/store";
-import { logout } from "../../services/user/action";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: IconLayoutDashboardFilled },
