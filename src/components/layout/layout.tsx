@@ -2,7 +2,7 @@ import { AppShell, Burger, Group, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Outlet, useLocation } from "react-router-dom";
 import { ColorSchemeToggle } from "../color-sheme-toggle/color-sheme-toggle";
-import { Dashboard } from "../../pages/dashboard/dashboard.page";
+import { Dashboard } from "@/pages/dashboard/dashboard.page";
 import { Navbar } from "../navbar/navbar";
 import classes from "./layout.module.css";
 
