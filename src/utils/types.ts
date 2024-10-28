@@ -5,3 +5,12 @@ export type TUser = {
   updateAt?: string;
   roles: string;
 };
+
+export type TVolunteer = {
+  surname: string;
+  name: string;
+  patronymic: string;
+  phone: string;
+  email: string;
+  rating: number;
+};
