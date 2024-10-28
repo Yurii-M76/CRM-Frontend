@@ -1,4 +1,4 @@
-import { Modal as ModalMantine, Title } from "@mantine/core";
+import { Modal as ModalMantine } from "@mantine/core";
 import { FC, ReactNode } from "react";
 
 type ModalProps = {
@@ -15,7 +15,7 @@ export const Modal: FC<ModalProps> = ({ title, close, opened, children }) => {
       <ModalMantine
         opened={opened}
         onClose={close}
-        title={<Title order={4}>{title}</Title>}
+        title={title}
         size="lg"
         overlayProps={{
           backgroundOpacity: 0.55,
