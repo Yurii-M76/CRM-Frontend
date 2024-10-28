@@ -45,10 +45,10 @@ export const ControlPanel: FC<TControlPanel> = ({
           >
             Добавить
           </Button>
-          <Button variant="default" rightSection={<IconUpload size={14} />}>
+          <Button variant="default" rightSection={<IconUpload size={14} />} disabled>
             Загрузить
           </Button>
-          <Button variant="default" rightSection={<IconDownload size={14} />}>
+          <Button variant="default" rightSection={<IconDownload size={14} />} disabled>
             Скачать
           </Button>
         </ButtonGroup>
@@ -69,7 +69,7 @@ export const ControlPanel: FC<TControlPanel> = ({
           />
         </Form>
       </div>
-      <Button variant="default" rightSection={<IconFilter size={14} />}>
+      <Button variant="default" rightSection={<IconFilter size={14} />} disabled>
         Фильтры
       </Button>
     </div>
