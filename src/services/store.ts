@@ -4,10 +4,12 @@ import {
   useDispatch as dispatchHook,
   useSelector as selectorHook,
 } from "react-redux";
-import { userSlice } from "./user/reducer";
+import userSlice from "./user/reducer";
+import VolunteerSlice from "./volunteers/reducer";
 
 export const rootReducer = combineReducers({
   [userSlice.reducerPath]: userSlice.reducer,
+  [VolunteerSlice.reducerPath]: VolunteerSlice.reducer,
 });
 
 const store = configureStore({
