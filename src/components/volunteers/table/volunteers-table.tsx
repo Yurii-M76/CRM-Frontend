@@ -1,5 +1,5 @@
 import { Button, Checkbox, Loader, Table } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { getAllVolunteers } from "@/services/volunteer/action";
 import {
@@ -9,21 +9,22 @@ import {
   setSort,
 } from "@/services/volunteer/reducer";
 import { ProjectList } from "./project-list";
-import { ButtonGroupLeft } from "../control-panel/button-group-left";
-import { ButtonGroupRight } from "../control-panel/button-group-right";
-import { Search } from "../control-panel/search";
-import { Info } from "../footer/info";
 import { SortButton } from "./sort-button";
 import { Column } from "../types";
 import { TVolunteer } from "@/utils/types";
+import { Footer } from "../footer/footer";
+import { Head } from "../head/head";
 import classes from "./volunteers-table.module.css";
 
 // FIXME: Исправить тип данных ДР в БД
 // FIXME: Исправить сортировку по дате рождения
+// FIXME: Исправить сброс сортировки (использовать resetSort из reducer)
 // FIXME: Исправить отображение на мобильных экранах
 // FIXME: Исправить дерганье столбцов при появлении иконки сортировки
 
 export const VolonteersTable = () => {
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector(getVolunteersLoading);
   const volunteers = useSelector(getVolunteers);
@@ -51,10 +52,39 @@ export const VolonteersTable = () => {
     );
   };
 
+  // Статус чекбокса в шапке колонки
+  const indeterminate =
+    checkedIds.size > 0 && checkedIds.size < volunteers.length;
+  const updateCheckedIds = (newCheckedIds: Set<string>) => {
+    setCheckedIds(newCheckedIds);
+    setIsCheckedAll(newCheckedIds.size === volunteers.length);
+  };
+
+  const handleCheckedOne = (id: string) => {
+    const newCheckedIds = new Set(checkedIds);
+    if (newCheckedIds.has(id)) {
+      newCheckedIds.delete(id);
+    } else {
+      newCheckedIds.add(id);
+    }
+    updateCheckedIds(newCheckedIds);
+  };
+
+  const handleCheckedAll = () => {
+    const newCheckedIds: Set<string> = isCheckedAll
+      ? new Set()
+      : new Set(volunteers.map((item) => item.id));
+    updateCheckedIds(newCheckedIds);
+  };
+
   const rows = volunteers.map((item) => (
     <Table.Tr key={item.id}>
       <Table.Td>
-        <Checkbox />
+        <Checkbox
+          key={item.id}
+          checked={checkedIds.has(item.id)}
+          onChange={() => handleCheckedOne(item.id)}
+        />
       </Table.Td>
       <Table.Td>
         {item.surname} {item.name} {item.patronymic}
@@ -75,28 +105,19 @@ export const VolonteersTable = () => {
   } else {
     return (
       <div className={classes.container}>
-        <div className={classes.control}>
-          <div className={classes.buttons}>
-            <ButtonGroupLeft />
-          </div>
-          <div className={classes.search}>
-            <Search />
-          </div>
-          <div className={classes.filters}>
-            <ButtonGroupRight />
-          </div>
-        </div>
+        <Head />
         <Table verticalSpacing="6px" className={classes.table}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th className={classes.thead}>
-                <Checkbox />
+                <Checkbox
+                  checked={isCheckedAll}
+                  indeterminate={indeterminate}
+                  onChange={handleCheckedAll}
+                />
               </Table.Th>
               {columns.map((column, index) => (
-                <Table.Th
-                  key={index}
-                  className={classes.thead}
-                >
+                <Table.Th key={index} className={classes.thead}>
                   <div className={classes.column_name}>
                     <Button.Group>
                       <Button
@@ -120,12 +141,7 @@ export const VolonteersTable = () => {
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
-        <div className={classes.footer}>
-          <div className={classes.info}>
-            <Info />
-          </div>
-          <div className={classes.pagination}>pagination</div>
-        </div>
+        <Footer rows={volunteers.length} checkedIds={checkedIds} />
       </div>
     );
   }
