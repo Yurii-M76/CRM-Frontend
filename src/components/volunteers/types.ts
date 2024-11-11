@@ -1,13 +1,12 @@
-export type Person = {
-  id: number;
-  name: string;
-  birthday: string;
-  city: string;
-  phone: string;
-};
+import { TVolunteer } from "@/utils/types";
 
 export type Column = {
   label: string;
-  accessor: keyof Person;
+  accessor: keyof TVolunteer;
   sorted: boolean;
+};
+
+export type TProjectList = {
+  id: string;
+  name: string;
 };

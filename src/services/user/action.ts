@@ -1,7 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  getMeApi,
+  loginUserApi,
+  logoutUserApi,
+  TLoginData,
+} from "../../utils/api";
+import { getCookie } from "../../utils/cookie";
 import { setIsAuthChecked } from "./reducer";
-import { loginUserApi, logoutApi, TLoginData } from "@/utils/api";
-import { getCookie } from "@/utils/cookie";
 
 export const checkUserAuth = createAsyncThunk(
   "user/checkUserAuth",
@@ -15,11 +20,13 @@ export const checkUserAuth = createAsyncThunk(
 );
 
 export const login = createAsyncThunk(
-  "user/login",
+  "auth/login",
   async (data: TLoginData) => await loginUserApi(data)
 );
 
 export const logout = createAsyncThunk(
-  "user/logout",
-  async () => await logoutApi()
+  "auth/logout",
+  async () => await logoutUserApi()
 );
+
+export const getMe = createAsyncThunk("user/me", async () => await getMeApi());

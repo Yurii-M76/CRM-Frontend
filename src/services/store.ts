@@ -5,7 +5,7 @@ import {
   useSelector as selectorHook,
 } from "react-redux";
 import userSlice from "./user/reducer";
-import VolunteerSlice from "./volunteers/reducer";
+import VolunteerSlice from "./volunteer/reducer";
 
 export const rootReducer = combineReducers({
   [userSlice.reducerPath]: userSlice.reducer,

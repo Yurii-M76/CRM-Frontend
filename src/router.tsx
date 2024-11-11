@@ -1,15 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { getIsAuthChecked } from "./services/user/reducer";
-import { useSelector } from "./services/store";
-import {
-  Login,
-  Mailing,
-  NotFound,
-  Projects,
-  Settings,
-  Volunteers,
-} from "./pages";
+import { Mailing, NotFound, Projects, Settings, Volunteers } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -41,11 +32,5 @@ const router = createBrowserRouter([
 ]);
 
 export function Router() {
-  const isAuthenticated = useSelector(getIsAuthChecked);
-
-  if (isAuthenticated) {
-    return <RouterProvider router={router} />;
-  } else {
-    return <Login />;
-  }
+  return <RouterProvider router={router} />;
 }
