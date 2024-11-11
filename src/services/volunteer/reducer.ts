@@ -26,10 +26,10 @@ export const VolunteerSlice = createSlice({
   name: "volunteer",
   initialState,
   reducers: {
-    setVolunteers: (state, action: PayloadAction<TVolunteer[]>) => {
-      state.items = action.payload;
-      state.originalItems = [...action.payload]; // Сохраняем оригинальный массив
-    },
+    // setVolunteers: (state, action: PayloadAction<TVolunteer[]>) => {
+    //   state.items = action.payload;
+    //   state.originalItems = [...action.payload]; // Сохраняем оригинальный массив
+    // },
     setSort: (
       state,
       action: PayloadAction<{
@@ -71,10 +71,39 @@ export const VolunteerSlice = createSlice({
       });
     },
     resetSort: (state) => {
-      // reducer для сброса
       state.items = [...state.originalItems];
       state.sortBy = "";
       state.sortOrder = null;
+    },
+    setSearch: (state, action: PayloadAction<string>) => {
+      state.items = [...state.originalItems].filter((item) => {
+        if (
+          item.surname ||
+          item.name ||
+          item.patronymic ||
+          item.phone ||
+          item.email
+        ) {
+          return (
+            item.surname +
+            " " +
+            item.name +
+            " " +
+            item.patronymic +
+            " " +
+            item.phone +
+            " " +
+            item.email
+          )
+            .toLowerCase()
+            .includes(action.payload.trim().toLowerCase());
+        }
+      });
+      state.count = state.items.length;
+    },
+    resetSearch: (state) => {
+      state.items = [...state.originalItems];
+      state.count = state.items.length;
     },
   },
   selectors: {
@@ -96,6 +125,7 @@ export const VolunteerSlice = createSlice({
         state.loading = false;
         state.count = action.payload.length;
         state.items = action.payload;
+        state.originalItems = [...action.payload];
         state.error = null;
       })
       .addCase(getAllVolunteers.rejected, (state, action) => {
@@ -106,7 +136,8 @@ export const VolunteerSlice = createSlice({
   },
 });
 
-export const { setSort, resetSort } = VolunteerSlice.actions;
+export const { setSort, resetSort, setSearch, resetSearch } =
+  VolunteerSlice.actions;
 export const {
   getVolunteersLoading,
   getVolunteers,
