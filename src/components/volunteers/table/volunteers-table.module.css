@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.table tbody {
+  font-size: 0.95rem;
+}
+
+.column_name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.column_label:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.sort {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* .thead:not(:first-child):hover {
+  background-color: var(--mantine-color-gray-light);
+  cursor: pointer;
+} */
+
+.rows:hover {
+  background-color: var(--mantine-color-gray-light);
+}
+
+.rows_select {
+  background-color: var(--mantine-primary-color-light);
+}
+
+.search_field {
+  font-weight: 400;
+}
+
+/* .icon_action_edit:hover {
+  color: #fff;
+  background-color: var(--mantine-color-blue-filled-hover);
+}
+
+.icon_action_remove:hover {
+  color: #fff;
+  background-color: var(--mantine-color-red-filled-hover);
+} */
+
+.projects_list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.control {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
