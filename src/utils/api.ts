@@ -21,6 +21,26 @@ const getValidAccessToken = async () => {
   return token;
 };
 
+export const refreshTokens = async () => {
+  return await fetch(`${URL}/api/auth/refresh-tokens`, {
+    mode: "cors",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      authorization: getCookie("accessToken"),
+    } as HeadersInit,
+    credentials: "include",
+  })
+    .then((res) => checkResponse<TAuthResponse>(res))
+    .then((data) => {
+      if (data) {
+        setCookie("accessToken", data.accessToken);
+        return data;
+      }
+      return Promise.reject(data);
+    });
+};
+
 export type TAuthResponse = {
   accessToken: string;
   refreshToken: {
@@ -94,22 +114,98 @@ export const getMeApi = async () => {
     });
 };
 
-export const refreshTokens = async () => {
-  return await fetch(`${URL}/api/auth/refresh-tokens`, {
+type TVolunteer = {
+  id: string;
+  surname: string;
+  name: string;
+  patronymic: string;
+  birthday: string;
+  phone: string;
+  email: string;
+  rating: number;
+  projects: JSON;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export const getAllVolunteersApi = async () => {
+  return await fetch(`${URL}/api/volunteers`, {
     mode: "cors",
     method: "GET",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
-      authorization: getCookie("accessToken"),
+      authorization: await getValidAccessToken(),
     } as HeadersInit,
     credentials: "include",
   })
-    .then((res) => checkResponse<TAuthResponse>(res))
+    .then((res) => {
+      return checkResponse<TVolunteer[]>(res);
+    })
     .then((data) => {
-      if (data) {
-        setCookie("accessToken", data.accessToken);
-        return data;
-      }
+      if (data) return data;
+      return Promise.reject(data);
+    });
+};
+
+export const getOneVolunteerApi = async (id: string) => {
+  return await fetch(`${URL}/api/volunteers`, {
+    mode: "cors",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      authorization: await getValidAccessToken(),
+    } as HeadersInit,
+    credentials: "include",
+    body: JSON.stringify(id),
+  })
+    .then((res) => {
+      return checkResponse<TVolunteer>(res);
+    })
+    .then((data) => {
+      if (data) return data;
+      return Promise.reject(data);
+    });
+};
+
+export const updateVolunteerApi = async (
+  id: string,
+  data: Partial<TVolunteer>
+) => {
+  return await fetch(`${URL}/api/volunteers`, {
+    mode: "cors",
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      authorization: await getValidAccessToken(),
+    } as HeadersInit,
+    credentials: "include",
+    body: JSON.stringify({ id, data }),
+  })
+    .then((res) => {
+      return checkResponse<TVolunteer>(res);
+    })
+    .then((data) => {
+      if (data) return data;
+      return Promise.reject(data);
+    });
+};
+
+export const deleteVolunteerApi = async (id: string) => {
+  return await fetch(`${URL}/api/volunteers`, {
+    mode: "cors",
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      authorization: await getValidAccessToken(),
+    } as HeadersInit,
+    credentials: "include",
+    body: JSON.stringify(id),
+  })
+    .then((res) => {
+      return checkResponse<{ id: string }>(res);
+    })
+    .then((data) => {
+      if (data) return data;
       return Promise.reject(data);
     });
 };
