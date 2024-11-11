@@ -10,10 +10,11 @@ export type TVolunteer = {
   surname: string;
   name: string;
   patronymic: string;
+  birthday: string;
   phone: string;
   email: string;
   rating: number;
-  projects: string[];
+  projects: JSON;
   createdAt: Date;
   updatedAt: Date;
 };
