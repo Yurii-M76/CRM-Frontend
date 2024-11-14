@@ -2,34 +2,85 @@ import { TVolunteer } from "@/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllVolunteers } from "./action";
 
+// FIXME: Исправить поиск: находит только 5 значений (вероятно ищет по одной странице)
+
 type TInitialState = {
   loading: boolean;
   count: number;
   items: TVolunteer[];
-  error?: string | null;
-  sortBy: keyof TVolunteer | ""; // '' для состояния "без сортировки"
+  originalItems: TVolunteer[];
+  searchResult: TVolunteer[];
+  sortBy: keyof TVolunteer | "";
   sortOrder: "asc" | "desc" | null;
-  originalItems: TVolunteer[]; // Храним оригинальный массив для сброса
+  activePage: number;
+  rangeOnPage: number;
+  error?: string | null;
 };
 
 const initialState: TInitialState = {
   loading: false,
   count: 0,
   items: [],
-  error: null,
+  originalItems: [],
+  searchResult: [],
   sortBy: "",
   sortOrder: null,
-  originalItems: [], // Инициализируем оригинальный массив
+  activePage: 1,
+  rangeOnPage: 5,
+  error: null,
+};
+
+const sliceItems = <T>(
+  data: T[],
+  activePage: number,
+  rangeOnPage: number
+): T[] => {
+  return [...data].slice(
+    (activePage - 1) * rangeOnPage,
+    activePage * rangeOnPage
+  );
+};
+
+const sortedItems = (
+  data: TVolunteer[],
+  sortBy: keyof TVolunteer,
+  sortOrder: string | null
+) => {
+  return data.sort((a, b) => {
+    const aVal =
+      sortBy === "surname"
+        ? `${a.surname} ${a.name} ${a.patronymic}`
+        : a[sortBy];
+    const bVal =
+      sortBy === "surname"
+        ? `${b.surname} ${b.name} ${b.patronymic}`
+        : b[sortBy];
+
+    // Улучшенное сравнение с учетом типа данных
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      return sortOrder === "asc"
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal);
+    } else if (typeof aVal === "number" && typeof bVal === "number") {
+      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+    } else {
+      //Обработка других типов данных, если необходимо.  Возвращаем 0, если типы не совпадают.
+      return 0;
+    }
+  });
+};
+
+const checkCurrentItems = (
+  original: TVolunteer[],
+  alternative: TVolunteer[]
+) => {
+  return alternative.length ? alternative : original;
 };
 
 export const VolunteerSlice = createSlice({
   name: "volunteer",
   initialState,
   reducers: {
-    // setVolunteers: (state, action: PayloadAction<TVolunteer[]>) => {
-    //   state.items = action.payload;
-    //   state.originalItems = [...action.payload]; // Сохраняем оригинальный массив
-    // },
     setSort: (
       state,
       action: PayloadAction<{
@@ -42,41 +93,42 @@ export const VolunteerSlice = createSlice({
       state.sortOrder = sortOrder;
 
       // Сброс сортировки
-      if (!sortBy) {
-        state.items = [...state.originalItems]; // Восстанавливаем оригинальный массив
-        return;
-      }
-
-      state.items.sort((a, b) => {
-        const aVal =
-          sortBy === "surname"
-            ? `${a.surname} ${a.name} ${a.patronymic}`
-            : a[sortBy];
-        const bVal =
-          sortBy === "surname"
-            ? `${b.surname} ${b.name} ${b.patronymic}`
-            : b[sortBy];
-
-        // Улучшенное сравнение с учетом типа данных
-        if (typeof aVal === "string" && typeof bVal === "string") {
-          return sortOrder === "asc"
-            ? aVal.localeCompare(bVal)
-            : bVal.localeCompare(aVal);
-        } else if (typeof aVal === "number" && typeof bVal === "number") {
-          return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
-        } else {
-          //Обработка других типов данных, если необходимо.  Возвращаем 0, если типы не совпадают.
-          return 0;
-        }
-      });
+      // if (!sortBy) {
+      //   state.items = [...state.originalItems];
+      //   return;
+      // }
+      const currentItems = checkCurrentItems(
+        [...state.originalItems],
+        [...state.searchResult]
+      );
+      const sortedItemsResult: TVolunteer[] = sortedItems(
+        currentItems,
+        state.sortBy,
+        state.sortOrder
+      );
+      state.items = sliceItems(
+        sortedItemsResult,
+        state.activePage,
+        state.rangeOnPage
+      );
+      state.count = currentItems.length;
     },
     resetSort: (state) => {
-      state.items = [...state.originalItems];
+      const currentItems = checkCurrentItems(
+        [...state.originalItems],
+        [...state.searchResult]
+      );
+      state.items = sliceItems(
+        currentItems,
+        state.activePage,
+        state.rangeOnPage
+      );
+      state.count = currentItems.length;
       state.sortBy = "";
       state.sortOrder = null;
     },
     setSearch: (state, action: PayloadAction<string>) => {
-      state.items = [...state.originalItems].filter((item) => {
+      state.searchResult = [...state.originalItems].filter((item) => {
         if (
           item.surname ||
           item.name ||
@@ -99,11 +151,45 @@ export const VolunteerSlice = createSlice({
             .includes(action.payload.trim().toLowerCase());
         }
       });
-      state.count = state.items.length;
+      state.items = sliceItems(
+        sortedItems([...state.searchResult], state.sortBy, state.sortOrder),
+        state.activePage,
+        state.rangeOnPage
+      );
+      state.count = state.searchResult.length;
     },
     resetSearch: (state) => {
-      state.items = [...state.originalItems];
-      state.count = state.items.length;
+      state.items = sliceItems(
+        sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
+        state.activePage,
+        state.rangeOnPage
+      );
+      state.searchResult = [];
+      state.count = state.originalItems.length;
+    },
+    setActivePage: (state, action: PayloadAction<number>) => {
+      const currentItems = checkCurrentItems(
+        [...state.originalItems],
+        [...state.searchResult]
+      );
+      state.activePage = action.payload;
+      state.items = sliceItems(
+        sortedItems(currentItems, state.sortBy, state.sortOrder),
+        state.activePage,
+        state.rangeOnPage
+      );
+    },
+    setRangeOnPage: (state, action: PayloadAction<number>) => {
+      const currentItems = checkCurrentItems(
+        [...state.originalItems],
+        [...state.searchResult]
+      );
+      state.rangeOnPage = action.payload;
+      state.items = sliceItems(
+        sortedItems(currentItems, state.sortBy, state.sortOrder),
+        state.activePage,
+        state.rangeOnPage
+      );
     },
   },
   selectors: {
@@ -112,6 +198,8 @@ export const VolunteerSlice = createSlice({
     getSortOrder: (state) => state.sortOrder,
     getSortBy: (state) => state.sortBy,
     getCountVolunteers: (state) => state.count,
+    getActivePage: (state) => state.activePage,
+    getRangeOnPage: (state) => state.rangeOnPage,
   },
   extraReducers(builder) {
     builder
@@ -120,12 +208,18 @@ export const VolunteerSlice = createSlice({
         state.loading = true;
         state.count = 0;
         state.error = null;
+        state.sortOrder = null;
+        state.sortBy = "";
       })
       .addCase(getAllVolunteers.fulfilled, (state, action) => {
         state.loading = false;
         state.count = action.payload.length;
-        state.items = action.payload;
-        state.originalItems = [...action.payload];
+        state.originalItems = action.payload;
+        state.items = sliceItems(
+          [...state.originalItems],
+          state.activePage,
+          state.rangeOnPage
+        );
         state.error = null;
       })
       .addCase(getAllVolunteers.rejected, (state, action) => {
@@ -136,13 +230,21 @@ export const VolunteerSlice = createSlice({
   },
 });
 
-export const { setSort, resetSort, setSearch, resetSearch } =
-  VolunteerSlice.actions;
+export const {
+  setSort,
+  resetSort,
+  setSearch,
+  resetSearch,
+  setActivePage,
+  setRangeOnPage,
+} = VolunteerSlice.actions;
 export const {
   getVolunteersLoading,
   getVolunteers,
   getSortOrder,
   getSortBy,
   getCountVolunteers,
+  getActivePage,
+  getRangeOnPage,
 } = VolunteerSlice.selectors;
 export default VolunteerSlice;
