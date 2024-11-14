@@ -1,4 +1,12 @@
-import { Button, Checkbox, Loader, Table } from "@mantine/core";
+import {
+  Blockquote,
+  Box,
+  Button,
+  Center,
+  Checkbox,
+  LoadingOverlay,
+  Table,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { getAllVolunteers } from "@/services/volunteer/action";
@@ -14,13 +22,15 @@ import { Column } from "../types";
 import { TVolunteer } from "@/utils/types";
 import { Footer } from "../footer/footer";
 import { Head } from "../head/head";
+import { Tools } from "./tools";
 import classes from "./volunteers-table.module.css";
+
+// TODO: Добавить форму ввода данных
 
 // FIXME: Исправить тип данных ДР в БД
 // FIXME: Исправить сортировку по дате рождения
-// FIXME: Исправить сброс сортировки (использовать resetSort из reducer)
-// FIXME: Исправить отображение на мобильных экранах
 // FIXME: Исправить дерганье столбцов при появлении иконки сортировки
+// FIXME: Проверить стили на неиспользуемые селекторы
 
 export const VolonteersTable = () => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
@@ -96,53 +106,64 @@ export const VolonteersTable = () => {
       <Table.Td>
         <ProjectList data={item.projects} />
       </Table.Td>
-      <Table.Td>edit / delete</Table.Td>
+      <Table.Td>
+        <Tools />
+      </Table.Td>
     </Table.Tr>
   ));
 
-  if (loading) {
-    return <Loader size={20} color="blue" />;
-  } else {
-    return (
+  return (
+    <Box pos="relative">
+      <LoadingOverlay
+        visible={loading}
+        // loaderProps={{ children: <Loader color="blue" /> }}
+      />
       <div className={classes.container}>
         <Head />
-        <Table verticalSpacing="6px" className={classes.table}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th className={classes.thead}>
-                <Checkbox
-                  checked={isCheckedAll}
-                  indeterminate={indeterminate}
-                  onChange={handleCheckedAll}
-                />
-              </Table.Th>
-              {columns.map((column, index) => (
-                <Table.Th key={index} className={classes.thead}>
-                  <div className={classes.column_name}>
-                    <Button.Group>
-                      <Button
-                        variant="light"
-                        color="blue"
-                        size="compact-sm"
-                        className={classes.column_label}
-                        onClick={() =>
-                          column.sorted && sortedColumn(column.accessor)
-                        }
-                      >
-                        {column.label}
-                      </Button>
-                      <SortButton accessor={column.accessor} />
-                    </Button.Group>
-                  </div>
+        <div className={classes.wrapper}>
+          <Table verticalSpacing="6px" className={classes.table}>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th className={classes.thead}>
+                  <Checkbox
+                    checked={isCheckedAll}
+                    indeterminate={indeterminate}
+                    onChange={handleCheckedAll}
+                  />
                 </Table.Th>
-              ))}
-              <Table.Th></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-        <Footer rows={volunteers.length} checkedIds={checkedIds} />
+                {columns.map((column, index) => (
+                  <Table.Th key={index} className={classes.thead}>
+                    <div className={classes.column_name}>
+                      <Button.Group>
+                        <Button
+                          variant="light"
+                          color="blue"
+                          size="compact-sm"
+                          className={classes.column_label}
+                          onClick={() =>
+                            column.sorted && sortedColumn(column.accessor)
+                          }
+                        >
+                          {column.label}
+                        </Button>
+                        <SortButton accessor={column.accessor} />
+                      </Button.Group>
+                    </div>
+                  </Table.Th>
+                ))}
+                <Table.Th></Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+          {!volunteers.length && (
+            <Blockquote color="gray" mt={20} p={12} mb={0}>
+              <Center>нет данных</Center>
+            </Blockquote>
+          )}
+        </div>
+        <Footer checkedIds={checkedIds} />
       </div>
-    );
-  }
+    </Box>
+  );
 };
