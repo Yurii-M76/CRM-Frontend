@@ -1,6 +1,6 @@
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { ActionIcon } from "@mantine/core";
-import classes from "./volunteers-table.module.css";
+import classes from "./tools.module.css";
 
 export const Tools = () => {
   return (

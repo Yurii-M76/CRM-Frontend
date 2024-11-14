@@ -1,8 +1,8 @@
 import { Badge } from "@mantine/core";
-import { TProjectList } from "../types";
-import { FC } from "react";
-import classes from "./volunteers-table.module.css";
 import { randomId } from "@mantine/hooks";
+import { FC } from "react";
+import { TProjectList } from "../types";
+import classes from "./project-list.module.css";
 
 type ProjectList = {
   data: JSON;

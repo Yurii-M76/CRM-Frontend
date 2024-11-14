@@ -1,5 +1,9 @@
 import { useDispatch, useSelector } from "@/services/store";
-import { getSortBy, getSortOrder, resetSort } from "@/services/volunteer/reducer";
+import {
+  getSortBy,
+  getSortOrder,
+  resetSort,
+} from "@/services/volunteer/reducer";
 import { Button, Tooltip } from "@mantine/core";
 import {
   IconCircleArrowDown,

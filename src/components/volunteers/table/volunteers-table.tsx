@@ -29,8 +29,6 @@ import classes from "./volunteers-table.module.css";
 
 // FIXME: Исправить тип данных ДР в БД
 // FIXME: Исправить сортировку по дате рождения
-// FIXME: Исправить дерганье столбцов при появлении иконки сортировки
-// FIXME: Проверить стили на неиспользуемые селекторы
 
 export const VolonteersTable = () => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
