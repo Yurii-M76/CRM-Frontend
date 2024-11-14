@@ -2,16 +2,14 @@ import { TVolunteer } from "@/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllVolunteers } from "./action";
 
-// FIXME: Исправить поиск: находит только 5 значений (вероятно ищет по одной странице)
-
 type TInitialState = {
   loading: boolean;
   count: number;
   items: TVolunteer[];
   originalItems: TVolunteer[];
   searchResult: TVolunteer[];
-  sortBy: keyof TVolunteer | "";
-  sortOrder: "asc" | "desc" | null;
+  sortBy: keyof TVolunteer;
+  sortOrder: "asc" | "desc";
   activePage: number;
   rangeOnPage: number;
   error?: string | null;
@@ -23,10 +21,10 @@ const initialState: TInitialState = {
   items: [],
   originalItems: [],
   searchResult: [],
-  sortBy: "",
-  sortOrder: null,
+  sortBy: "createdAt",
+  sortOrder: "asc",
   activePage: 1,
-  rangeOnPage: 5,
+  rangeOnPage: 10,
   error: null,
 };
 
@@ -44,7 +42,7 @@ const sliceItems = <T>(
 const sortedItems = (
   data: TVolunteer[],
   sortBy: keyof TVolunteer,
-  sortOrder: string | null
+  sortOrder: string
 ) => {
   return data.sort((a, b) => {
     const aVal =
@@ -84,19 +82,13 @@ export const VolunteerSlice = createSlice({
     setSort: (
       state,
       action: PayloadAction<{
-        sortBy: keyof TVolunteer | "";
-        sortOrder: "asc" | "desc" | null;
+        sortBy: keyof TVolunteer;
+        sortOrder: "asc" | "desc";
       }>
     ) => {
       const { sortBy, sortOrder } = action.payload;
       state.sortBy = sortBy;
       state.sortOrder = sortOrder;
-
-      // Сброс сортировки
-      // if (!sortBy) {
-      //   state.items = [...state.originalItems];
-      //   return;
-      // }
       const currentItems = checkCurrentItems(
         [...state.originalItems],
         [...state.searchResult]
@@ -124,8 +116,8 @@ export const VolunteerSlice = createSlice({
         state.rangeOnPage
       );
       state.count = currentItems.length;
-      state.sortBy = "";
-      state.sortOrder = null;
+      state.sortBy = "createdAt";
+      state.sortOrder = "asc";
     },
     setSearch: (state, action: PayloadAction<string>) => {
       state.searchResult = [...state.originalItems].filter((item) => {
@@ -208,8 +200,8 @@ export const VolunteerSlice = createSlice({
         state.loading = true;
         state.count = 0;
         state.error = null;
-        state.sortOrder = null;
-        state.sortBy = "";
+        state.sortBy = "createdAt";
+        state.sortOrder = "asc";
       })
       .addCase(getAllVolunteers.fulfilled, (state, action) => {
         state.loading = false;
