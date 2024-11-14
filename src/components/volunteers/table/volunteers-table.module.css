@@ -4,6 +4,11 @@
   gap: 40px;
 }
 
+.wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
 .table tbody {
   font-size: 0.95rem;
 }
@@ -16,8 +21,8 @@
 }
 
 .column_label:hover {
-  cursor: pointer;
   color: red;
+  cursor: pointer;
 }
 
 .sort {
@@ -75,4 +80,13 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.tools {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
 }
