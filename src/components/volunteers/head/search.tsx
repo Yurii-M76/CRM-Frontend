@@ -1,8 +1,8 @@
 import { useDispatch } from "@/services/store";
-import { resetSearch, setSearch } from "@/services/volunteer/reducer";
 import { TextInput, CloseButton } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Form } from "react-router-dom";
+import { resetSearch, setSearch } from "@/services/volunteer/reducer";
 
 export const Search = () => {
   const dispatch = useDispatch();
