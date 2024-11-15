@@ -21,7 +21,7 @@
 }
 
 .thead:nth-child(1) {
-  min-width: 50px;
+  width: 50px;
 }
 
 .thead:nth-child(2) {

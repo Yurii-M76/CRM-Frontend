@@ -29,6 +29,7 @@ import classes from "./volunteers-table.module.css";
 
 // FIXME: Исправить тип данных ДР в БД
 // FIXME: Исправить сортировку по дате рождения
+// FIXME: Исправить отображение identerminate при выбранной строке на другой странице
 
 export const VolonteersTable = () => {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
