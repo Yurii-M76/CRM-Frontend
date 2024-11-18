@@ -23,12 +23,10 @@ import { TVolunteer } from "@/utils/types";
 import { Footer } from "../footer/footer";
 import { Head } from "../head/head";
 import { Tools } from "./tools";
+import { dateFormatForTable } from "@/utils/date-format-for-table";
 import classes from "./volunteers-table.module.css";
 
 // TODO: Добавить форму ввода данных
-
-// FIXME: Исправить тип данных ДР в БД
-// FIXME: Исправить сортировку по дате рождения
 // FIXME: Исправить отображение identerminate при выбранной строке на другой странице
 
 export const VolonteersTable = () => {
@@ -99,7 +97,7 @@ export const VolonteersTable = () => {
         {item.surname} {item.name} {item.patronymic}
       </Table.Td>
       <Table.Td>{item.phone ?? "-"}</Table.Td>
-      <Table.Td>{item.birthday ?? "-"}</Table.Td>
+      <Table.Td>{dateFormatForTable(item.birthday) ?? "-"}</Table.Td>
       <Table.Td>{item.email ?? "-"}</Table.Td>
       <Table.Td>{item.rating ?? "-"}</Table.Td>
       <Table.Td>
