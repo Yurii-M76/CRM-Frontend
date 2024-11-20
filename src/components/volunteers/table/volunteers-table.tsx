@@ -7,13 +7,17 @@ import {
   LoadingOverlay,
   Table,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { getAllVolunteers } from "@/services/volunteer/action";
 import {
+  getCountVolunteers,
+  getOneChecked,
   getSortOrder,
   getVolunteers,
   getVolunteersLoading,
+  setAllChecked,
+  setOneChecked,
   setSort,
 } from "@/services/volunteer/reducer";
 import { ProjectList } from "./project-list";
@@ -23,26 +27,21 @@ import { TVolunteer } from "@/utils/types";
 import { Footer } from "../footer/footer";
 import { Head } from "../head/head";
 import { Tools } from "./tools";
+import { dateFormatForTable } from "@/utils/date-format-for-table";
 import classes from "./volunteers-table.module.css";
 
 // TODO: Добавить форму ввода данных
 
-// FIXME: Исправить тип данных ДР в БД
-// FIXME: Исправить сортировку по дате рождения
-// FIXME: Исправить отображение identerminate при выбранной строке на другой странице
-
 export const VolonteersTable = () => {
-  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
-  const [isCheckedAll, setIsCheckedAll] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector(getVolunteersLoading);
   const volunteers = useSelector(getVolunteers);
   const sortOrder = useSelector(getSortOrder);
-
+  const checkedIds = useSelector(getOneChecked);
+  const countVolunteers = useSelector(getCountVolunteers);
   useEffect(() => {
     dispatch(getAllVolunteers());
   }, [dispatch]);
-
   const columns: Column[] = [
     { label: "ФИО", accessor: "surname", sorted: true },
     { label: "Телефон", accessor: "phone", sorted: true },
@@ -51,7 +50,6 @@ export const VolonteersTable = () => {
     { label: "Рейтинг", accessor: "rating", sorted: true },
     { label: "Проекты", accessor: "projects", sorted: true },
   ];
-
   const sortedColumn = (sortBy: keyof TVolunteer) => {
     dispatch(
       setSort({
@@ -60,46 +58,24 @@ export const VolonteersTable = () => {
       })
     );
   };
-
-  // Статус чекбокса в шапке колонки
   const indeterminate =
-    checkedIds.size > 0 && checkedIds.size < volunteers.length;
-  const updateCheckedIds = (newCheckedIds: Set<string>) => {
-    setCheckedIds(newCheckedIds);
-    setIsCheckedAll(newCheckedIds.size === volunteers.length);
-  };
-
-  const handleCheckedOne = (id: string) => {
-    const newCheckedIds = new Set(checkedIds);
-    if (newCheckedIds.has(id)) {
-      newCheckedIds.delete(id);
-    } else {
-      newCheckedIds.add(id);
-    }
-    updateCheckedIds(newCheckedIds);
-  };
-
-  const handleCheckedAll = () => {
-    const newCheckedIds: Set<string> = isCheckedAll
-      ? new Set()
-      : new Set(volunteers.map((item) => item.id));
-    updateCheckedIds(newCheckedIds);
-  };
-
+    checkedIds.length > 0 && checkedIds.length < countVolunteers;
+  const isAllCheched =
+    countVolunteers !== 0 && checkedIds.length === countVolunteers;
   const rows = volunteers.map((item) => (
     <Table.Tr key={item.id}>
       <Table.Td>
         <Checkbox
           key={item.id}
-          checked={checkedIds.has(item.id)}
-          onChange={() => handleCheckedOne(item.id)}
+          checked={checkedIds.includes(item.id)}
+          onChange={() => dispatch(setOneChecked(item.id))}
         />
       </Table.Td>
       <Table.Td>
         {item.surname} {item.name} {item.patronymic}
       </Table.Td>
       <Table.Td>{item.phone ?? "-"}</Table.Td>
-      <Table.Td>{item.birthday ?? "-"}</Table.Td>
+      <Table.Td>{dateFormatForTable(item.birthday) ?? "-"}</Table.Td>
       <Table.Td>{item.email ?? "-"}</Table.Td>
       <Table.Td>{item.rating ?? "-"}</Table.Td>
       <Table.Td>
@@ -110,13 +86,9 @@ export const VolonteersTable = () => {
       </Table.Td>
     </Table.Tr>
   ));
-
   return (
     <Box pos="relative">
-      <LoadingOverlay
-        visible={loading}
-        // loaderProps={{ children: <Loader color="blue" /> }}
-      />
+      <LoadingOverlay visible={loading} />
       <div className={classes.container}>
         <Head />
         <div className={classes.wrapper}>
@@ -125,9 +97,11 @@ export const VolonteersTable = () => {
               <Table.Tr>
                 <Table.Th className={classes.thead}>
                   <Checkbox
-                    checked={isCheckedAll}
+                    checked={isAllCheched}
                     indeterminate={indeterminate}
-                    onChange={handleCheckedAll}
+                    onChange={() => {
+                      dispatch(setAllChecked());
+                    }}
                   />
                 </Table.Th>
                 {columns.map((column, index) => (
@@ -161,7 +135,7 @@ export const VolonteersTable = () => {
             </Blockquote>
           )}
         </div>
-        <Footer checkedIds={checkedIds} />
+        <Footer checkedIds={checkedIds.length} />
       </div>
     </Box>
   );
