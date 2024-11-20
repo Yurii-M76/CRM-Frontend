@@ -12,6 +12,7 @@ type TInitialState = {
   sortOrder: "asc" | "desc";
   activePage: number;
   rangeOnPage: number;
+  checkedIds: string[];
   error?: string | null;
 };
 
@@ -25,6 +26,7 @@ const initialState: TInitialState = {
   sortOrder: "asc",
   activePage: 1,
   rangeOnPage: 10,
+  checkedIds: [],
   error: null,
 };
 
@@ -111,7 +113,7 @@ export const VolunteerSlice = createSlice({
         [...state.searchResult]
       );
       state.items = sliceItems(
-        currentItems,
+        sortedItems(currentItems, "createdAt", "asc"),
         state.activePage,
         state.rangeOnPage
       );
@@ -161,7 +163,7 @@ export const VolunteerSlice = createSlice({
     },
     setActivePage: (state, action: PayloadAction<number>) => {
       const currentItems = checkCurrentItems(
-        [...state.originalItems],
+        sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
         [...state.searchResult]
       );
       state.activePage = action.payload;
@@ -183,6 +185,30 @@ export const VolunteerSlice = createSlice({
         state.rangeOnPage
       );
     },
+    setOneChecked: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      if (state.checkedIds.includes(id)) {
+        state.checkedIds = state.checkedIds.filter((item) => item !== id);
+      } else {
+        state.checkedIds.push(id);
+      }
+    },
+    setAllChecked: (state) => {
+      const allChecked = state.items.every((item) =>
+        state.checkedIds.includes(item.id)
+      );
+      if (allChecked) {
+        state.checkedIds = state.checkedIds.filter(
+          (id) => !state.items.some((item) => item.id === id)
+        );
+      } else {
+        state.items.forEach((item) => {
+          if (!state.checkedIds.includes(item.id)) {
+            state.checkedIds.push(item.id);
+          }
+        });
+      }
+    },
   },
   selectors: {
     getVolunteersLoading: (state) => state.loading,
@@ -192,6 +218,7 @@ export const VolunteerSlice = createSlice({
     getCountVolunteers: (state) => state.count,
     getActivePage: (state) => state.activePage,
     getRangeOnPage: (state) => state.rangeOnPage,
+    getOneChecked: (state) => state.checkedIds,
   },
   extraReducers(builder) {
     builder
@@ -208,7 +235,7 @@ export const VolunteerSlice = createSlice({
         state.count = action.payload.length;
         state.originalItems = action.payload;
         state.items = sliceItems(
-          [...state.originalItems],
+          sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
           state.activePage,
           state.rangeOnPage
         );
@@ -229,6 +256,8 @@ export const {
   resetSearch,
   setActivePage,
   setRangeOnPage,
+  setOneChecked,
+  setAllChecked,
 } = VolunteerSlice.actions;
 export const {
   getVolunteersLoading,
@@ -238,5 +267,6 @@ export const {
   getCountVolunteers,
   getActivePage,
   getRangeOnPage,
+  getOneChecked,
 } = VolunteerSlice.selectors;
 export default VolunteerSlice;

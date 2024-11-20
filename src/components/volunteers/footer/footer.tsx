@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "@/services/store";
 import classes from "./footer.module.css";
 
 type TFooter = {
-  checkedIds: Set<string>;
+  checkedIds: number;
 };
 
 export const Footer: FC<TFooter> = ({ checkedIds }) => {
@@ -31,7 +31,9 @@ export const Footer: FC<TFooter> = ({ checkedIds }) => {
 
   return (
     <div className={classes.footer}>
-      <Text c="dimmed">{`Всего записей: ${countVolunteers} / Выбрано: ${checkedIds.size}`}</Text>
+      <Text c="dimmed">{`Всего записей: ${countVolunteers} / Выбрано: ${
+        checkedIds ?? 0
+      }`}</Text>
       <div className={classes.pagination}>
         <Pagination
           total={totalPages || 1}
