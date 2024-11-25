@@ -1,8 +1,9 @@
-import { Pagination, Select, Text } from "@mantine/core";
+import { Anchor, Group, Pagination, Select, Text } from "@mantine/core";
 import { FC, useEffect, useState } from "react";
 import {
   getCountVolunteers,
   getRangeOnPage,
+  resetAllChecked,
   setActivePage,
   setRangeOnPage,
 } from "@/services/volunteer/reducer";
@@ -19,21 +20,27 @@ export const Footer: FC<TFooter> = ({ checkedIds }) => {
   const rowsOnPage = useSelector(getRangeOnPage);
   const totalPages = Math.ceil(countVolunteers / rowsOnPage);
   const [activePage, setPage] = useState(1);
-
   useEffect(() => {
     dispatch(setActivePage(activePage));
     localStorage.setItem("rowsOnPageVolunteersTable", String(rowsOnPage));
   }, [dispatch, activePage, rowsOnPage]);
-
   const handleChange = (data: string | null) => {
     return data ? dispatch(setRangeOnPage(+data)) : null;
   };
-
+  const checkedItems = checkedIds ? `/ Выбрано: ${checkedIds} ` : "";
   return (
     <div className={classes.footer}>
-      <Text c="dimmed">{`Всего записей: ${countVolunteers} / Выбрано: ${
-        checkedIds ?? 0
-      }`}</Text>
+      <Group c="dimmed" gap={5}>
+        <Text>{`Всего записей: ${countVolunteers}`}</Text>
+        {checkedItems && (
+          <Text>
+            {checkedItems}
+            <Anchor href="#" onClick={() => dispatch(resetAllChecked())}>
+              [очистить]
+            </Anchor>
+          </Text>
+        )}
+      </Group>
       <div className={classes.pagination}>
         <Pagination
           total={totalPages || 1}
