@@ -6,10 +6,12 @@ import {
 } from "react-redux";
 import userSlice from "./user/reducer";
 import VolunteerSlice from "./volunteer/reducer";
+import projectSlice from "./project/reducer";
 
 export const rootReducer = combineReducers({
   [userSlice.reducerPath]: userSlice.reducer,
   [VolunteerSlice.reducerPath]: VolunteerSlice.reducer,
+  [projectSlice.reducerPath]: projectSlice.reducer,
 });
 
 const store = configureStore({

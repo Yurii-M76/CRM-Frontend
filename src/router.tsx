@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { Mailing, NotFound, Projects, Settings, Volunteers } from "./pages";
+import { Mailing, NotFound, Settings, Volunteers, ProjectsPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/projects",
-        element: <Projects />,
+        element: <ProjectsPage />,
       },
       {
         path: "/mailing",
