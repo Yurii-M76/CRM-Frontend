@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { findAllProjects } from "./action";
-import { TProject } from "@/utils/types";
+import { TProject } from "@/types";
 
 type TInitialState = {
   loading: boolean;

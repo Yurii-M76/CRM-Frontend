@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Cover } from './not-found-cover';
 import classes from './not-found.module.css';
 
-export function NotFound() {
+export const NotFoundPage = () => {
   const navigate = useNavigate();
 
   return (

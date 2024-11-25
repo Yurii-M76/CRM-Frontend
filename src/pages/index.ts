@@ -1,7 +1,7 @@
-export { Dashboard } from "./dashboard/dashboard.page";
-export { Login } from "./login/login.page";
-export { Mailing } from "./mailing/mailing.page";
-export { NotFound } from "./not-found/not-found.page";
+export { DashboardPage } from "./dashboard/dashboard.page";
+export { LoginPage } from "./login/login.page";
+export { MailingPage } from "./mailing/mailing.page";
+export { NotFoundPage } from "./not-found/not-found.page";
 export { ProjectsPage } from "./projects/projects.page";
-export { Settings } from "./settings/settings.page";
-export { Volunteers } from "./volunteers/volunteers.page";
+export { SettingsPage } from "./settings/settings.page";
+export { VolunteersPage } from "./volunteers/volunteers.page";

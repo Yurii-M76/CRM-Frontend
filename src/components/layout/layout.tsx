@@ -8,7 +8,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { Outlet, useLocation } from "react-router-dom";
 import { ColorSchemeToggle } from "../color-sheme-toggle/color-sheme-toggle";
-import { Dashboard } from "@/pages/dashboard/dashboard.page";
+import { DashboardPage } from "@/pages/dashboard/dashboard.page";
 import { Navbar } from "../navbar/navbar";
 import classes from "./layout.module.css";
 import { useDispatch, useSelector } from "@/services/store";
@@ -21,7 +21,7 @@ export const Layout = () => {
   const dispatch = useDispatch();
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const content = useLocation().pathname === "/" ? <Dashboard /> : <Outlet />;
+  const content = useLocation().pathname === "/" ? <DashboardPage /> : <Outlet />;
   const user = useSelector(getMeData);
 
   useEffect(() => {

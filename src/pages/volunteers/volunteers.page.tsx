@@ -1,5 +1,5 @@
 import { VolonteersTable } from "@/components/volunteers/table/volunteers-table";
 
-export const Volunteers = () => {
+export const VolunteersPage = () => {
   return <VolonteersTable />;
 };

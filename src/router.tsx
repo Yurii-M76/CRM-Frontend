@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { Mailing, NotFound, Settings, Volunteers, ProjectsPage } from "./pages";
+import { MailingPage, NotFoundPage, ProjectsPage, SettingsPage, VolunteersPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -9,7 +9,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/volunteers",
-        element: <Volunteers />,
+        element: <VolunteersPage />,
       },
       {
         path: "/projects",
@@ -17,17 +17,17 @@ const router = createBrowserRouter([
       },
       {
         path: "/mailing",
-        element: <Mailing />,
+        element: <MailingPage />,
       },
       {
         path: "/settings",
-        element: <Settings />,
+        element: <SettingsPage />,
       },
     ],
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: <NotFoundPage />,
   },
 ]);
 

@@ -1,7 +1,7 @@
 import { Badge } from "@mantine/core";
-import { TProject } from "@/utils/types";
 import { FC } from "react";
 import classes from "./project-list.module.css";
+import { TProject } from "@/types";
 
 type TProjects = {
   data: TProject[];

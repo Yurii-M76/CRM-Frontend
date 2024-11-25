@@ -1,4 +1,4 @@
-export const Mailing = () => {
+export const MailingPage = () => {
   return (
     <>
       Mailing

@@ -1,6 +1,6 @@
-import { TVolunteer } from "@/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllVolunteers } from "./action";
+import { TVolunteer } from "@/types";
 
 type TInitialState = {
   loading: boolean;
