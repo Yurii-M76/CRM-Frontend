@@ -1,9 +1,4 @@
-export type TUser = {
-  id: string;
-  name: string;
-  email: string;
-  roles: string;
-};
+import { TProject } from ".";
 
 export type TVolunteer = {
   id: string;
@@ -14,7 +9,7 @@ export type TVolunteer = {
   phone: string;
   email: string;
   rating: number;
-  projects: JSON;
+  projects: TProject[];
   createdAt: Date;
   updatedAt: Date;
 };

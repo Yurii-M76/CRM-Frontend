@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { getCookie, setCookie } from "./cookie";
+import { TAuthResponse, TLoginData, TMe, TVolunteer } from "@/types";
 
 const HOST = import.meta.env.VITE_API_URL;
 const PORT = import.meta.env.VITE_API_PORT;
@@ -41,20 +42,6 @@ export const refreshTokens = async () => {
     });
 };
 
-export type TAuthResponse = {
-  accessToken: string;
-  refreshToken: {
-    token: string;
-    exp: string;
-    userId: string;
-  };
-};
-
-export type TLoginData = {
-  email: string;
-  password: string;
-};
-
 export const loginUserApi = async (data: TLoginData) => {
   return await fetch(`${URL}/api/auth/login`, {
     method: "POST",
@@ -86,14 +73,7 @@ export const logoutUserApi = async () => {
     .catch((error) => Promise.reject(error));
 };
 
-export type TMe = {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-  iat: number;
-  exp: number;
-};
+//** User */
 
 export const getMeApi = async () => {
   return await fetch(`${URL}/api/user`, {
@@ -114,19 +94,7 @@ export const getMeApi = async () => {
     });
 };
 
-type TVolunteer = {
-  id: string;
-  surname: string;
-  name: string;
-  patronymic: string;
-  birthday: string;
-  phone: string;
-  email: string;
-  rating: number;
-  projects: JSON;
-  createdAt: Date;
-  updatedAt: Date;
-};
+//** Volunteers */
 
 export const getAllVolunteersApi = async () => {
   return await fetch(`${URL}/api/volunteers`, {
@@ -208,4 +176,35 @@ export const deleteVolunteerApi = async (id: string) => {
       if (data) return data;
       return Promise.reject(data);
     });
+};
+
+export const findDataApi = async <T>(param: {
+  path: string;
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  id?: string;
+  data?: Partial<T>;
+}): Promise<T> => {
+  const { path, method, id, data } = param;
+  let body: string | null = null;
+  if (id) {
+    body = JSON.stringify({ id, ...(data ? { data } : {}) });
+  } else if (data) {
+    body = JSON.stringify(data);
+  }
+  try {
+    const response = await fetch(`${URL}/api/${path}`, {
+      mode: "cors",
+      method,
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+        authorization: await getValidAccessToken(),
+      } as HeadersInit,
+      credentials: "include",
+      body,
+    });
+    return await checkResponse<T>(response);
+  } catch (error) {
+    console.error("Request failed:", error);
+    return Promise.reject(error);
+  }
 };

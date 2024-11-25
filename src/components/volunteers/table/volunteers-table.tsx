@@ -22,15 +22,12 @@ import {
 } from "@/services/volunteer/reducer";
 import { ProjectList } from "./project-list";
 import { SortButton } from "./sort-button";
-import { Column } from "../types";
-import { TVolunteer } from "@/utils/types";
 import { Footer } from "../footer/footer";
 import { Head } from "../head/head";
 import { Tools } from "./tools";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
 import classes from "./volunteers-table.module.css";
-
-// TODO: Добавить форму ввода данных
+import { Column, TVolunteer } from "@/types";
 
 export const VolonteersTable = () => {
   const dispatch = useDispatch();
