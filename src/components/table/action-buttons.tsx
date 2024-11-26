@@ -1,10 +1,10 @@
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { ActionIcon } from "@mantine/core";
-import classes from "./tools.module.css";
+import classes from "../table/table.module.css";
 
-export const Tools = () => {
+export const ActionButtons = () => {
   return (
-    <div className={classes.tools}>
+    <div className={classes.action_buttons}>
       <ActionIcon aria-label="Edit" variant="light" radius="xl" color="orange">
         <IconEdit style={{ width: "20px", height: "20px" }} stroke={1} />
       </ActionIcon>

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getMe, login, logout } from "./action";
 import { deleteCookie, setCookie } from "../../utils/cookie";
-import { TMe } from "../../utils/api";
+import { TMe } from "@/types";
 
 type TInitialState = {
   isAuthChecked: boolean;

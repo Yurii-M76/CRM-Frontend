@@ -1,9 +1,3 @@
-import { useDispatch, useSelector } from "@/services/store";
-import {
-  getSortBy,
-  getSortOrder,
-  resetSort,
-} from "@/services/volunteer/reducer";
 import { Button, Tooltip } from "@mantine/core";
 import {
   IconCircleArrowDown,
@@ -12,22 +6,25 @@ import {
 } from "@tabler/icons-react";
 import { FC, useState } from "react";
 
-type TSortIcon = {
+type TProps = {
   accessor: string;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  resetSort: () => void
 };
 
-export const SortButton: FC<TSortIcon> = ({ accessor }) => {
-  const dispatch = useDispatch();
+export const THeadSortButton: FC<TProps> = ({
+  accessor,
+  sortBy,
+  sortOrder,
+  resetSort,
+}) => {
   const [isResetSortButton, setIsResetSortButton] = useState(false);
-  const sortOrder = useSelector(getSortOrder);
-  const sortBy = useSelector(getSortBy);
-
+  const resetSortIcon = () => <IconXboxX size={17} />;
   const handleSortClick = () => {
-    dispatch(resetSort());
+    resetSort();
     setIsResetSortButton(false);
   };
-
-  const resetSortIcon = () => <IconXboxX size={17} />;
   const sortIcon = () => {
     if (!isResetSortButton) {
       if (sortOrder === "asc") {
@@ -40,7 +37,6 @@ export const SortButton: FC<TSortIcon> = ({ accessor }) => {
       return resetSortIcon();
     }
   };
-
   return (
     sortBy === accessor && (
       <Tooltip label="Сбросить">

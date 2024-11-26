@@ -1,4 +1,4 @@
-export const Settings = () => {
+export const SettingsPage = () => {
   return (
     <>
       Settings

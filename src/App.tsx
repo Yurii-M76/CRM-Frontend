@@ -4,7 +4,7 @@ import { checkUserAuth } from "@services/user/action";
 import { useEffect } from "react";
 import { Router } from "./router";
 import { theme } from "./theme";
-import { Login } from "./pages";
+import { LoginPage } from "./pages";
 import { getIsAuthChecked } from "./services/user/reducer";
 import "@mantine/core/styles.css";
 
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <MantineProvider theme={theme}>
-      {!isAuthenticated && <Login />}
+      {!isAuthenticated && <LoginPage />}
       {isAuthenticated && <Router />}
     </MantineProvider>
   );

@@ -1,0 +1,99 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.flexGroup {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.tableBox {
+  display: block;
+  padding-bottom: 10px;
+  overflow: auto;
+}
+
+.column_name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.table tbody {
+  font-size: 0.95rem;
+}
+
+.badges_list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spoiler {
+  display: flex;
+  flex-direction: column;
+}
+
+.spoiler_close {
+  max-height: 70px;
+  overflow-y: hidden;
+  transition: max-height ease-in-out .3s;
+}
+
+.spoiler_open {
+  max-height: 350px;
+  overflow-y: scroll;
+  transition: max-height ease-in-out .3s;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.count_badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.action_buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.table_toolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (width <= 431px) {
+  .table_toolbar {
+    justify-content: center;
+  }
+  .flexGroup {
+    justify-content: center;
+  }
+} 

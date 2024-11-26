@@ -1,6 +1,6 @@
-import { TVolunteer } from "@/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllVolunteers } from "./action";
+import { TVolunteer } from "@/types";
 
 type TInitialState = {
   loading: boolean;
@@ -50,10 +50,15 @@ const sortedItems = (
     const aVal =
       sortBy === "surname"
         ? `${a.surname} ${a.name} ${a.patronymic}`
+        : sortBy === "projects" // условие для сортировки проектов
+        ? a.projects.map((tag) => tag.title).join(", ")
         : a[sortBy];
+
     const bVal =
       sortBy === "surname"
         ? `${b.surname} ${b.name} ${b.patronymic}`
+        : sortBy === "projects"
+        ? b.projects.map((tag) => tag.title).join(", ")
         : b[sortBy];
 
     // Улучшенное сравнение с учетом типа данных
@@ -64,7 +69,7 @@ const sortedItems = (
     } else if (typeof aVal === "number" && typeof bVal === "number") {
       return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
     } else {
-      //Обработка других типов данных, если необходимо.  Возвращаем 0, если типы не совпадают.
+      // Если типы не совпадают, возвращаем 0
       return 0;
     }
   });
@@ -75,6 +80,24 @@ const checkCurrentItems = (
   alternative: TVolunteer[]
 ) => {
   return alternative.length ? alternative : original;
+};
+
+const filterItems = (items: TVolunteer[], query: string) => {
+  return items.filter((item) => {
+    const allFields =
+      `${item.surname} ${item.name} ${item.patronymic} ${item.phone} ${item.email}`.toLowerCase();
+    return allFields.includes(query.trim().toLowerCase());
+  });
+};
+
+const updatePagination = (state: TInitialState) => {
+  const currentItems = checkCurrentItems(
+    sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
+    [...state.searchResult]
+  );
+
+  state.items = sliceItems(currentItems, state.activePage, state.rangeOnPage);
+  state.count = currentItems.length;
 };
 
 export const VolunteerSlice = createSlice({
@@ -91,99 +114,28 @@ export const VolunteerSlice = createSlice({
       const { sortBy, sortOrder } = action.payload;
       state.sortBy = sortBy;
       state.sortOrder = sortOrder;
-      const currentItems = checkCurrentItems(
-        [...state.originalItems],
-        [...state.searchResult]
-      );
-      const sortedItemsResult: TVolunteer[] = sortedItems(
-        currentItems,
-        state.sortBy,
-        state.sortOrder
-      );
-      state.items = sliceItems(
-        sortedItemsResult,
-        state.activePage,
-        state.rangeOnPage
-      );
-      state.count = currentItems.length;
+      updatePagination(state);
     },
     resetSort: (state) => {
-      const currentItems = checkCurrentItems(
-        [...state.originalItems],
-        [...state.searchResult]
-      );
-      state.items = sliceItems(
-        sortedItems(currentItems, "createdAt", "asc"),
-        state.activePage,
-        state.rangeOnPage
-      );
-      state.count = currentItems.length;
       state.sortBy = "createdAt";
       state.sortOrder = "asc";
+      updatePagination(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
-      state.searchResult = [...state.originalItems].filter((item) => {
-        if (
-          item.surname ||
-          item.name ||
-          item.patronymic ||
-          item.phone ||
-          item.email
-        ) {
-          return (
-            item.surname +
-            " " +
-            item.name +
-            " " +
-            item.patronymic +
-            " " +
-            item.phone +
-            " " +
-            item.email
-          )
-            .toLowerCase()
-            .includes(action.payload.trim().toLowerCase());
-        }
-      });
-      state.items = sliceItems(
-        sortedItems([...state.searchResult], state.sortBy, state.sortOrder),
-        state.activePage,
-        state.rangeOnPage
-      );
-      state.count = state.searchResult.length;
+      state.searchResult = filterItems(state.originalItems, action.payload);
+      updatePagination(state);
     },
     resetSearch: (state) => {
-      state.items = sliceItems(
-        sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
-        state.activePage,
-        state.rangeOnPage
-      );
       state.searchResult = [];
-      state.count = state.originalItems.length;
+      updatePagination(state);
     },
     setActivePage: (state, action: PayloadAction<number>) => {
-      const currentItems = checkCurrentItems(
-        sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
-        [...state.searchResult]
-      );
       state.activePage = action.payload;
-      state.items = sliceItems(
-        sortedItems(currentItems, state.sortBy, state.sortOrder),
-        state.activePage,
-        state.rangeOnPage
-      );
+      updatePagination(state);
     },
     setRangeOnPage: (state, action: PayloadAction<number>) => {
-      const currentItems = checkCurrentItems(
-        [...state.originalItems],
-        [...state.searchResult]
-      );
       state.rangeOnPage = action.payload;
-      state.items = sliceItems(
-        sortedItems(currentItems, state.sortBy, state.sortOrder),
-        state.activePage,
-        state.rangeOnPage
-      );
+      updatePagination(state);
     },
     setOneChecked: (state, action: PayloadAction<string>) => {
       const id = action.payload;
@@ -194,20 +146,27 @@ export const VolunteerSlice = createSlice({
       }
     },
     setAllChecked: (state) => {
+      // Проверяем, все ли текущие элементы уже выбраны
       const allChecked = state.items.every((item) =>
         state.checkedIds.includes(item.id)
       );
       if (allChecked) {
+        // Если все текущие элементы выбраны, снимаем отметки
         state.checkedIds = state.checkedIds.filter(
           (id) => !state.items.some((item) => item.id === id)
         );
       } else {
+        // Если есть невыбранные элементы, добавляем их в checkedIds
         state.items.forEach((item) => {
           if (!state.checkedIds.includes(item.id)) {
             state.checkedIds.push(item.id);
           }
         });
       }
+    },
+    resetAllChecked: (state) => {
+      state.checkedIds = [];
+      updatePagination(state);
     },
   },
   selectors: {
@@ -219,6 +178,7 @@ export const VolunteerSlice = createSlice({
     getActivePage: (state) => state.activePage,
     getRangeOnPage: (state) => state.rangeOnPage,
     getOneChecked: (state) => state.checkedIds,
+    getErrors: (state) => state.error,
   },
   extraReducers(builder) {
     builder
@@ -258,6 +218,7 @@ export const {
   setRangeOnPage,
   setOneChecked,
   setAllChecked,
+  resetAllChecked,
 } = VolunteerSlice.actions;
 export const {
   getVolunteersLoading,
@@ -268,5 +229,6 @@ export const {
   getActivePage,
   getRangeOnPage,
   getOneChecked,
+  getErrors,
 } = VolunteerSlice.selectors;
 export default VolunteerSlice;

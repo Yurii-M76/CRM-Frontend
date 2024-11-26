@@ -3,10 +3,10 @@ import {
   getMeApi,
   loginUserApi,
   logoutUserApi,
-  TLoginData,
 } from "../../utils/api";
 import { getCookie } from "../../utils/cookie";
 import { setIsAuthChecked } from "./reducer";
+import { TLoginData } from "@/types";
 
 export const checkUserAuth = createAsyncThunk(
   "user/checkUserAuth",

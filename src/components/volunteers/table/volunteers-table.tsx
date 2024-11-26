@@ -1,55 +1,47 @@
-import {
-  Blockquote,
-  Box,
-  Button,
-  Center,
-  Checkbox,
-  LoadingOverlay,
-  Table,
-} from "@mantine/core";
+import { Button, Checkbox, LoadingOverlay, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { getAllVolunteers } from "@/services/volunteer/action";
 import {
   getCountVolunteers,
   getOneChecked,
+  getSortBy,
   getSortOrder,
   getVolunteers,
   getVolunteersLoading,
+  resetSort,
   setAllChecked,
   setOneChecked,
   setSort,
 } from "@/services/volunteer/reducer";
-import { ProjectList } from "./project-list";
-import { SortButton } from "./sort-button";
-import { Column } from "../types";
-import { TVolunteer } from "@/utils/types";
 import { Footer } from "../footer/footer";
-import { Head } from "../head/head";
-import { Tools } from "./tools";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
-import classes from "./volunteers-table.module.css";
-
-// TODO: Добавить форму ввода данных
+import { Column, TVolunteer } from "@/types";
+import { ProjectsListForTables } from "@/components/lists-of-cells-for-tables/projects-list-for-tables";
+import { VolunteersTableToolbar } from "../toolbar/volunteers-table-toolbar";
+import { ActionButtons, NoData, THeadSortButton } from "@/components/table";
+import classes from "@components/table/table.module.css";
 
 export const VolonteersTable = () => {
   const dispatch = useDispatch();
-  const loading = useSelector(getVolunteersLoading);
+  const isLoading = useSelector(getVolunteersLoading);
   const volunteers = useSelector(getVolunteers);
+  const sortBy = useSelector(getSortBy);
   const sortOrder = useSelector(getSortOrder);
   const checkedIds = useSelector(getOneChecked);
   const countVolunteers = useSelector(getCountVolunteers);
   useEffect(() => {
     dispatch(getAllVolunteers());
   }, [dispatch]);
-  const columns: Column[] = [
-    { label: "ФИО", accessor: "surname", sorted: true },
-    { label: "Телефон", accessor: "phone", sorted: true },
-    { label: "Дата рождения", accessor: "birthday", sorted: true },
-    { label: "E-Mail", accessor: "email", sorted: true },
-    { label: "Рейтинг", accessor: "rating", sorted: true },
-    { label: "Проекты", accessor: "projects", sorted: true },
+  const columns: Column<TVolunteer>[] = [
+    { label: "ФИО", accessor: "surname", size: 200, sorted: true },
+    { label: "Телефон", accessor: "phone", size: 150, sorted: true },
+    { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
+    { label: "E-Mail", accessor: "email", size: 200, sorted: true },
+    { label: "Рейтинг", accessor: "rating", size: 130, sorted: true },
+    { label: "Проекты", accessor: "projects", size: 200, sorted: true },
   ];
+  const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
   const sortedColumn = (sortBy: keyof TVolunteer) => {
     dispatch(
       setSort({
@@ -79,64 +71,80 @@ export const VolonteersTable = () => {
       <Table.Td>{item.email ?? "-"}</Table.Td>
       <Table.Td>{item.rating ?? "-"}</Table.Td>
       <Table.Td>
-        <ProjectList data={item.projects} />
+        <ProjectsListForTables data={item.projects} />
       </Table.Td>
       <Table.Td>
-        <Tools />
+        <ActionButtons />
       </Table.Td>
     </Table.Tr>
   ));
   return (
-    <Box pos="relative">
-      <LoadingOverlay visible={loading} />
-      <div className={classes.container}>
-        <Head />
-        <div className={classes.wrapper}>
-          <Table verticalSpacing="6px" className={classes.table}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th className={classes.thead}>
-                  <Checkbox
-                    checked={isAllCheched}
-                    indeterminate={indeterminate}
-                    onChange={() => {
-                      dispatch(setAllChecked());
-                    }}
-                  />
+    <div
+      className={classes.container}
+      style={{
+        maxInlineSize: `${widthTable + 300}px`,
+        minInlineSize: "350px",
+      }}
+    >
+      <LoadingOverlay visible={isLoading} />
+      <VolunteersTableToolbar />
+      <div className={classes.tableBox}>
+        <Table
+          maw={widthTable + 250}
+          highlightOnHover
+          horizontalSpacing="md"
+          verticalSpacing="10px"
+          withColumnBorders
+          className={classes.table}
+        >
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th className={classes.thead}>
+                <Checkbox
+                  checked={isAllCheched}
+                  indeterminate={indeterminate}
+                  onChange={() => {
+                    dispatch(setAllChecked());
+                  }}
+                />
+              </Table.Th>
+              {columns.map((column, index) => (
+                <Table.Th
+                  miw={column.size}
+                  maw={column.size}
+                  key={index}
+                  className={classes.tableTh}
+                >
+                  <div className={classes.column_name}>
+                    <Button.Group>
+                      <Button
+                        variant="light"
+                        color="blue"
+                        size="compact-sm"
+                        onClick={() =>
+                          column.sorted && sortedColumn(column.accessor)
+                        }
+                      >
+                        {column.label}
+                      </Button>
+                      <THeadSortButton
+                        accessor={column.accessor}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        resetSort={() => dispatch(resetSort())}
+                      />
+                    </Button.Group>
+                  </div>
                 </Table.Th>
-                {columns.map((column, index) => (
-                  <Table.Th key={index} className={classes.thead}>
-                    <div className={classes.column_name}>
-                      <Button.Group>
-                        <Button
-                          variant="light"
-                          color="blue"
-                          size="compact-sm"
-                          className={classes.column_label}
-                          onClick={() =>
-                            column.sorted && sortedColumn(column.accessor)
-                          }
-                        >
-                          {column.label}
-                        </Button>
-                        <SortButton accessor={column.accessor} />
-                      </Button.Group>
-                    </div>
-                  </Table.Th>
-                ))}
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-          {!volunteers.length && (
-            <Blockquote color="gray" mt={20} p={12} mb={0}>
-              <Center>нет данных</Center>
-            </Blockquote>
-          )}
-        </div>
-        <Footer checkedIds={checkedIds.length} />
+              ))}
+              <Table.Th w={100}>{/*actions*/}</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
+        {!volunteers.length && <NoData />}
       </div>
-    </Box>
+      <Footer checkedIds={checkedIds.length} />
+    </div>
   );
 };
