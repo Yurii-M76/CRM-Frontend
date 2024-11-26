@@ -1,7 +1,7 @@
-import { Projects } from "@/components/projects/projects"
+import { ProjectsTable } from "@/components/projects"
 
 export const ProjectsPage = () => {
   return (
-    <Projects />
+    <ProjectsTable />
   )
 }

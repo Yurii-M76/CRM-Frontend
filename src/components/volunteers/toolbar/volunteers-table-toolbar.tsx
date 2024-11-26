@@ -1,39 +1,26 @@
-import { Button, ButtonGroup, Modal, Text } from "@mantine/core";
+import { Button, ButtonGroup } from "@mantine/core";
 import {
   IconDownload,
   IconFilter,
   IconPlus,
   IconUpload,
 } from "@tabler/icons-react";
-import { Search } from "./search";
-import classes from "./head.module.css";
 import { useDisclosure } from "@mantine/hooks";
 import { AddForm } from "../add-form/add-form";
+import { Search } from "@/components/search/search";
+import { resetSearch, setSearch } from "@/services/volunteer/reducer";
+import { Modal } from "@/components/modal/modal";
+import classes from "@components/table/table.module.css";
 
-export const Head = () => {
+export const VolunteersTableToolbar = () => {
   const [opened, { open, close }] = useDisclosure(false);
-
   return (
     <>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={
-          <Text
-            fw={700}
-            variant="gradient"
-            gradient={{ from: "blue", to: "cyan", deg: 90 }}
-          >
-            Добавить волонтера
-          </Text>
-        }
-        size="lg"
-      >
+      <Modal title="Добавить волонтера" opened={opened} close={close} size="lg">
         <AddForm />
       </Modal>
-
-      <div className={classes.head}>
-        <div className={classes.left}>
+      <div className={classes.table_toolbar}>
+        <div className={classes.flexGroup}>
           <ButtonGroup>
             <Button
               variant="light"
@@ -58,9 +45,9 @@ export const Head = () => {
               Скачать
             </Button>
           </ButtonGroup>
-          <Search />
+          <Search query={setSearch} reset={resetSearch} />
         </div>
-        <div>
+        <div className={classes.flexGroup}>
           <Button
             variant="default"
             rightSection={<IconFilter size={14} />}

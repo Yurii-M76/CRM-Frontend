@@ -1,13 +1,13 @@
 import { Badge } from "@mantine/core";
 import { FC } from "react";
-import classes from "./project-list.module.css";
 import { TProject } from "@/types";
+import classes from "../table/table.module.css";
 
 type TProjects = {
   data: TProject[];
 };
 
-export const ProjectList: FC<TProjects> = ({ data }) => {
+export const ProjectsListForTables: FC<TProjects> = ({ data }) => {
   const projects = data.map((item) => {
     return (
       <li key={item.id}>
@@ -17,5 +17,5 @@ export const ProjectList: FC<TProjects> = ({ data }) => {
       </li>
     );
   });
-  return <ul className={classes.projects_list}>{projects}</ul>;
+  return <ul className={classes.badges_list}>{projects}</ul>;
 };

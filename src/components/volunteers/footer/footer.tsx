@@ -1,5 +1,5 @@
-import { Anchor, Group, Pagination, Select, Text } from "@mantine/core";
-import { FC, useEffect, useState } from "react";
+import { Anchor, Group, Text } from "@mantine/core";
+import { FC } from "react";
 import {
   getCountVolunteers,
   getRangeOnPage,
@@ -9,6 +9,7 @@ import {
 } from "@/services/volunteer/reducer";
 import { useDispatch, useSelector } from "@/services/store";
 import classes from "./footer.module.css";
+import { Paginator } from "@/components/paginator/paginator";
 
 type TFooter = {
   checkedIds: number;
@@ -18,15 +19,6 @@ export const Footer: FC<TFooter> = ({ checkedIds }) => {
   const dispatch = useDispatch();
   const countVolunteers = useSelector(getCountVolunteers);
   const rowsOnPage = useSelector(getRangeOnPage);
-  const totalPages = Math.ceil(countVolunteers / rowsOnPage);
-  const [activePage, setPage] = useState(1);
-  useEffect(() => {
-    dispatch(setActivePage(activePage));
-    localStorage.setItem("rowsOnPageVolunteersTable", String(rowsOnPage));
-  }, [dispatch, activePage, rowsOnPage]);
-  const handleChange = (data: string | null) => {
-    return data ? dispatch(setRangeOnPage(+data)) : null;
-  };
   const checkedItems = checkedIds ? `/ Выбрано: ${checkedIds} ` : "";
   return (
     <div className={classes.footer}>
@@ -41,25 +33,12 @@ export const Footer: FC<TFooter> = ({ checkedIds }) => {
           </Text>
         )}
       </Group>
-      <div className={classes.pagination}>
-        <Pagination
-          total={totalPages || 1}
-          value={activePage}
-          onChange={setPage}
-          disabled={!totalPages}
-          color={!totalPages ? "gray" : "blue"}
-        />
-        <Select
-          data={["5", "10", "25", "50", "100"]}
-          defaultValue={String(rowsOnPage)}
-          w={80}
-          disabled={!totalPages}
-          onChange={(data) => {
-            handleChange(data);
-            setPage(1);
-          }}
-        ></Select>
-      </div>
+      <Paginator
+        count={countVolunteers}
+        rowsOnPage={rowsOnPage}
+        setActivePage={setActivePage}
+        setRangeOnPage={setRangeOnPage}
+      />
     </div>
   );
 };

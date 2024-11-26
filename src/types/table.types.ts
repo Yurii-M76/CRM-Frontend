@@ -1,7 +1,6 @@
-import { TVolunteer } from ".";
-
-export type Column = {
+export type Column<T> = {
   label: string;
-  accessor: keyof TVolunteer;
+  accessor: keyof T;
   sorted: boolean;
+  size: number;
 };
