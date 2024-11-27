@@ -19,6 +19,7 @@ export const projectSlice = createSlice({
   initialState,
   reducers: {},
   selectors: {
+    getLoading: (state) => state.loading,
     getAllProjects: (state) => state.items,
   },
   extraReducers(builder) {
@@ -40,5 +41,5 @@ export const projectSlice = createSlice({
 });
 
 // export const {} = nameSlice.actions;
-export const { getAllProjects } = projectSlice.selectors;
+export const { getLoading, getAllProjects } = projectSlice.selectors;
 export default projectSlice;

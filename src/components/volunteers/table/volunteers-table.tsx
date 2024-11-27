@@ -9,17 +9,26 @@ import {
   getSortOrder,
   getVolunteers,
   getVolunteersLoading,
-  resetSort,
+  getRangeOnPage,
+  setActivePage,
+  setRangeOnPage,
   setAllChecked,
   setOneChecked,
   setSort,
+  resetSort,
+  resetAllChecked,
 } from "@/services/volunteer/reducer";
-import { Footer } from "../footer/footer";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
 import { Column, TVolunteer } from "@/types";
 import { ProjectsListForTables } from "@/components/lists-of-cells-for-tables/projects-list-for-tables";
 import { VolunteersTableToolbar } from "../toolbar/volunteers-table-toolbar";
-import { ActionButtons, NoData, THeadSortButton } from "@/components/table";
+import {
+  ActionButtons,
+  NoData,
+  TableInfoBlock,
+  THeadSortButton,
+} from "@/components/table";
+import { Paginator } from "@/components/paginator/paginator";
 import classes from "@components/table/table.module.css";
 
 export const VolonteersTable = () => {
@@ -30,6 +39,7 @@ export const VolonteersTable = () => {
   const sortOrder = useSelector(getSortOrder);
   const checkedIds = useSelector(getOneChecked);
   const countVolunteers = useSelector(getCountVolunteers);
+  const rowsOnPage = useSelector(getRangeOnPage);
   useEffect(() => {
     dispatch(getAllVolunteers());
   }, [dispatch]);
@@ -144,7 +154,19 @@ export const VolonteersTable = () => {
         </Table>
         {!volunteers.length && <NoData />}
       </div>
-      <Footer checkedIds={checkedIds.length} />
+      <div className={classes.flexGroup}>
+        <TableInfoBlock
+          count={countVolunteers}
+          checkedIds={checkedIds.length}
+          resetAllChecked={resetAllChecked}
+        />
+        <Paginator
+          count={countVolunteers}
+          rowsOnPage={rowsOnPage}
+          setActivePage={setActivePage}
+          setRangeOnPage={setRangeOnPage}
+        />
+      </div>
     </div>
   );
 };
