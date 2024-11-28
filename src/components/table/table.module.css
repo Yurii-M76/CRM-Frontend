@@ -31,9 +31,10 @@
   font-size: 0.95rem;
 }
 
-.badges_list {
+.projects_list_for_table {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
   margin: 0;
