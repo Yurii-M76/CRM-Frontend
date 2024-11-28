@@ -1,6 +1,6 @@
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { ActionIcon } from "@mantine/core";
-import classes from "../table/table.module.css";
+import classes from "@components/table/table.module.css";
 
 export const ActionButtons = () => {
   return (

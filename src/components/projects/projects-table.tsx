@@ -2,12 +2,17 @@ import { Button, LoadingOverlay, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
-import { getAllProjects } from "@/services/project/reducer";
+import { getLoading, getAllProjects } from "@/services/project/reducer";
 import { Column, TProject } from "@/types";
 import { getSortOrder, resetSort } from "@/services/volunteer/reducer";
 import { VolunteersListForTables } from "../lists-of-cells-for-tables/volunteers-list-for-tables";
 import { ProjectsTableToolbar } from ".";
-import { ActionButtons, THeadSortButton, NoData } from "@components/table";
+import {
+  ActionButtons,
+  THeadSortButton,
+  NoData,
+  TableInfoBlock,
+} from "@components/table";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
@@ -27,6 +32,7 @@ const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
 
 export const ProjectsTable = () => {
   const dispatch = useDispatch();
+  const isLoading = useSelector(getLoading);
   const projectsData = useSelector(getAllProjects);
   const sortOrder = useSelector(getSortOrder);
   useEffect(() => {
@@ -50,7 +56,7 @@ export const ProjectsTable = () => {
       className={classes.container}
       style={{ maxInlineSize: `${widthTable + 300}px`, minInlineSize: "350px" }}
     >
-      <LoadingOverlay visible={false} />
+      <LoadingOverlay visible={isLoading} />
       <ProjectsTableToolbar />
       <div className={classes.tableBox}>
         <Table
@@ -100,8 +106,17 @@ export const ProjectsTable = () => {
         {!projectsData.length && <NoData />}
       </div>
       <div className={classes.flexGroup}>
-        <div className={classes.info}>info</div>
-        <div className={classes.pagination}>pagination</div>
+        <TableInfoBlock
+          count={1}
+          checkedIds={0}
+          // resetAllChecked={resetAllChecked}
+        />
+        {/* <Paginator
+          count={0}
+          rowsOnPage={10}
+          setActivePage={setActivePage}
+          setRangeOnPage={setRangeOnPage}
+        /> */}
       </div>
     </div>
   );

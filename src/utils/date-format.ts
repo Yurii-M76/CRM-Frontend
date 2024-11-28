@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param inputDateStr входные данные в виде строки
+ * @returns возвращает дату в формате "YYYY-MM-DD"
+ */
 export const dateFormat = (inputDateStr: string): string => {
   if (!inputDateStr) {
     return "";

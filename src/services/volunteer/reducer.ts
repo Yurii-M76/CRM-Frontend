@@ -1,14 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllVolunteers } from "./action";
 import { TVolunteer } from "@/types";
+import { filterData, pagination, sortData } from "@/utils";
 
-type TInitialState = {
+type TInitialState<T> = {
   loading: boolean;
   count: number;
-  items: TVolunteer[];
-  originalItems: TVolunteer[];
-  searchResult: TVolunteer[];
-  sortBy: keyof TVolunteer;
+  items: T[];
+  originalItems: T[];
+  searchResult: T[];
+  sortBy: keyof T;
   sortOrder: "asc" | "desc";
   activePage: number;
   rangeOnPage: number;
@@ -16,7 +17,7 @@ type TInitialState = {
   error?: string | null;
 };
 
-const initialState: TInitialState = {
+const initialState: TInitialState<TVolunteer> = {
   loading: false,
   count: 0,
   items: [],
@@ -30,74 +31,18 @@ const initialState: TInitialState = {
   error: null,
 };
 
-const sliceItems = <T>(
-  data: T[],
-  activePage: number,
-  rangeOnPage: number
-): T[] => {
-  return [...data].slice(
-    (activePage - 1) * rangeOnPage,
-    activePage * rangeOnPage
+const processedData = <T>(state: TInitialState<T>) => {
+  return pagination(
+    sortData(
+      state.searchResult.length
+        ? [...state.searchResult]
+        : [...state.originalItems],
+      state.sortBy,
+      state.sortOrder
+    ),
+    state.activePage,
+    state.rangeOnPage
   );
-};
-
-const sortedItems = (
-  data: TVolunteer[],
-  sortBy: keyof TVolunteer,
-  sortOrder: string
-) => {
-  return data.sort((a, b) => {
-    const aVal =
-      sortBy === "surname"
-        ? `${a.surname} ${a.name} ${a.patronymic}`
-        : sortBy === "projects" // условие для сортировки проектов
-        ? a.projects.map((tag) => tag.title).join(", ")
-        : a[sortBy];
-
-    const bVal =
-      sortBy === "surname"
-        ? `${b.surname} ${b.name} ${b.patronymic}`
-        : sortBy === "projects"
-        ? b.projects.map((tag) => tag.title).join(", ")
-        : b[sortBy];
-
-    // Улучшенное сравнение с учетом типа данных
-    if (typeof aVal === "string" && typeof bVal === "string") {
-      return sortOrder === "asc"
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
-    } else if (typeof aVal === "number" && typeof bVal === "number") {
-      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
-    } else {
-      // Если типы не совпадают, возвращаем 0
-      return 0;
-    }
-  });
-};
-
-const checkCurrentItems = (
-  original: TVolunteer[],
-  alternative: TVolunteer[]
-) => {
-  return alternative.length ? alternative : original;
-};
-
-const filterItems = (items: TVolunteer[], query: string) => {
-  return items.filter((item) => {
-    const allFields =
-      `${item.surname} ${item.name} ${item.patronymic} ${item.phone} ${item.email}`.toLowerCase();
-    return allFields.includes(query.trim().toLowerCase());
-  });
-};
-
-const updatePagination = (state: TInitialState) => {
-  const currentItems = checkCurrentItems(
-    sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
-    [...state.searchResult]
-  );
-
-  state.items = sliceItems(currentItems, state.activePage, state.rangeOnPage);
-  state.count = currentItems.length;
 };
 
 export const VolunteerSlice = createSlice({
@@ -114,28 +59,33 @@ export const VolunteerSlice = createSlice({
       const { sortBy, sortOrder } = action.payload;
       state.sortBy = sortBy;
       state.sortOrder = sortOrder;
-      updatePagination(state);
+      state.items = processedData(state);
     },
     resetSort: (state) => {
       state.sortBy = "createdAt";
       state.sortOrder = "asc";
-      updatePagination(state);
+      state.items = processedData(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
-      state.searchResult = filterItems(state.originalItems, action.payload);
-      updatePagination(state);
+      state.searchResult = filterData(
+        [...state.originalItems],
+        action.payload,
+        ["surname", "name", "patronymic", "phone", "email", "birthday"]
+      );
+      state.items = state.searchResult;
+      state.count = state.searchResult.length;
     },
     resetSearch: (state) => {
       state.searchResult = [];
-      updatePagination(state);
+      state.items = processedData(state);
+      state.count = state.originalItems.length;
     },
     setActivePage: (state, action: PayloadAction<number>) => {
       state.activePage = action.payload;
-      updatePagination(state);
+      state.items = processedData(state);
     },
     setRangeOnPage: (state, action: PayloadAction<number>) => {
       state.rangeOnPage = action.payload;
-      updatePagination(state);
     },
     setOneChecked: (state, action: PayloadAction<string>) => {
       const id = action.payload;
@@ -166,7 +116,7 @@ export const VolunteerSlice = createSlice({
     },
     resetAllChecked: (state) => {
       state.checkedIds = [];
-      updatePagination(state);
+      state.items = processedData(state);
     },
   },
   selectors: {
@@ -194,11 +144,7 @@ export const VolunteerSlice = createSlice({
         state.loading = false;
         state.count = action.payload.length;
         state.originalItems = action.payload;
-        state.items = sliceItems(
-          sortedItems([...state.originalItems], state.sortBy, state.sortOrder),
-          state.activePage,
-          state.rangeOnPage
-        );
+        state.items = processedData(state);
         state.error = null;
       })
       .addCase(getAllVolunteers.rejected, (state, action) => {
