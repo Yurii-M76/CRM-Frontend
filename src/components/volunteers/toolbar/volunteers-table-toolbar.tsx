@@ -10,15 +10,24 @@ import { AddForm } from "../add-form/add-form";
 import { Search } from "@/components/search/search";
 import { resetSearch, setSearch } from "@/services/volunteer/reducer";
 import { Modal } from "@/components/modal/modal";
+import { FC } from "react";
 import classes from "@components/table/table.module.css";
 
-export const VolunteersTableToolbar = () => {
+type TVolunteersTableToolbar = {
+  isDisabled: boolean;
+};
+
+export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
+  isDisabled,
+}) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const modal = (
+    <Modal title="Добавить волонтера" opened={opened} close={close} size="lg">
+      <AddForm />
+    </Modal>
+  );
   return (
     <>
-      <Modal title="Добавить волонтера" opened={opened} close={close} size="lg">
-        <AddForm />
-      </Modal>
       <div className={classes.table_toolbar}>
         <div className={classes.flexGroup}>
           <ButtonGroup>
@@ -27,6 +36,7 @@ export const VolunteersTableToolbar = () => {
               color="green"
               leftSection={<IconPlus size={14} />}
               onClick={open}
+              disabled={isDisabled}
             >
               Добавить
             </Button>
@@ -45,7 +55,7 @@ export const VolunteersTableToolbar = () => {
               Скачать
             </Button>
           </ButtonGroup>
-          <Search query={setSearch} reset={resetSearch} />
+          <Search query={setSearch} reset={resetSearch} isDisabled={isDisabled} />
         </div>
         <div className={classes.flexGroup}>
           <Button
@@ -57,6 +67,7 @@ export const VolunteersTableToolbar = () => {
           </Button>
         </div>
       </div>
+      {modal}
     </>
   );
 };
