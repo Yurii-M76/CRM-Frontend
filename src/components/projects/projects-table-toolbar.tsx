@@ -1,12 +1,19 @@
 import { Button, ButtonGroup } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconDownload, IconFilter, IconPlus } from "@tabler/icons-react";
 import { Search } from "@/components/search/search";
-import { resetSearch, setSearch } from "@/services/volunteer/reducer";
+import { resetSearch, setSearch } from "@/services/project/reducer";
 import { Modal } from "../modal/modal";
-import { useDisclosure } from "@mantine/hooks";
+import { FC } from "react";
 import classes from "../table/table.module.css";
 
-export const ProjectsTableToolbar = () => {
+type TProjectsTableToolbar = {
+  isDisabled: boolean;
+};
+
+export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
+  isDisabled,
+}) => {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
@@ -21,6 +28,7 @@ export const ProjectsTableToolbar = () => {
               color="green"
               leftSection={<IconPlus size={14} />}
               onClick={open}
+              disabled={isDisabled}
             >
               Добавить
             </Button>
@@ -32,7 +40,7 @@ export const ProjectsTableToolbar = () => {
               Скачать
             </Button>
           </ButtonGroup>
-          <Search query={setSearch} reset={resetSearch} />
+          <Search query={setSearch} reset={resetSearch} isDisabled={isDisabled} />
         </div>
         <div className={classes.flexGroup}>
           <Button
