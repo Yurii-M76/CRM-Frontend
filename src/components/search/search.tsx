@@ -1,4 +1,7 @@
-import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import {
+  ActionCreatorWithoutPayload,
+  ActionCreatorWithPayload,
+} from "@reduxjs/toolkit";
 import { CloseButton, TextInput } from "@mantine/core";
 import { useDispatch } from "@/services/store";
 import { useForm } from "@mantine/form";

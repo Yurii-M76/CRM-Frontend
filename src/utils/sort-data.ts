@@ -5,16 +5,19 @@
  * @param sortOrder направление сортировки
  * @returns результат сортирвки, если данные являются строкой / числом (в противном случае 0)
  */
-export const sortData = <T>(data: T[], sortBy: keyof T, sortOrder: string) => {
+export const sortData = <T>(data: T[], sortBy: keyof T, sortOrder: "asc" | "desc") => {
+  if (!data.length) return data;
   return data.sort((a, b) => {
-    if (typeof a[sortBy] === "string" && typeof b[sortBy] === "string") {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+    if (typeof aValue === "string" && typeof bValue === "string") {
       return sortOrder === "asc"
-        ? a[sortBy].localeCompare(b[sortBy])
-        : b[sortBy].localeCompare(a[sortBy]);
-    } else if (typeof a[sortBy] === "number" && typeof b[sortBy] === "number") {
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    } else if (typeof aValue === "number" && typeof bValue === "number") {
       return sortOrder === "asc"
-        ? a[sortBy] - b[sortBy]
-        : b[sortBy] - a[sortBy];
+        ? aValue - bValue
+        : bValue - aValue;
     } else {
       return 0;
     }

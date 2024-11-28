@@ -15,18 +15,21 @@ export const TableInfoBlock: FC<TTableInfoBlock> = ({
   resetAllChecked,
 }) => {
   const dispatch = useDispatch();
-  const checkedItems = checkedIds ? `/ Выбрано: ${checkedIds} ` : "";
+  const hasCheckedItems = checkedIds > 0;
+  const checkedItemsText = hasCheckedItems ? `/ Выбрано: ${checkedIds} ` : "";
+  const resetLink = resetAllChecked ? (
+    <Anchor href="#" onClick={() => dispatch(resetAllChecked())}>
+      [очистить]
+    </Anchor>
+  ) : null;
+
   return (
     <Group c="dimmed" gap={5}>
       <Text>{`Всего записей: ${count}`}</Text>
-      {checkedItems && (
+      {hasCheckedItems && (
         <Text>
-          {checkedItems}
-          {resetAllChecked && (
-            <Anchor href="#" onClick={() => dispatch(resetAllChecked())}>
-              [очистить]
-            </Anchor>
-          )}
+          {checkedItemsText}
+          {resetLink}
         </Text>
       )}
     </Group>
