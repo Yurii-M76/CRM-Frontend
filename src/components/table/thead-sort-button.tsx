@@ -10,7 +10,8 @@ type TProps = {
   accessor: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
-  resetSort: () => void
+  resetSort: () => void;
+  isDisabled: boolean;
 };
 
 export const THeadSortButton: FC<TProps> = ({
@@ -18,6 +19,7 @@ export const THeadSortButton: FC<TProps> = ({
   sortBy,
   sortOrder,
   resetSort,
+  isDisabled,
 }) => {
   const [isResetSortButton, setIsResetSortButton] = useState(false);
   const resetSortIcon = () => <IconXboxX size={17} />;
@@ -39,7 +41,7 @@ export const THeadSortButton: FC<TProps> = ({
   };
   return (
     sortBy === accessor && (
-      <Tooltip label="Сбросить">
+      <Tooltip label="Сбросить сортировку">
         <Button
           variant="light"
           color="blue"
@@ -47,6 +49,7 @@ export const THeadSortButton: FC<TProps> = ({
           onClick={handleSortClick}
           onMouseEnter={() => setIsResetSortButton(true)}
           onMouseLeave={() => setIsResetSortButton(false)}
+          disabled={isDisabled}
         >
           {sortIcon()}
         </Button>

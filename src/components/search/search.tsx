@@ -11,9 +11,10 @@ import { FC } from "react";
 type TSearch = {
   query: ActionCreatorWithPayload<string>;
   reset: ActionCreatorWithoutPayload;
+  isDisabled: boolean;
 };
 
-export const Search: FC<TSearch> = ({ query, reset }) => {
+export const Search: FC<TSearch> = ({ query, reset, isDisabled }) => {
   const dispatch = useDispatch();
   const form = useForm({ mode: "uncontrolled", initialValues: { search: "" } });
   const handleSubmit = (values: typeof form.values) => {
@@ -30,6 +31,7 @@ export const Search: FC<TSearch> = ({ query, reset }) => {
   return (
     <Form onSubmit={form.onSubmit(handleSubmit)} aria-label="Поиск">
       <TextInput
+        disabled={isDisabled}
         placeholder="Найти... + Enter"
         miw="340px"
         rightSection={

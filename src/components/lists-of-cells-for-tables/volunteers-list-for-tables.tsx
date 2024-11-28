@@ -1,4 +1,4 @@
-import { Anchor, Badge } from "@mantine/core";
+import { Anchor, Badge, Tooltip } from "@mantine/core";
 import { FC, useState } from "react";
 import { TVolunteer } from "@/types";
 import classes from "../table/table.module.css";
@@ -20,9 +20,11 @@ export const VolunteersListForTables: FC<TData> = ({ data }) => {
     <div className={classes.spoiler} style={{ position: "relative" }}>
       {!isOpen ? (
         <div className={classes.count_badge}>
-          <Badge size="lg" variant="light" color="gray" circle>
-            {list.length}
-          </Badge>
+          <Tooltip label="Количество волонтеров">
+            <Badge size="lg" variant="light" color="gray" circle>
+              {list.length}
+            </Badge>
+          </Tooltip>
         </div>
       ) : null}
       <div className={!isOpen ? classes.spoiler_close : classes.spoiler_open}>

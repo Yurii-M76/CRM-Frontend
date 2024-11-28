@@ -139,6 +139,7 @@ export const VolunteerSlice = createSlice({
         state.error = null;
         state.sortBy = "createdAt";
         state.sortOrder = "asc";
+        state.searchResult = [];
       })
       .addCase(getAllVolunteers.fulfilled, (state, action) => {
         state.loading = false;

@@ -1,4 +1,4 @@
-import { Badge } from "@mantine/core";
+import { Pill } from "@mantine/core";
 import { FC } from "react";
 import { TProject } from "@/types";
 import classes from "../table/table.module.css";
@@ -11,11 +11,9 @@ export const ProjectsListForTables: FC<TProjects> = ({ data }) => {
   const projects = data.map((item) => {
     return (
       <li key={item.id}>
-        <Badge variant="default" color="gray">
-          {item.title}
-        </Badge>
+        <Pill size="md">{item.title}</Pill>
       </li>
     );
   });
-  return <ul className={classes.badges_list}>{projects}</ul>;
+  return <ul className={classes.projects_list_for_table}>{projects}</ul>;
 };
