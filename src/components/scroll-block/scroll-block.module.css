@@ -1,0 +1,11 @@
+.scroll_block {
+  position: relative;
+  display: block;
+  transition: max-height 0.5s ease-in-out;
+}
+
+.count {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
