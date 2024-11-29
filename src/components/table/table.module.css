@@ -90,6 +90,12 @@
   gap: 10px;
 }
 
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 @media (width <= 431px) {
   .table_toolbar {
     justify-content: center;

@@ -20,7 +20,6 @@ import {
 } from "@/services/volunteer/reducer";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
 import { Column, TVolunteer } from "@/types";
-import { ProjectsListForTables } from "@/components/lists-of-cells-for-tables/projects-list-for-tables";
 import { VolunteersTableToolbar } from "../toolbar/volunteers-table-toolbar";
 import {
   ActionButtons,
@@ -29,8 +28,9 @@ import {
   THeadSortButton,
 } from "@/components/table";
 import { Paginator } from "@/components/paginator/paginator";
-import classes from "@components/table/table.module.css";
 import { Loader } from "@/components/loader/loader";
+import { ScrollBlock } from "@/components/scroll-block/scroll-block";
+import classes from "@components/table/table.module.css";
 
 const columns: Column<TVolunteer>[] = [
   { label: "ФИО", accessor: "surname", size: 260, sorted: true },
@@ -125,7 +125,17 @@ export const VolonteersTable = () => {
         <Table.Td>{item.email ?? "-"}</Table.Td>
         <Table.Td>{item.rating ?? "-"}</Table.Td>
         <Table.Td>
-          <ProjectsListForTables data={item.projects} />
+          <ScrollBlock
+            height={400}
+            maxItems={3}
+            totalItems={item.projects.length}
+          >
+            <ul>
+              {item.projects.map((item) => {
+                return <li key={item.id}>{item.title}</li>;
+              })}
+            </ul>
+          </ScrollBlock>
         </Table.Td>
         <Table.Td>
           <ActionButtons />

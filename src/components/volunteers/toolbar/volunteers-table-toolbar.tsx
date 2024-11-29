@@ -10,7 +10,10 @@ import { AddForm } from "../add-form/add-form";
 import { Search } from "@/components/search/search";
 import { resetSearch, setSearch } from "@/services/volunteer/reducer";
 import { Modal } from "@/components/modal/modal";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import { useDispatch, useSelector } from "@/services/store";
+import { getProjects } from "@/services/project/reducer";
+import { findAllProjects } from "@/services/project/action";
 import classes from "@components/table/table.module.css";
 
 type TVolunteersTableToolbar = {
@@ -20,12 +23,19 @@ type TVolunteersTableToolbar = {
 export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
   isDisabled,
 }) => {
+  const dispatch = useDispatch();
+  const projects = useSelector(getProjects);
   const [opened, { open, close }] = useDisclosure(false);
   const modal = (
     <Modal title="Добавить волонтера" opened={opened} close={close} size="lg">
-      <AddForm />
+      <AddForm projects={projects} />
     </Modal>
   );
+
+  useEffect(() => {
+    dispatch(findAllProjects());
+  }, [dispatch]);
+
   return (
     <>
       <div className={classes.table_toolbar}>
@@ -55,7 +65,11 @@ export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
               Скачать
             </Button>
           </ButtonGroup>
-          <Search query={setSearch} reset={resetSearch} isDisabled={isDisabled} />
+          <Search
+            query={setSearch}
+            reset={resetSearch}
+            isDisabled={isDisabled}
+          />
         </div>
         <div className={classes.flexGroup}>
           <Button

@@ -43,7 +43,7 @@ export const Paginator: FC<TPaginator> = ({
       />
       <Tooltip label="Строк на странице">
         <Select
-          data={["1", "5", "10", "25", "50", "100"]}
+          data={["10", "25", "50", "100"]}
           defaultValue={String(rowsOnPage)}
           w={80}
           disabled={!totalPages}

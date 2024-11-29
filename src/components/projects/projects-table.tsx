@@ -15,7 +15,6 @@ import {
   resetSort,
 } from "@/services/project/reducer";
 import { Column, TProject } from "@/types";
-import { VolunteersListForTables } from "../lists-of-cells-for-tables/volunteers-list-for-tables";
 import { ProjectsTableToolbar } from ".";
 import {
   ActionButtons,
@@ -25,6 +24,7 @@ import {
 } from "@components/table";
 import { Loader } from "../loader/loader";
 import { Paginator } from "../paginator/paginator";
+import { ScrollBlock } from "../scroll-block/scroll-block";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
@@ -92,7 +92,19 @@ export const ProjectsTable = () => {
         <Table.Td>{item.title}</Table.Td>
         <Table.Td>{item.describe}</Table.Td>
         <Table.Td>
-          <VolunteersListForTables data={item.volunteers} />
+          <ScrollBlock
+            height={400}
+            maxItems={3}
+            totalItems={item.volunteers.length}
+          >
+            <ul>
+              {item.volunteers.map((item) => (
+                <li key={item.id}>
+                  {item.surname + " " + item.name + " " + item.patronymic}
+                </li>
+              ))}
+            </ul>
+          </ScrollBlock>
         </Table.Td>
         <Table.Td>
           <ActionButtons />
