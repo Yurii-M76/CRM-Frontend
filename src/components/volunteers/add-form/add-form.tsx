@@ -12,12 +12,17 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
-import { useState } from "react";
+import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
 import "@mantine/dates/styles.css";
 import classes from "./add-form.module.css";
+import { TProject } from "@/types";
 
-export const AddForm = () => {
+type TAddForm = {
+  projects: TProject[];
+};
+
+export const AddForm: FC<TAddForm> = ({ projects }) => {
   const [phone, setPhone] = useState<string | "">("");
   dayjs.extend(customParseFormat); // кастомный формат ввода даты
   const correctAge = 18; // допустимый возраст волонтера
@@ -91,6 +96,7 @@ export const AddForm = () => {
       projects: form.getValues().projects,
     });
   };
+
   return (
     <form
       className={classes.form}
@@ -178,10 +184,13 @@ export const AddForm = () => {
         <MultiSelect
           id="projects"
           label="Проекты"
-          data={["React", "Angular", "Vue", "Svelte"]}
+          data={projects.map((item) => ({ value: item.id, label: item.title }))}
           key={form.key("projects")}
+          clearable
+          searchable
+          nothingFoundMessage="Не найдено..."
           {...form.getInputProps("projects")}
-        ></MultiSelect>
+        />
       </Fieldset>
       <Button type="submit">Добавить</Button>
     </form>
