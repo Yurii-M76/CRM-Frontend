@@ -26,6 +26,7 @@ export const authSlice = createSlice({
   selectors: {
     getIsAuthChecked: (state) => state.isAuthChecked,
     getMeData: (state) => state.user,
+    getErrors: (state) => state.error,
   },
   extraReducers(builder) {
     builder
@@ -80,5 +81,5 @@ export const authSlice = createSlice({
 });
 
 export const { setIsAuthChecked } = authSlice.actions;
-export const { getIsAuthChecked, getMeData } = authSlice.selectors;
+export const { getIsAuthChecked, getMeData, getErrors } = authSlice.selectors;
 export default authSlice;

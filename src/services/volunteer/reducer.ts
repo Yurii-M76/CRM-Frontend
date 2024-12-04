@@ -1,10 +1,23 @@
+// TODO: протестировать работу фильтрации и пагинации, состояния при добавлении и удалении волонтера
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getAllVolunteers } from "./action";
+import { createVolunteer, deleteVolunteer, getAllVolunteers } from "./action";
 import { TVolunteer } from "@/types";
 import { filterData, pagination, sortData } from "@/utils";
 
-type TInitialState<T> = {
+type TStatusData = {
   loading: boolean;
+  success: boolean;
+  error?: string | null;
+};
+
+type TInitialState<T> = {
+  status: {
+    create: TStatusData;
+    read: TStatusData;
+    update: TStatusData;
+    delete: TStatusData;
+  };
   count: number;
   items: T[];
   originalItems: T[];
@@ -18,7 +31,24 @@ type TInitialState<T> = {
 };
 
 const initialState: TInitialState<TVolunteer> = {
-  loading: false,
+  status: {
+    create: {
+      loading: false,
+      success: false,
+    },
+    read: {
+      loading: false,
+      success: false,
+    },
+    update: {
+      loading: false,
+      success: false,
+    },
+    delete: {
+      loading: false,
+      success: false,
+    },
+  },
   count: 0,
   items: [],
   originalItems: [],
@@ -120,7 +150,7 @@ export const VolunteerSlice = createSlice({
     },
   },
   selectors: {
-    getVolunteersLoading: (state) => state.loading,
+    getVolunteersStatus: (state) => state.status,
     getVolunteers: (state) => state.items,
     getSortOrder: (state) => state.sortOrder,
     getSortBy: (state) => state.sortBy,
@@ -131,10 +161,31 @@ export const VolunteerSlice = createSlice({
     getErrors: (state) => state.error,
   },
   extraReducers(builder) {
+    // Create new
     builder
-      // Find all volunteer
+      .addCase(createVolunteer.pending, (state) => {
+        state.status.create.loading = true;
+        state.status.create.success = false;
+        state.error = null;
+      })
+      .addCase(createVolunteer.fulfilled, (state, action) => {
+        state.status.create.loading = false;
+        state.status.create.success = true;
+        state.error = null;
+        state.items = [...state.items, action.payload];
+        state.originalItems = state.items;
+        state.count = state.originalItems.length;
+      })
+      .addCase(createVolunteer.rejected, (state, action) => {
+        state.status.create.loading = false;
+        state.status.create.success = false;
+        state.error = action.error.message;
+      });
+
+    builder
+      // Find all
       .addCase(getAllVolunteers.pending, (state) => {
-        state.loading = true;
+        state.status.read.loading = true;
         state.count = 0;
         state.error = null;
         state.sortBy = "createdAt";
@@ -142,15 +193,39 @@ export const VolunteerSlice = createSlice({
         state.searchResult = [];
       })
       .addCase(getAllVolunteers.fulfilled, (state, action) => {
-        state.loading = false;
+        state.status.read.loading = false;
         state.count = action.payload.length;
         state.originalItems = action.payload;
         state.items = processedData(state);
         state.error = null;
       })
       .addCase(getAllVolunteers.rejected, (state, action) => {
-        state.loading = false;
+        state.status.read.loading = false;
         state.count = 0;
+        state.error = action.error.message;
+      });
+
+    // Delete
+    builder
+      .addCase(deleteVolunteer.pending, (state) => {
+        state.status.delete.loading = true;
+        state.status.delete.success = false;
+        state.error = null;
+      })
+      .addCase(deleteVolunteer.fulfilled, (state, action) => {
+        state.status.delete.loading = false;
+        state.status.delete.success = true;
+        state.items = state.items.filter(
+          (item) => item.id !== action.payload.id
+        );
+        state.originalItems = state.originalItems.filter(
+          (item) => item.id !== action.payload.id
+        );
+        state.count = state.items.length;
+      })
+      .addCase(deleteVolunteer.rejected, (state, action) => {
+        state.status.delete.loading = false;
+        state.status.delete.success = false;
         state.error = action.error.message;
       });
   },
@@ -168,7 +243,7 @@ export const {
   resetAllChecked,
 } = VolunteerSlice.actions;
 export const {
-  getVolunteersLoading,
+  getVolunteersStatus,
   getVolunteers,
   getSortOrder,
   getSortBy,

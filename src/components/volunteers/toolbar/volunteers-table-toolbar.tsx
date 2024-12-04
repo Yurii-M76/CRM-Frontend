@@ -5,37 +5,22 @@ import {
   IconPlus,
   IconUpload,
 } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { AddForm } from "../add-form/add-form";
 import { Search } from "@/components/search/search";
 import { resetSearch, setSearch } from "@/services/volunteer/reducer";
-import { Modal } from "@/components/modal/modal";
-import { FC, useEffect } from "react";
-import { useDispatch, useSelector } from "@/services/store";
-import { getProjects } from "@/services/project/reducer";
-import { findAllProjects } from "@/services/project/action";
+import { FC } from "react";
 import classes from "@components/table/table.module.css";
 
 type TVolunteersTableToolbar = {
+  isLoading: boolean;
   isDisabled: boolean;
+  openedAddForm?: () => void;
 };
 
 export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
+  isLoading,
   isDisabled,
+  openedAddForm: onClickToOpenAddForm,
 }) => {
-  const dispatch = useDispatch();
-  const projects = useSelector(getProjects);
-  const [opened, { open, close }] = useDisclosure(false);
-  const modal = (
-    <Modal title="Добавить волонтера" opened={opened} close={close} size="lg">
-      <AddForm projects={projects} />
-    </Modal>
-  );
-
-  useEffect(() => {
-    dispatch(findAllProjects());
-  }, [dispatch]);
-
   return (
     <>
       <div className={classes.table_toolbar}>
@@ -45,8 +30,8 @@ export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
               variant="light"
               color="green"
               leftSection={<IconPlus size={14} />}
-              onClick={open}
-              disabled={isDisabled}
+              onClick={onClickToOpenAddForm}
+              disabled={isLoading}
             >
               Добавить
             </Button>
@@ -81,7 +66,6 @@ export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
           </Button>
         </div>
       </div>
-      {modal}
     </>
   );
 };

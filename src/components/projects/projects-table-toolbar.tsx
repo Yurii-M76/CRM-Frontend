@@ -8,10 +8,12 @@ import { FC } from "react";
 import classes from "../table/table.module.css";
 
 type TProjectsTableToolbar = {
+  isLoading: boolean;
   isDisabled: boolean;
 };
 
 export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
+  isLoading,
   isDisabled,
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -28,7 +30,7 @@ export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
               color="green"
               leftSection={<IconPlus size={14} />}
               onClick={open}
-              disabled={isDisabled}
+              disabled={isLoading}
             >
               Добавить
             </Button>
@@ -40,7 +42,11 @@ export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
               Скачать
             </Button>
           </ButtonGroup>
-          <Search query={setSearch} reset={resetSearch} isDisabled={isDisabled} />
+          <Search
+            query={setSearch}
+            reset={resetSearch}
+            isDisabled={isDisabled}
+          />
         </div>
         <div className={classes.flexGroup}>
           <Button

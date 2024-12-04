@@ -1,6 +1,6 @@
 import { FC, ReactNode, useState } from "react";
-import classes from "./scroll-block.module.css";
 import { Anchor, Badge, Tooltip } from "@mantine/core";
+import classes from "./scroll-block.module.css";
 
 type TScrollBlock = {
   height?: number;

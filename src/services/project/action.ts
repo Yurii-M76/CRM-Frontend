@@ -1,8 +1,8 @@
 import { TProject } from "@/types";
-import { findDataApi } from "@/utils/api";
+import { getAllDataFromApi } from "@/utils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const findAllProjects = createAsyncThunk(
   "projects/findAll",
-  async () => await findDataApi<TProject[]>({ path: "projects", method: "GET" })
+  async () => await getAllDataFromApi<TProject[]>("projects")
 );
