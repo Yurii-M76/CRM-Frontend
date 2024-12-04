@@ -1,5 +1,5 @@
+// TODO: добавить закрытие модалки при клике по кнопке "отменить"
 import {
-  Button,
   Fieldset,
   TextInput,
   Select,
@@ -14,38 +14,48 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
+import { TProject } from "@/types";
+import { createVolunteer } from "@/services/volunteer/action";
+import { useDispatch, useSelector } from "@/services/store";
+import { getVolunteersStatus } from "@/services/volunteer/reducer";
+import { AddFormButtons } from "@/components/buttons";
 import "@mantine/dates/styles.css";
 import classes from "./add-form.module.css";
-import { TProject } from "@/types";
 
 type TAddForm = {
   projects: TProject[];
+  onClose?: () => void;
 };
 
-export const AddForm: FC<TAddForm> = ({ projects }) => {
+type TInitialValues = {
+  surname: string;
+  name: string;
+  patronymic: string;
+  birthday: string;
+  phone: string;
+  email: string;
+  district: string;
+  projects: string[];
+};
+
+export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
+  const dispatch = useDispatch();
+  const status = useSelector(getVolunteersStatus);
   const [phone, setPhone] = useState<string | "">("");
   dayjs.extend(customParseFormat); // кастомный формат ввода даты
   const correctAge = 18; // допустимый возраст волонтера
-  type TInitialValues = {
-    surname: string;
-    name: string;
-    partonymic: string;
-    birthday: string;
-    phone: string;
-    email: string;
-    district: string;
-    projects: string[];
-  };
+
   const initialValues: TInitialValues = {
     surname: "",
     name: "",
-    partonymic: "",
+    patronymic: "",
     birthday: "",
     phone: "",
     email: "",
     district: "",
     projects: [],
   };
+
   const form = useForm({
     mode: "uncontrolled",
     initialValues: initialValues,
@@ -62,7 +72,7 @@ export const AddForm: FC<TAddForm> = ({ projects }) => {
           : /^[А-яЁё]{2,}$/.test(value)
           ? null
           : "Имя должно быть не короче двух букв",
-      partonymic: (value) =>
+      patronymic: (value) =>
         !value.length
           ? null
           : /^[А-яЁё]{2,}$/.test(value)
@@ -84,17 +94,17 @@ export const AddForm: FC<TAddForm> = ({ projects }) => {
         !value.length ? "Район не должен быть пустым" : null,
     },
   });
+
   const handleSubmit = () => {
-    console.log({
-      surname: form.getValues().surname,
+    const newVolunteer = {
+      surname: form.getValues().surname || undefined,
       name: form.getValues().name,
-      partonymic: form.getValues().partonymic,
-      birthday: dateFormat(form.getValues().birthday),
+      patronymic: form.getValues().patronymic || undefined,
+      birthday: dateFormat(form.getValues().birthday) || undefined,
       phone: phone,
-      email: form.getValues().email,
-      district: form.getValues().district,
-      projects: form.getValues().projects,
-    });
+      email: form.getValues().email || undefined,
+    };
+    dispatch(createVolunteer(newVolunteer));
   };
 
   return (
@@ -123,10 +133,10 @@ export const AddForm: FC<TAddForm> = ({ projects }) => {
         </div>
         <div className={classes.input_group}>
           <TextInput
-            id="partonymic"
+            id="patronymic"
             label="Отчество"
-            key={form.key("partonymic")}
-            {...form.getInputProps("partonymic")}
+            key={form.key("patronymic")}
+            {...form.getInputProps("patronymic")}
             className={classes.input}
           />
           <DateInput
@@ -188,11 +198,11 @@ export const AddForm: FC<TAddForm> = ({ projects }) => {
           key={form.key("projects")}
           clearable
           searchable
-          nothingFoundMessage="Не найдено..."
+          nothingFoundMessage="нет данных"
           {...form.getInputProps("projects")}
         />
       </Fieldset>
-      <Button type="submit">Добавить</Button>
+      <AddFormButtons loading={status.create.loading} onClose={onClose} />
     </form>
   );
 };

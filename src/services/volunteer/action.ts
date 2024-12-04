@@ -1,27 +1,24 @@
+import { TVolunteer } from "@/types";
 import {
-  deleteVolunteerApi,
-  getAllVolunteersApi,
-  getOneVolunteerApi,
-} from "@/utils/api";
+  createDataFromApi,
+  deleteDataFromApi,
+  getAllDataFromApi,
+} from "@/utils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+
+export const createVolunteer = createAsyncThunk(
+  "volunteer/create",
+  async (data: Partial<TVolunteer>) =>
+    await createDataFromApi<TVolunteer>("volunteers", data)
+);
 
 export const getAllVolunteers = createAsyncThunk(
   "volunteer/findAll",
-  async () => await getAllVolunteersApi()
+  async () => await getAllDataFromApi<TVolunteer[]>("volunteers")
 );
-
-export const getOneVolunteer = createAsyncThunk(
-  "volunteer/findAll",
-  async (id: string) => await getOneVolunteerApi(id)
-);
-
-// export const updateVolunteer = createAsyncThunk(
-//   "volunteer/findAll",
-//   async (id: string, data: Partial<TVolunteer>) =>
-//     await updateVolunteerApi({ id, data })
-// );
 
 export const deleteVolunteer = createAsyncThunk(
-  "volunteer/findAll",
-  async (id: string) => await deleteVolunteerApi(id)
+  "volunteer/delete",
+  async (id: string) =>
+    await deleteDataFromApi<{id: string}>("volunteers", id)
 );

@@ -1,3 +1,7 @@
+// TODO: реализовать добавление проекта через форму
+// TODO: реализовать редактирование проекта через форму
+// TODO: реализовать удаление проекта по кнопке
+
 import { Button, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
@@ -17,7 +21,7 @@ import {
 import { Column, TProject } from "@/types";
 import { ProjectsTableToolbar } from ".";
 import {
-  ActionButtons,
+  // ActionButtons,
   THeadSortButton,
   NoData,
   TableInfoBlock,
@@ -42,9 +46,8 @@ export const ProjectsTable = () => {
   const sortOrder = useSelector(getSortOrder);
   const countProjects = useSelector(getCountProjects);
   const rowsOnPage = useSelector(getRangeOnPage);
-  const disabled = isLoading || !projects.length;
   const loader = isLoading && <Loader />;
-  const noData = !projects.length && <NoData />;
+  const noData = !isLoading && !projects.length && <NoData />;
 
   const sortedColumn = (sortBy: keyof TProject) => {
     dispatch(
@@ -69,7 +72,7 @@ export const ProjectsTable = () => {
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
             onClick={() => column.sorted && sortedColumn(column.accessor)}
-            disabled={disabled}
+            disabled={isLoading || !projects.length}
           >
             {column.label}
           </Button>
@@ -78,7 +81,7 @@ export const ProjectsTable = () => {
             sortBy={sortBy}
             sortOrder={sortOrder}
             resetSort={() => dispatch(resetSort())}
-            isDisabled={disabled}
+            isDisabled={isLoading}
           />
         </Button.Group>
       </div>
@@ -98,16 +101,17 @@ export const ProjectsTable = () => {
             totalItems={item.volunteers.length}
           >
             <ul>
-              {item.volunteers.map((item) => (
-                <li key={item.id}>
-                  {item.surname + " " + item.name + " " + item.patronymic}
-                </li>
-              ))}
+              {item.volunteers.length &&
+                item.volunteers.map((item) => (
+                  <li key={item.id}>
+                    {item.surname + " " + item.name + " " + item.patronymic}
+                  </li>
+                ))}
             </ul>
           </ScrollBlock>
         </Table.Td>
         <Table.Td>
-          <ActionButtons />
+          {/* <ActionButtons /> */}
         </Table.Td>
       </Table.Tr>
     ));
@@ -121,7 +125,10 @@ export const ProjectsTable = () => {
       className={classes.container}
       style={{ maxInlineSize: `${widthTable + 300}px`, minInlineSize: "350px" }}
     >
-      <ProjectsTableToolbar isDisabled={disabled} />
+      <ProjectsTableToolbar
+        isLoading={isLoading}
+        isDisabled={!projects.length}
+      />
       <div className={classes.tableBox}>
         <Table
           maw={widthTable + 250}

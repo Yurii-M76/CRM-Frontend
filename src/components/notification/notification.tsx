@@ -1,13 +1,12 @@
 import { Notification, Transition } from "@mantine/core";
-import { useSelector } from "@/services/store";
-import { getErrors } from "@/services/volunteer/reducer";
+import { useState } from "react";
 
 export const CRM_Notification = () => {
-  const error = useSelector(getErrors);
-  error?.includes("Failed")
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Transition
-      mounted={error ? true : false}
+      mounted={isOpen}
       transition={"fade-up"}
       duration={200}
       timingFunction="ease"
@@ -15,7 +14,7 @@ export const CRM_Notification = () => {
     >
       {(transitionStyle) => (
         <Notification
-          color={error?.includes("Failed") ? "red" : "gray"}
+          color={"red"}
           title="Error"
           pos={"absolute"}
           bottom={20}
@@ -23,10 +22,11 @@ export const CRM_Notification = () => {
           pl={18}
           miw={300}
           maw={500}
-          style={{ ...transitionStyle, zIndex: 99 }}
+          style={{ ...transitionStyle, zIndex: 999 }}
           withBorder
+          onClose={() => setIsOpen(false)}
         >
-          {error}
+          {"item"}
         </Notification>
       )}
     </Transition>
