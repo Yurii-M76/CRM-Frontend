@@ -6,13 +6,13 @@
 import { Button, Checkbox, Table, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { deleteVolunteer, getAllVolunteers } from "@/services/volunteer/action";
+import { deletePerson, getAllPersons } from "@/services/person/action";
 import {
-  getCountVolunteers,
+  getCountPersons,
   getOneChecked,
   getSortBy,
   getSortOrder,
-  getVolunteers,
+  getPersons,
   getRangeOnPage,
   setActivePage,
   setRangeOnPage,
@@ -21,11 +21,11 @@ import {
   setSort,
   resetSort,
   resetAllChecked,
-  getVolunteersStatus,
-} from "@/services/volunteer/reducer";
+  getPersonsStatus,
+} from "@/services/person/reducer";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
-import { Column, TVolunteer } from "@/types";
-import { VolunteersTableToolbar } from "../toolbar/volunteers-table-toolbar";
+import { Column, TPerson } from "@/types";
+import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
 import {
   ActionButtons,
   NoData,
@@ -42,7 +42,7 @@ import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
 import classes from "@components/table/table.module.css";
 
-const columns: Column<TVolunteer>[] = [
+const columns: Column<TPerson>[] = [
   { label: "ФИО", accessor: "surname", size: 260, sorted: true },
   { label: "Телефон", accessor: "phone", size: 150, sorted: true },
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
@@ -52,21 +52,21 @@ const columns: Column<TVolunteer>[] = [
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
 
-export const VolonteersTable = () => {
+export const PersonsTable = () => {
   const dispatch = useDispatch();
-  const status = useSelector(getVolunteersStatus);
-  const volunteers = useSelector(getVolunteers);
+  const status = useSelector(getPersonsStatus);
+  const persons = useSelector(getPersons);
   const projects = useSelector(getProjects);
   const sortBy = useSelector(getSortBy);
   const sortOrder = useSelector(getSortOrder);
   const checkedIds = useSelector(getOneChecked);
-  const countVolunteers = useSelector(getCountVolunteers);
+  const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
   const [isOpenModalAddForm, setIsOpenModalAddForm] = useState(false);
   const [isOpenModalToDelete, setIsOpenModalToDelete] = useState(false);
   const [idToDelete, setIdToDelete] = useState<string | null>(null);
   const loader = status.read.loading && <Loader />;
-  const noData = !status.read.loading && !volunteers.length && <NoData />;
+  const noData = !status.read.loading && !persons.length && <NoData />;
 
   const confirmActionModal = (
     <Modal
@@ -86,7 +86,7 @@ export const VolonteersTable = () => {
           setIdToDelete(null);
         }}
         onClickToDelete={() =>
-          idToDelete && dispatch(deleteVolunteer(idToDelete))
+          idToDelete && dispatch(deletePerson(idToDelete))
         }
       />
     </Modal>
@@ -115,7 +115,7 @@ export const VolonteersTable = () => {
     setIdToDelete(id);
   };
 
-  const sortedColumn = (sortBy: keyof TVolunteer) => {
+  const sortedColumn = (sortBy: keyof TPerson) => {
     dispatch(
       setSort({
         sortBy: sortBy,
@@ -125,9 +125,9 @@ export const VolonteersTable = () => {
   };
 
   const indeterminate =
-    checkedIds.length > 0 && checkedIds.length < countVolunteers;
+    checkedIds.length > 0 && checkedIds.length < countPersons;
   const isAllCheched =
-    countVolunteers !== 0 && checkedIds.length === countVolunteers;
+    countPersons !== 0 && checkedIds.length === countPersons;
 
   const thead = columns.map((column, index) => (
     <Table.Th
@@ -143,7 +143,7 @@ export const VolonteersTable = () => {
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
             onClick={() => column.sorted && sortedColumn(column.accessor)}
-            disabled={status.read.loading || !volunteers.length}
+            disabled={status.read.loading || !persons.length}
           >
             {column.label}
           </Button>
@@ -161,7 +161,7 @@ export const VolonteersTable = () => {
 
   const rows =
     !status.read.loading &&
-    volunteers.map((item) => (
+    persons.map((item) => (
       <Table.Tr
         key={item.id}
         bg={
@@ -207,7 +207,7 @@ export const VolonteersTable = () => {
     ));
 
   useEffect(() => {
-    dispatch(getAllVolunteers());
+    dispatch(getAllPersons());
     dispatch(findAllProjects());
   }, [dispatch]);
 
@@ -229,9 +229,9 @@ export const VolonteersTable = () => {
           minInlineSize: "350px",
         }}
       >
-        <VolunteersTableToolbar
+        <PersonsTableToolbar
           isLoading={status.read.loading}
-          isDisabled={!volunteers.length}
+          isDisabled={!persons.length}
           openedAddForm={() => setIsOpenModalAddForm(true)}
         />
         <div className={classes.tableBox}>
@@ -252,7 +252,7 @@ export const VolonteersTable = () => {
                     onChange={() => {
                       dispatch(setAllChecked());
                     }}
-                    disabled={status.read.loading || !volunteers.length}
+                    disabled={status.read.loading || !persons.length}
                   />
                 </Table.Th>
                 {thead}
@@ -267,12 +267,12 @@ export const VolonteersTable = () => {
         <div className={classes.flexGroup}>
           <TableInfoBlock
             entityTitle="волонтеров"
-            count={countVolunteers}
+            count={countPersons}
             checkedIds={checkedIds.length}
             resetAllChecked={resetAllChecked}
           />
           <Paginator
-            count={countVolunteers}
+            count={countPersons}
             rowsOnPage={rowsOnPage}
             setActivePage={setActivePage}
             setRangeOnPage={setRangeOnPage}

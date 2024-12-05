@@ -4,4 +4,4 @@ export { MailingPage } from "./mailing/mailing.page";
 export { NotFoundPage } from "./not-found/not-found.page";
 export { ProjectsPage } from "./projects/projects.page";
 export { SettingsPage } from "./settings/settings.page";
-export { VolunteersPage } from "./volunteers/volunteers.page";
+export { PersonsPage } from "./persons/persons.page"

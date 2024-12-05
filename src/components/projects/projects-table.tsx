@@ -34,7 +34,7 @@ import classes from "../table/table.module.css";
 const columns: Column<TProject>[] = [
   { label: "Название", accessor: "title", size: 200, sorted: true },
   { label: "Описание", accessor: "describe", size: 400, sorted: true },
-  { label: "Участники", accessor: "volunteers", size: 300, sorted: false },
+  { label: "Участники", accessor: "persons", size: 300, sorted: false },
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
 
@@ -98,11 +98,11 @@ export const ProjectsTable = () => {
           <ScrollBlock
             height={400}
             maxItems={3}
-            totalItems={item.volunteers.length}
+            totalItems={item.persons.length}
           >
             <ul>
-              {item.volunteers.length &&
-                item.volunteers.map((item) => (
+              {item.persons.length &&
+                item.persons.map((item) => (
                   <li key={item.id}>
                     {item.surname + " " + item.name + " " + item.patronymic}
                   </li>

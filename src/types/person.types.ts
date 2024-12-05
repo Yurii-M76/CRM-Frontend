@@ -1,6 +1,6 @@
 import { TProject } from ".";
 
-export type TVolunteer = {
+export type TPerson = {
   id: string;
   surname: string;
   name: string;

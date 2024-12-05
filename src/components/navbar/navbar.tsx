@@ -13,7 +13,7 @@ import classes from "./Navbar.module.css";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: IconLayoutDashboardFilled },
-  { link: "volunteers", label: "Волонтеры", icon: IconDatabase },
+  { link: "persons", label: "Персоналии", icon: IconDatabase },
   { link: "projects", label: "Проекты", icon: IconCalendarEvent },
   { link: "mailing", label: "Рассылки", icon: IconMail },
   { link: "settings", label: "Настройки", icon: IconSettings },

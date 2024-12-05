@@ -15,10 +15,10 @@ import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
 import { TProject } from "@/types";
-import { createVolunteer } from "@/services/volunteer/action";
 import { useDispatch, useSelector } from "@/services/store";
-import { getVolunteersStatus } from "@/services/volunteer/reducer";
 import { AddFormButtons } from "@/components/buttons";
+import { getPersonsStatus } from "@/services/person/reducer";
+import { createPerson } from "@/services/person/action";
 import "@mantine/dates/styles.css";
 import classes from "./add-form.module.css";
 
@@ -40,7 +40,7 @@ type TInitialValues = {
 
 export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
   const dispatch = useDispatch();
-  const status = useSelector(getVolunteersStatus);
+  const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
   dayjs.extend(customParseFormat); // кастомный формат ввода даты
   const correctAge = 18; // допустимый возраст волонтера
@@ -96,7 +96,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
   });
 
   const handleSubmit = () => {
-    const newVolunteer = {
+    const newPerson = {
       surname: form.getValues().surname || undefined,
       name: form.getValues().name,
       patronymic: form.getValues().patronymic || undefined,
@@ -104,7 +104,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
       phone: phone,
       email: form.getValues().email || undefined,
     };
-    dispatch(createVolunteer(newVolunteer));
+    dispatch(createPerson(newPerson));
   };
 
   return (

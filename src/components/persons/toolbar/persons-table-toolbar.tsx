@@ -6,17 +6,17 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { Search } from "@/components/search/search";
-import { resetSearch, setSearch } from "@/services/volunteer/reducer";
+import { resetSearch, setSearch } from "@/services/person/reducer";
 import { FC } from "react";
 import classes from "@components/table/table.module.css";
 
-type TVolunteersTableToolbar = {
+type TPersonsTableToolbar = {
   isLoading: boolean;
   isDisabled: boolean;
   openedAddForm?: () => void;
 };
 
-export const VolunteersTableToolbar: FC<TVolunteersTableToolbar> = ({
+export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
   isLoading,
   isDisabled,
   openedAddForm: onClickToOpenAddForm,
