@@ -1,9 +1,9 @@
 import {
   IconSettings,
   IconLayoutDashboardFilled,
-  IconDatabase,
   IconMail,
   IconCalendarEvent,
+  IconUsers,
 } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mantine/core";
@@ -13,7 +13,7 @@ import classes from "./Navbar.module.css";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: IconLayoutDashboardFilled },
-  { link: "volunteers", label: "Волонтеры", icon: IconDatabase },
+  { link: "persons", label: "Персоналии", icon: IconUsers },
   { link: "projects", label: "Проекты", icon: IconCalendarEvent },
   { link: "mailing", label: "Рассылки", icon: IconMail },
   { link: "settings", label: "Настройки", icon: IconSettings },

@@ -1,8 +1,8 @@
 // TODO: протестировать работу фильтрации и пагинации, состояния при добавлении и удалении волонтера
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createVolunteer, deleteVolunteer, getAllVolunteers } from "./action";
-import { TVolunteer } from "@/types";
+import { createPerson, deletePerson, getAllPersons } from "./action";
+import { TPerson } from "@/types";
 import { filterData, pagination, sortData } from "@/utils";
 
 type TStatusData = {
@@ -30,7 +30,7 @@ type TInitialState<T> = {
   error?: string | null;
 };
 
-const initialState: TInitialState<TVolunteer> = {
+const initialState: TInitialState<TPerson> = {
   status: {
     create: {
       loading: false,
@@ -75,14 +75,14 @@ const processedData = <T>(state: TInitialState<T>) => {
   );
 };
 
-export const VolunteerSlice = createSlice({
-  name: "volunteer",
+export const PersonSlice = createSlice({
+  name: "person",
   initialState,
   reducers: {
     setSort: (
       state,
       action: PayloadAction<{
-        sortBy: keyof TVolunteer;
+        sortBy: keyof TPerson;
         sortOrder: "asc" | "desc";
       }>
     ) => {
@@ -150,11 +150,11 @@ export const VolunteerSlice = createSlice({
     },
   },
   selectors: {
-    getVolunteersStatus: (state) => state.status,
-    getVolunteers: (state) => state.items,
+    getPersonsStatus: (state) => state.status,
+    getPersons: (state) => state.items,
     getSortOrder: (state) => state.sortOrder,
     getSortBy: (state) => state.sortBy,
-    getCountVolunteers: (state) => state.count,
+    getCountPersons: (state) => state.count,
     getActivePage: (state) => state.activePage,
     getRangeOnPage: (state) => state.rangeOnPage,
     getOneChecked: (state) => state.checkedIds,
@@ -163,12 +163,12 @@ export const VolunteerSlice = createSlice({
   extraReducers(builder) {
     // Create new
     builder
-      .addCase(createVolunteer.pending, (state) => {
+      .addCase(createPerson.pending, (state) => {
         state.status.create.loading = true;
         state.status.create.success = false;
         state.error = null;
       })
-      .addCase(createVolunteer.fulfilled, (state, action) => {
+      .addCase(createPerson.fulfilled, (state, action) => {
         state.status.create.loading = false;
         state.status.create.success = true;
         state.error = null;
@@ -176,7 +176,7 @@ export const VolunteerSlice = createSlice({
         state.originalItems = state.items;
         state.count = state.originalItems.length;
       })
-      .addCase(createVolunteer.rejected, (state, action) => {
+      .addCase(createPerson.rejected, (state, action) => {
         state.status.create.loading = false;
         state.status.create.success = false;
         state.error = action.error.message;
@@ -184,7 +184,7 @@ export const VolunteerSlice = createSlice({
 
     builder
       // Find all
-      .addCase(getAllVolunteers.pending, (state) => {
+      .addCase(getAllPersons.pending, (state) => {
         state.status.read.loading = true;
         state.count = 0;
         state.error = null;
@@ -192,14 +192,14 @@ export const VolunteerSlice = createSlice({
         state.sortOrder = "asc";
         state.searchResult = [];
       })
-      .addCase(getAllVolunteers.fulfilled, (state, action) => {
+      .addCase(getAllPersons.fulfilled, (state, action) => {
         state.status.read.loading = false;
         state.count = action.payload.length;
         state.originalItems = action.payload;
         state.items = processedData(state);
         state.error = null;
       })
-      .addCase(getAllVolunteers.rejected, (state, action) => {
+      .addCase(getAllPersons.rejected, (state, action) => {
         state.status.read.loading = false;
         state.count = 0;
         state.error = action.error.message;
@@ -207,12 +207,12 @@ export const VolunteerSlice = createSlice({
 
     // Delete
     builder
-      .addCase(deleteVolunteer.pending, (state) => {
+      .addCase(deletePerson.pending, (state) => {
         state.status.delete.loading = true;
         state.status.delete.success = false;
         state.error = null;
       })
-      .addCase(deleteVolunteer.fulfilled, (state, action) => {
+      .addCase(deletePerson.fulfilled, (state, action) => {
         state.status.delete.loading = false;
         state.status.delete.success = true;
         state.items = state.items.filter(
@@ -223,7 +223,7 @@ export const VolunteerSlice = createSlice({
         );
         state.count = state.items.length;
       })
-      .addCase(deleteVolunteer.rejected, (state, action) => {
+      .addCase(deletePerson.rejected, (state, action) => {
         state.status.delete.loading = false;
         state.status.delete.success = false;
         state.error = action.error.message;
@@ -241,16 +241,16 @@ export const {
   setOneChecked,
   setAllChecked,
   resetAllChecked,
-} = VolunteerSlice.actions;
+} = PersonSlice.actions;
 export const {
-  getVolunteersStatus,
-  getVolunteers,
+  getPersonsStatus,
+  getPersons,
   getSortOrder,
   getSortBy,
-  getCountVolunteers,
+  getCountPersons,
   getActivePage,
   getRangeOnPage,
   getOneChecked,
   getErrors,
-} = VolunteerSlice.selectors;
-export default VolunteerSlice;
+} = PersonSlice.selectors;
+export default PersonSlice;

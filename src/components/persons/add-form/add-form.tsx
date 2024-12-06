@@ -14,11 +14,12 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
-import { TProject } from "@/types";
-import { createVolunteer } from "@/services/volunteer/action";
+import { TPersonRoles, TProject } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
-import { getVolunteersStatus } from "@/services/volunteer/reducer";
 import { AddFormButtons } from "@/components/buttons";
+import { getPersonsStatus } from "@/services/person/reducer";
+import { createPerson } from "@/services/person/action";
+import { personRoles } from "../person-roles";
 import "@mantine/dates/styles.css";
 import classes from "./add-form.module.css";
 
@@ -35,12 +36,13 @@ type TInitialValues = {
   phone: string;
   email: string;
   district: string;
+  roles: TPersonRoles;
   projects: string[];
 };
 
 export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
   const dispatch = useDispatch();
-  const status = useSelector(getVolunteersStatus);
+  const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
   dayjs.extend(customParseFormat); // кастомный формат ввода даты
   const correctAge = 18; // допустимый возраст волонтера
@@ -53,6 +55,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
     phone: "",
     email: "",
     district: "",
+    roles: [],
     projects: [],
   };
 
@@ -68,7 +71,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
           : "Фамилия должна быть не короче двух букв",
       name: (value) =>
         !value.length
-          ? "Имя не должно быть пустым"
+          ? "Укажите имя"
           : /^[А-яЁё]{2,}$/.test(value)
           ? null
           : "Имя должно быть не короче двух букв",
@@ -80,7 +83,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
           : "Отчество должно быть не короче двух букв",
       phone: () =>
         !phone.length
-          ? "Телефон не должен быть пустым"
+          ? "Укажите телефон"
           : /^.{18}$/.test(phone)
           ? null
           : "Не корректный номер телефона",
@@ -91,20 +94,24 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
           ? null
           : "Не корректный email",
       district: (value) =>
-        !value.length ? "Район не должен быть пустым" : null,
+        !value.length ? "Выберите район" : null,
+      roles: (value) => !value.length ? "Выберите роль" : null,
     },
   });
 
   const handleSubmit = () => {
-    const newVolunteer = {
+    const newPerson = {
       surname: form.getValues().surname || undefined,
       name: form.getValues().name,
       patronymic: form.getValues().patronymic || undefined,
       birthday: dateFormat(form.getValues().birthday) || undefined,
       phone: phone,
       email: form.getValues().email || undefined,
+      district: form.getValues().district,
+      roles: form.getValues().roles,
+      projectsIds: form.getValues().projects || undefined,
     };
-    dispatch(createVolunteer(newVolunteer));
+    dispatch(createPerson(newPerson));
   };
 
   return (
@@ -190,7 +197,15 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
           required
         ></Select>
       </Fieldset>
-      <Fieldset legend="Прочее" className={classes.fieldset}>
+      <Fieldset legend="" className={classes.fieldset}>
+        <MultiSelect
+          id="roles"
+          label="Роль"
+          data={personRoles.map((role) => ({ value: role.value, label: role.label }))}
+          key={form.key("roles")}
+          {...form.getInputProps("roles")}
+          required
+        />
         <MultiSelect
           id="projects"
           label="Проекты"

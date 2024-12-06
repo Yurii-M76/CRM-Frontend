@@ -1,10 +1,10 @@
-import { TVolunteer } from ".";
+import { TPerson } from ".";
 
 export type TProject = {
   id: string;
   title: string;
   describe: string;
-  volunteers: TVolunteer[];
+  persons: TPerson[];
   createdAt: Date;
   updatedAt: Date;
 };

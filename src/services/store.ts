@@ -5,12 +5,12 @@ import {
   useSelector as selectorHook,
 } from "react-redux";
 import userSlice from "./user/reducer";
-import VolunteerSlice from "./volunteer/reducer";
+import PersonSlice from "./person/reducer";
 import projectSlice from "./project/reducer";
 
 export const rootReducer = combineReducers({
   [userSlice.reducerPath]: userSlice.reducer,
-  [VolunteerSlice.reducerPath]: VolunteerSlice.reducer,
+  [PersonSlice.reducerPath]: PersonSlice.reducer,
   [projectSlice.reducerPath]: projectSlice.reducer,
 });
 

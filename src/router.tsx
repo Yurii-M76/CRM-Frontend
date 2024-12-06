@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { MailingPage, NotFoundPage, ProjectsPage, SettingsPage, VolunteersPage } from "./pages";
+import { MailingPage, NotFoundPage, PersonsPage, ProjectsPage, SettingsPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -8,8 +8,8 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/volunteers",
-        element: <VolunteersPage />,
+        path: "/persons",
+        element: <PersonsPage />,
       },
       {
         path: "/projects",

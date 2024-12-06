@@ -116,7 +116,7 @@ export const createDataFromApi = async <T>(
     });
     return await checkResponse<T>(response);
   } catch (error) {
-    console.error("Request failed (create):", error);
+    console.error(`Request failed (${path} create):`, error);
     return Promise.reject(error);
   }
 };
@@ -134,7 +134,7 @@ export const getAllDataFromApi = async <T>(path: string): Promise<T> => {
     });
     return await checkResponse<T>(response);
   } catch (error) {
-    console.error("Request failed (find all):", error);
+    console.error(`Request failed (${path} find all):`, error);
     return Promise.reject(error);
   }
 };
@@ -156,7 +156,7 @@ export const getOneDataFromApi = async <T>(
     });
     return await checkResponse<T>(response);
   } catch (error) {
-    console.error("Request failed (find one):", error);
+    console.error(`Request failed (${path} find one):`, error);
     return Promise.reject(error);
   }
 };
@@ -179,7 +179,7 @@ export const updateDataFromApi = async <T>(
     });
     return await checkResponse<T>(response);
   } catch (error) {
-    console.error("Request failed (update):", error);
+    console.error(`Request failed (${path} update):`, error);
     return Promise.reject(error);
   }
 };
@@ -200,7 +200,7 @@ export const deleteDataFromApi = async <T>(
     });
     return await checkResponse<T>(response);
   } catch (error) {
-    console.error("Request failed (delete):", error);
+    console.error(`Request failed (${path} delete):`, error);
     return Promise.reject(error);
   }
 };
