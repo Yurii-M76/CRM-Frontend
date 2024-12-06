@@ -1,9 +1,7 @@
-// FIXME: исправить отображение вновь добавленного волонтера в таблице
 // FIXME: исправить сброс фильтров при удалении волонтера
 // TODO: реализовать редактирование волонтера через форму
-// TODO: реализовать удаление волонтера по кнопке
 
-import { Button, Checkbox, Table, Text } from "@mantine/core";
+import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
@@ -25,7 +23,6 @@ import {
 } from "@/services/person/reducer";
 import { dateFormatForTable } from "@/utils/date-format-for-table";
 import { Column, TPerson } from "@/types";
-import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
 import {
   ActionButtons,
   NoData,
@@ -40,6 +37,8 @@ import { DeleteModalButtons } from "@/components/buttons/delete-modal-buttons";
 import { AddForm } from "../add-form/add-form";
 import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
+import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
+import { personRoles } from "../person-roles";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -47,7 +46,7 @@ const columns: Column<TPerson>[] = [
   { label: "Телефон", accessor: "phone", size: 150, sorted: true },
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
-  { label: "Рейтинг", accessor: "rating", size: 130, sorted: true },
+  { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: false },
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
@@ -77,7 +76,7 @@ export const PersonsTable = () => {
       size="md"
     >
       <Text>
-        Вы уверены, что хотите удалить волонтера? Это действие нельзя отменить.
+        Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
       </Text>
       <DeleteModalButtons
         loading={status.delete.loading}
@@ -85,16 +84,14 @@ export const PersonsTable = () => {
           setIsOpenModalToDelete(false);
           setIdToDelete(null);
         }}
-        onClickToDelete={() =>
-          idToDelete && dispatch(deletePerson(idToDelete))
-        }
+        onClickToDelete={() => idToDelete && dispatch(deletePerson(idToDelete))}
       />
     </Modal>
   );
 
   const addFormModal = (
     <Modal
-      title="Добавить волонтера"
+      title="Новый персоналий"
       opened={isOpenModalAddForm}
       close={() => setIsOpenModalAddForm(!isOpenModalAddForm)}
       size="lg"
@@ -124,10 +121,14 @@ export const PersonsTable = () => {
     );
   };
 
+  const PersonRoleLocale = (role: string) => {
+    const roleItem = personRoles.find(r => r.value === role);
+    return roleItem ? roleItem.label : "";
+  };
+
   const indeterminate =
     checkedIds.length > 0 && checkedIds.length < countPersons;
-  const isAllCheched =
-    countPersons !== 0 && checkedIds.length === countPersons;
+  const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
   const thead = columns.map((column, index) => (
     <Table.Th
@@ -183,7 +184,11 @@ export const PersonsTable = () => {
         <Table.Td>{item.phone ?? "-"}</Table.Td>
         <Table.Td>{dateFormatForTable(item.birthday) ?? "-"}</Table.Td>
         <Table.Td>{item.email ?? "-"}</Table.Td>
-        <Table.Td>{item.rating ?? "-"}</Table.Td>
+        <Table.Td>
+          {item.roles.map((role, index) => (
+            <Pill key={index} mr={4}>{PersonRoleLocale(role)}</Pill>
+          ))}
+        </Table.Td>
         <Table.Td>
           <ScrollBlock
             height={400}
