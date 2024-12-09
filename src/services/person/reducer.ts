@@ -1,5 +1,3 @@
-// TODO: протестировать работу фильтрации и пагинации, состояния при добавлении и удалении волонтера
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createPerson, deletePerson, getAllPersons } from "./action";
 import { TPerson } from "@/types";
