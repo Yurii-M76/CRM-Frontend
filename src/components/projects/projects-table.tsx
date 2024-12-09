@@ -1,7 +1,3 @@
-// TODO: реализовать добавление проекта через форму
-// TODO: реализовать редактирование проекта через форму
-// TODO: реализовать удаление проекта по кнопке
-
 import { Button, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
@@ -21,22 +17,23 @@ import {
 import { Column, TProject } from "@/types";
 import { ProjectsTableToolbar } from ".";
 import {
-  // ActionButtons,
   THeadSortButton,
   NoData,
   TableInfoBlock,
+  ActionButtons,
 } from "@components/table";
 import { Loader } from "../loader/loader";
 import { Paginator } from "../paginator/paginator";
-import { ScrollBlock } from "../scroll-block/scroll-block";
+import { CollapseList } from "../collapse-list/collapse-list";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
-  { label: "Название", accessor: "title", size: 200, sorted: true },
+  { label: "Название", accessor: "title", size: 300, sorted: true },
   { label: "Описание", accessor: "describe", size: 400, sorted: true },
-  { label: "Участники", accessor: "persons", size: 300, sorted: false },
+  { label: "Участники", accessor: "persons", size: 320, sorted: false },
+  { label: "", accessor: "id", size: 100, sorted: false },
 ];
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
+const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
 
 export const ProjectsTable = () => {
   const dispatch = useDispatch();
@@ -59,13 +56,8 @@ export const ProjectsTable = () => {
   };
 
   const thead = columns.map((column, index) => (
-    <Table.Th
-      miw={column.size}
-      maw={column.size}
-      key={index}
-      className={classes.tableTh}
-    >
-      <div className={classes.column_name}>
+    <Table.Th miw={column.size} key={index} className={classes.tableTh}>
+      {column.label && (
         <Button.Group>
           <Button
             variant="light"
@@ -84,7 +76,7 @@ export const ProjectsTable = () => {
             isDisabled={isLoading}
           />
         </Button.Group>
-      </div>
+      )}
     </Table.Th>
   ));
 
@@ -107,11 +99,7 @@ export const ProjectsTable = () => {
         <Table.Td>{item.title}</Table.Td>
         <Table.Td>{item.describe}</Table.Td>
         <Table.Td>
-          <ScrollBlock
-            height={400}
-            maxItems={3}
-            totalItems={item.persons.length}
-          >
+          <CollapseList totalItems={item.persons.length}>
             <ul>
               {item.persons.length
                 ? item.persons.map((item) => (
@@ -121,9 +109,14 @@ export const ProjectsTable = () => {
                   ))
                 : "-"}
             </ul>
-          </ScrollBlock>
+          </CollapseList>
         </Table.Td>
-        <Table.Td>{/* <ActionButtons /> */}</Table.Td>
+        <Table.Td>
+          <ActionButtons
+            handleClickFromEdit={() => ""}
+            handleClickFromDelete={() => ""}
+          />
+        </Table.Td>
       </Table.Tr>
     ));
 
@@ -132,30 +125,27 @@ export const ProjectsTable = () => {
   }, [dispatch]);
 
   return (
-    <div
-      className={classes.container}
-      style={{ maxInlineSize: `${widthTable + 300}px`, minInlineSize: "350px" }}
-    >
+    <div className={classes.container} style={{ maxWidth: widthTable }}>
       <ProjectsTableToolbar
         isLoading={isLoading}
         isDisabled={!projects.length}
       />
       <div className={classes.tableBox}>
         <Table
-          maw={widthTable + 250}
+          striped
           highlightOnHover
           horizontalSpacing="md"
-          verticalSpacing="10px"
           withColumnBorders
+          withTableBorder
           className={classes.table}
         >
           <Table.Thead>
             <Table.Tr>
               {thead}
-              <Table.Th w={100}>{/*actions*/}</Table.Th>
+              {/* <Table.Th w={100}>actions</Table.Th> */}
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>{!isLoading && rows}</Table.Tbody>
         </Table>
         {loader}
         {noData}

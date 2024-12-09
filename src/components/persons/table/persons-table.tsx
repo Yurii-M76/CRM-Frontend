@@ -28,7 +28,7 @@ import {
 } from "@/components/table";
 import { Paginator } from "@/components/paginator/paginator";
 import { Loader } from "@/components/loader/loader";
-import { ScrollBlock } from "@/components/scroll-block/scroll-block";
+import { CollapseList } from "@/components/collapse-list/collapse-list";
 import { Modal } from "@/components/modal/modal";
 import { DeleteModalButtons } from "@/components/buttons/delete-modal-buttons";
 import { AddForm } from "../add-form/add-form";
@@ -40,13 +40,15 @@ import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
   { label: "ФИО", accessor: "surname", size: 260, sorted: true },
-  { label: "Телефон", accessor: "phone", size: 150, sorted: true },
+  { label: "Телефон", accessor: "phone", size: 170, sorted: true },
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: false },
+  { label: "", accessor: "id", size: 100, sorted: false },
 ];
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0);
+
+const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 54;
 
 export const PersonsTable = () => {
   const dispatch = useDispatch();
@@ -61,8 +63,10 @@ export const PersonsTable = () => {
   const [isOpenModalAddForm, setIsOpenModalAddForm] = useState(false);
   const [isOpenModalToDelete, setIsOpenModalToDelete] = useState(false);
   const [idToDelete, setIdToDelete] = useState<string | null>(null);
-  const loader = status.read.loading && <Loader />;
-  const noData = !status.read.loading && !persons.length && <NoData />;
+
+  const isLoading = status.read.loading;
+  const loader = isLoading && <Loader />;
+  const noData = !isLoading && !persons.length && <NoData />;
 
   const confirmActionModal = (
     <Modal
@@ -119,7 +123,7 @@ export const PersonsTable = () => {
   };
 
   const PersonRoleLocale = (role: string) => {
-    const roleItem = personRoles.find(r => r.value === role);
+    const roleItem = personRoles.find((r) => r.value === role);
     return roleItem ? roleItem.label : "";
   };
 
@@ -128,20 +132,15 @@ export const PersonsTable = () => {
   const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
   const thead = columns.map((column, index) => (
-    <Table.Th
-      miw={column.size}
-      maw={column.size}
-      key={index}
-      className={classes.tableTh}
-    >
-      <div className={classes.column_name}>
+    <Table.Th miw={column.size} key={index} className={classes.tableTh}>
+      {column.label && (
         <Button.Group>
           <Button
             variant={"light"}
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
             onClick={() => column.sorted && sortedColumn(column.accessor)}
-            disabled={status.read.loading || !persons.length}
+            disabled={isLoading || !persons.length}
           >
             {column.label}
           </Button>
@@ -150,15 +149,15 @@ export const PersonsTable = () => {
             sortBy={sortBy}
             sortOrder={sortOrder}
             resetSort={() => dispatch(resetSort())}
-            isDisabled={status.read.loading}
+            isDisabled={isLoading}
           />
         </Button.Group>
-      </div>
+      )}
     </Table.Th>
   ));
 
   const rows =
-    !status.read.loading &&
+    !isLoading &&
     persons.map((item) => (
       <Table.Tr
         key={item.id}
@@ -183,21 +182,19 @@ export const PersonsTable = () => {
         <Table.Td>{item.email ?? "-"}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
-            <Pill key={index} mr={4}>{PersonRoleLocale(role)}</Pill>
+            <Pill key={index} mr={4}>
+              {PersonRoleLocale(role)}
+            </Pill>
           ))}
         </Table.Td>
         <Table.Td>
-          <ScrollBlock
-            height={400}
-            maxItems={3}
-            totalItems={item.projects.length}
-          >
+          <CollapseList totalItems={item.projects.length}>
             <ul>
               {item.projects.map((item) => {
                 return <li key={item.id}>{item.title}</li>;
               })}
             </ul>
-          </ScrollBlock>
+          </CollapseList>
         </Table.Td>
         <Table.Td>
           <ActionButtons
@@ -224,44 +221,37 @@ export const PersonsTable = () => {
 
   return (
     <>
-      <div
-        className={classes.container}
-        style={{
-          maxInlineSize: `${widthTable + 300}px`,
-          minInlineSize: "350px",
-        }}
-      >
+      <div className={classes.container} style={{ maxWidth: widthTable }}>
         <PersonsTableToolbar
-          isLoading={status.read.loading}
+          isLoading={isLoading}
           isDisabled={!persons.length}
           openedAddForm={() => setIsOpenModalAddForm(true)}
         />
         <div className={classes.tableBox}>
           <Table
-            maw={widthTable + 250}
+            striped
             highlightOnHover
             horizontalSpacing="md"
-            verticalSpacing="10px"
             withColumnBorders
+            withTableBorder
             className={classes.table}
           >
             <Table.Thead>
               <Table.Tr>
-                <Table.Th className={classes.thead}>
+                <Table.Th>
                   <Checkbox
                     checked={isAllCheched}
                     indeterminate={indeterminate}
                     onChange={() => {
                       dispatch(setAllChecked());
                     }}
-                    disabled={status.read.loading || !persons.length}
+                    disabled={isLoading || !persons.length}
                   />
                 </Table.Th>
                 {thead}
-                <Table.Th w={100}>{/*actions*/}</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
+            <Table.Tbody>{!isLoading && rows}</Table.Tbody>
           </Table>
           {loader}
           {noData}
