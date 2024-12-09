@@ -1,6 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/layout";
-import { MailingPage, NotFoundPage, PersonsPage, ProjectsPage, SettingsPage } from "./pages";
+import {
+  AdminPage,
+  MailingPage,
+  NotFoundPage,
+  PersonsPage,
+  ProjectsPage,
+  SettingsPage,
+} from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <SettingsPage />,
+      },
+      {
+        path: "/admin-page",
+        element: <AdminPage />,
       },
     ],
   },

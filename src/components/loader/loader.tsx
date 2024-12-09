@@ -1,9 +1,10 @@
-import { Center, Loader as MantineLoader } from "@mantine/core";
+import { Loader as MantineLoader } from "@mantine/core";
+import classes from "./loader.module.css";
 
 export const Loader = () => {
   return (
-    <Center pt={20}>
-      <MantineLoader size={30} />
-    </Center>
+    <div className={classes.loader}>
+      <MantineLoader size={26} />
+    </div>
   );
 };

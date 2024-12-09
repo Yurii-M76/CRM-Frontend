@@ -1,6 +1,3 @@
-// FIXME: исправить сброс фильтров при удалении волонтера
-// TODO: реализовать редактирование волонтера через форму
-
 import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";

@@ -88,6 +88,18 @@ export const ProjectsTable = () => {
     </Table.Th>
   ));
 
+  const PersonFullName = (
+    surname: string,
+    name: string,
+    patronymic: string
+  ): string => {
+    const checkSurname = surname ? surname : "";
+    const checkName = name ? name : "";
+    const checkPatronymic = patronymic ? patronymic : "";
+    const result = `${checkSurname} ${checkName} ${checkPatronymic}`.trim();
+    return result;
+  };
+
   const rows =
     !isLoading &&
     projects.map((item) => (
@@ -101,18 +113,17 @@ export const ProjectsTable = () => {
             totalItems={item.persons.length}
           >
             <ul>
-              {item.persons.length &&
-                item.persons.map((item) => (
-                  <li key={item.id}>
-                    {item.surname + " " + item.name + " " + item.patronymic}
-                  </li>
-                ))}
+              {item.persons.length
+                ? item.persons.map((item) => (
+                    <li key={item.id}>
+                      {PersonFullName(item.surname, item.name, item.patronymic)}
+                    </li>
+                  ))
+                : "-"}
             </ul>
           </ScrollBlock>
         </Table.Td>
-        <Table.Td>
-          {/* <ActionButtons /> */}
-        </Table.Td>
+        <Table.Td>{/* <ActionButtons /> */}</Table.Td>
       </Table.Tr>
     ));
 
