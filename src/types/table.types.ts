@@ -1,6 +1,6 @@
 export type Column<T> = {
   label: string;
   accessor: keyof T;
-  sorted: boolean;
+  sorted?: boolean;
   size: number;
 };
