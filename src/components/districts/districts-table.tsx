@@ -10,10 +10,10 @@ import { Loader } from "../loader/loader";
 import { IconPlus } from "@tabler/icons-react";
 import classes from "../table/table.module.css";
 
-const columns: Column<TDistrict & { index: number; actions: number }>[] = [
-  { label: "#", accessor: "index", size: 60 },
+const columns: Column<TDistrict>[] = [
+  { label: "#", accessor: "id", size: 60 },
   { label: "Наименование района", accessor: "name", size: 400 },
-  { label: "Действия", accessor: "actions", size: 100 },
+  { label: "Действия", accessor: "id", size: 100 },
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
 
@@ -52,18 +52,15 @@ export const DistrictsTable = () => {
   }, [dispatch]);
 
   return (
-    <>
-      <div
-        className={classes.tableHeader}
-        style={{ maxWidth: widthTable }}
-      >
+    <div className={classes.container} style={{ maxWidth: widthTable }}>
+      <div className={classes.tableHeader}>
         <h2>Районы</h2>
         <Button variant="light" leftSection={<IconPlus size={14} />}>
           Добавить
         </Button>
       </div>
 
-      <div className={classes.tableBox} style={{ maxWidth: widthTable }}>
+      <div className={classes.tableBox}>
         <Table
           maw={widthTable}
           striped
@@ -81,6 +78,6 @@ export const DistrictsTable = () => {
         </Table>
         {isLoading && <Loader />}
       </div>
-    </>
+    </div>
   );
 };
