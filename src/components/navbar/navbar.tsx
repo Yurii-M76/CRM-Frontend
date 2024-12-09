@@ -4,9 +4,10 @@ import {
   IconMail,
   IconCalendarEvent,
   IconUsers,
+  IconAdjustmentsAlt,
 } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@mantine/core";
+import { Button, Divider } from "@mantine/core";
 import { useDispatch } from "@/services/store";
 import { logout } from "@/services/user/action";
 import classes from "./Navbar.module.css";
@@ -19,6 +20,14 @@ const tabs = [
   { link: "settings", label: "Настройки", icon: IconSettings },
 ];
 
+const adminTabs = [
+  {
+    link: "admin-page",
+    label: "Панель администратора",
+    icon: IconAdjustmentsAlt,
+  },
+];
+
 export function Navbar() {
   const location = useLocation().pathname;
   const dispatch = useDispatch();
@@ -26,7 +35,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
+    navigate("/");
   };
 
   const links = tabs.map((item) => (
@@ -45,9 +54,25 @@ export function Navbar() {
     </Link>
   ));
 
+  const adminLinks = adminTabs.map((item) => (
+    <Link
+      to={item.link}
+      className={classes.link}
+      data-active={location === "/" + item.link || undefined}
+      key={item.label}
+    >
+      <item.icon className={classes.linkIcon} stroke={1.5} />
+      <span>{item.label}</span>
+    </Link>
+  ));
+
   return (
     <>
-      <div className={classes.navbarMain}>{links}</div>
+      <div className={classes.navbarMain}>
+        {links}
+        <Divider mt={10} mb={10} />
+        {adminLinks}
+      </div>
 
       <div className={classes.footer}>
         <Button fullWidth variant="light" color="red" onClick={handleLogout}>
