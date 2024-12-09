@@ -51,6 +51,7 @@ export const districtsSlice = createSlice({
   reducers: {},
   selectors: {
     getDistrictsStatus: (state) => state.status,
+    getDistricts: (state) => state.items,
   },
   extraReducers(builder) {
     // create
@@ -127,5 +128,5 @@ export const districtsSlice = createSlice({
   },
 });
 
-export const { getDistrictsStatus } = districtsSlice.selectors;
+export const { getDistrictsStatus, getDistricts } = districtsSlice.selectors;
 export default districtsSlice;
