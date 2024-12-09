@@ -23,7 +23,7 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
 }) => {
   return (
     <>
-      <div className={classes.table_toolbar}>
+      <div className={classes.tableToolbar}>
         <div className={classes.flexGroup}>
           <ButtonGroup>
             <Button
