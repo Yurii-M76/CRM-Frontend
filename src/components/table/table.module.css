@@ -2,91 +2,25 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 30px;
-}
-
-.flexGroup {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  gap: 24px;
 }
 
 .tableBox {
   display: block;
-  overflow: auto;
+  overflow-y: auto;
 }
 
-.column_name {
+.tableToolbar {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
 
 .table tbody {
   font-size: 0.95rem;
-}
-
-.projects_list_for_table {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.spoiler {
-  display: flex;
-  flex-direction: column;
-}
-
-.spoiler_close {
-  max-height: 70px;
-  overflow-y: hidden;
-  transition: max-height ease-in-out .3s;
-}
-
-.spoiler_open {
-  max-height: 350px;
-  overflow-y: scroll;
-  transition: max-height ease-in-out .3s;
-}
-
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.count_badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
-}
-
-.action_buttons {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-}
-
-.table_toolbar {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
 }
 
 .tableHeader {
@@ -98,6 +32,24 @@
   width: 100%;
 }
 
+.flexGroup {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
 ul {
   list-style: none;
   margin: 0;
@@ -105,7 +57,7 @@ ul {
 }
 
 @media (width <= 431px) {
-  .table_toolbar {
+  .tableToolbar {
     justify-content: center;
   }
   .flexGroup {

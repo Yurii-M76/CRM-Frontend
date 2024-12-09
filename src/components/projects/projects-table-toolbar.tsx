@@ -22,7 +22,7 @@ export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
       <Modal title="Добавить проект" opened={opened} close={close} size="lg">
         form
       </Modal>
-      <div className={classes.table_toolbar}>
+      <div className={classes.tableToolbar}>
         <div className={classes.flexGroup}>
           <ButtonGroup>
             <Button

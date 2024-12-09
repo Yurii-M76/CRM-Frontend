@@ -13,7 +13,7 @@ export const ActionButtons: FC<TActionButtons> = ({
   handleClickFromDelete,
 }) => {
   return (
-    <div className={classes.action_buttons}>
+    <div className={classes.actionButtons}>
       <Tooltip label="Редактировать">
         <ActionIcon
           aria-label="Редактировать"
