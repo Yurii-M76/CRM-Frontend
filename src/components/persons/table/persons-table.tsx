@@ -47,6 +47,7 @@ const columns: Column<TPerson>[] = [
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: false },
+  { label: "Район", accessor: "districts", size: 210, sorted: true },
   { label: "", accessor: "id", size: 100, sorted: false },
 ];
 
@@ -200,6 +201,7 @@ export const PersonsTable = () => {
             </ul>
           </CollapseList>
         </Table.Td>
+        <Table.Td>{item.districts.map((district) => district.name)}</Table.Td>
         <Table.Td>
           <ActionButtons
             handleClickFromEdit={() => onClickFromEdit(item.id)}
