@@ -1,4 +1,4 @@
-import { TProject } from "./project.types";
+import { TDistrict, TProject } from ".";
 
 export type TPerson = {
   id: string;
@@ -9,6 +9,7 @@ export type TPerson = {
   phone: string;
   email: string;
   roles: TPersonRoles;
+  districts: TDistrict[];
   projects: TProject[];
   createdAt: Date;
   updatedAt: Date;

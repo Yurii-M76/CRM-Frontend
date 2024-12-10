@@ -5,6 +5,4 @@ export type TProject = {
   title: string;
   describe: string;
   persons: TPerson[];
-  createdAt: Date;
-  updatedAt: Date;
 };

@@ -36,6 +36,8 @@ import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
 import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
 import { personRoles } from "../person-roles";
+import { getDistricts } from "@/services/districts/reducer";
+import { getAllDistricts } from "@/services/districts/action";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -45,6 +47,7 @@ const columns: Column<TPerson>[] = [
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: false },
+  { label: "Район", accessor: "districts", size: 210, sorted: true },
   { label: "", accessor: "id", size: 100, sorted: false },
 ];
 
@@ -55,6 +58,7 @@ export const PersonsTable = () => {
   const status = useSelector(getPersonsStatus);
   const persons = useSelector(getPersons);
   const projects = useSelector(getProjects);
+  const districts = useSelector(getDistricts);
   const sortBy = useSelector(getSortBy);
   const sortOrder = useSelector(getSortOrder);
   const checkedIds = useSelector(getOneChecked);
@@ -99,6 +103,7 @@ export const PersonsTable = () => {
     >
       <AddForm
         projects={projects}
+        districts={districts}
         onClose={() => setIsOpenModalAddForm(false)}
       />
     </Modal>
@@ -196,6 +201,7 @@ export const PersonsTable = () => {
             </ul>
           </CollapseList>
         </Table.Td>
+        <Table.Td>{item.districts.map((district) => district.name)}</Table.Td>
         <Table.Td>
           <ActionButtons
             handleClickFromEdit={() => onClickFromEdit(item.id)}
@@ -208,6 +214,7 @@ export const PersonsTable = () => {
   useEffect(() => {
     dispatch(getAllPersons());
     dispatch(findAllProjects());
+    dispatch(getAllDistricts());
   }, [dispatch]);
 
   useEffect(() => {

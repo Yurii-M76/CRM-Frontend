@@ -13,17 +13,26 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
-import { TPersonRoles, TProject } from "@/types";
+import { TPersonRoles, TProject, TDistrict } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
 import { AddFormButtons } from "@/components/buttons";
 import { getPersonsStatus } from "@/services/person/reducer";
 import { createPerson } from "@/services/person/action";
 import { personRoles } from "../person-roles";
+import {
+  validationEmail,
+  validationName,
+  validationPatronymic,
+  validationPhone,
+  validationSurname,
+} from "./validation";
 import "@mantine/dates/styles.css";
 import classes from "./add-form.module.css";
+import exceptions from "@/constants/exceptions";
 
 type TAddForm = {
   projects: TProject[];
+  districts: TDistrict[];
   onClose?: () => void;
 };
 
@@ -34,12 +43,12 @@ type TInitialValues = {
   birthday: string;
   phone: string;
   email: string;
-  district: string;
   roles: TPersonRoles;
   projects: string[];
+  districts: string[];
 };
 
-export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
+export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
@@ -53,48 +62,24 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
     birthday: "",
     phone: "",
     email: "",
-    district: "",
     roles: [],
     projects: [],
+    districts: [],
   };
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: initialValues,
     validate: {
-      surname: (value) =>
-        !value.length
-          ? null
-          : /^[А-яЁё-]{2,}$/.test(value)
-          ? null
-          : "Фамилия должна быть не короче двух букв",
-      name: (value) =>
-        !value.length
-          ? "Укажите имя"
-          : /^[А-яЁё]{2,}$/.test(value)
-          ? null
-          : "Имя должно быть не короче двух букв",
-      patronymic: (value) =>
-        !value.length
-          ? null
-          : /^[А-яЁё]{2,}$/.test(value)
-          ? null
-          : "Отчество должно быть не короче двух букв",
-      phone: () =>
-        !phone.length
-          ? "Укажите телефон"
-          : /^.{18}$/.test(phone)
-          ? null
-          : "Не корректный номер телефона",
-      email: (value) =>
-        !value.length
-          ? null
-          : /^\S+@\S{2,}\.\S{2,}$/.test(value)
-          ? null
-          : "Не корректный email",
-      district: (value) =>
-        !value.length ? "Выберите район" : null,
-      roles: (value) => !value.length ? "Выберите роль" : null,
+      surname: validationSurname,
+      name: validationName,
+      patronymic: validationPatronymic,
+      phone: validationPhone,
+      email: validationEmail,
+      districts: (value) =>
+        !value.length ? exceptions.persons.formValidate.requiredField : null,
+      roles: (value) =>
+        !value.length ? exceptions.persons.formValidate.requiredField : null,
     },
   });
 
@@ -106,8 +91,8 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
       birthday: dateFormat(form.getValues().birthday) || undefined,
       phone: phone,
       email: form.getValues().email || undefined,
-      district: form.getValues().district,
       roles: form.getValues().roles,
+      districtsIds: [form.getValues().districts],
       projectsIds: form.getValues().projects || undefined,
     };
     dispatch(createPerson(newPerson));
@@ -183,24 +168,22 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
       </Fieldset>
       <Fieldset legend="Адрес" className={classes.fieldset}>
         <Select
-          id="district"
+          id="districts"
           label="Район"
-          data={[
-            "Большесельский район",
-            "Борисоглебский район",
-            "город Ярославль",
-            "город Рыбинск",
-          ]}
-          key={form.key("district")}
-          {...form.getInputProps("district")}
+          data={districts.map((item) => ({ value: item.id, label: item.name }))}
+          key={form.key("districts")}
+          {...form.getInputProps("districts")}
           required
-        ></Select>
+        />
       </Fieldset>
       <Fieldset legend="" className={classes.fieldset}>
         <MultiSelect
           id="roles"
           label="Роль"
-          data={personRoles.map((role) => ({ value: role.value, label: role.label }))}
+          data={personRoles.map((role) => ({
+            value: role.value,
+            label: role.label,
+          }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
           required
