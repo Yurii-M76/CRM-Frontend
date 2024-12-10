@@ -36,6 +36,8 @@ import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
 import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
 import { personRoles } from "../person-roles";
+import { getDistricts } from "@/services/districts/reducer";
+import { getAllDistricts } from "@/services/districts/action";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -55,6 +57,7 @@ export const PersonsTable = () => {
   const status = useSelector(getPersonsStatus);
   const persons = useSelector(getPersons);
   const projects = useSelector(getProjects);
+  const districts = useSelector(getDistricts);
   const sortBy = useSelector(getSortBy);
   const sortOrder = useSelector(getSortOrder);
   const checkedIds = useSelector(getOneChecked);
@@ -99,6 +102,7 @@ export const PersonsTable = () => {
     >
       <AddForm
         projects={projects}
+        districts={districts}
         onClose={() => setIsOpenModalAddForm(false)}
       />
     </Modal>
@@ -208,6 +212,7 @@ export const PersonsTable = () => {
   useEffect(() => {
     dispatch(getAllPersons());
     dispatch(findAllProjects());
+    dispatch(getAllDistricts());
   }, [dispatch]);
 
   useEffect(() => {

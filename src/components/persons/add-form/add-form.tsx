@@ -13,7 +13,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
 import { dateFormat } from "@/utils/date-format";
-import { TPersonRoles, TProject } from "@/types";
+import { TPersonRoles, TProject, TDistrict } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
 import { AddFormButtons } from "@/components/buttons";
 import { getPersonsStatus } from "@/services/person/reducer";
@@ -24,6 +24,7 @@ import classes from "./add-form.module.css";
 
 type TAddForm = {
   projects: TProject[];
+  districts: TDistrict[];
   onClose?: () => void;
 };
 
@@ -34,12 +35,12 @@ type TInitialValues = {
   birthday: string;
   phone: string;
   email: string;
-  district: string;
   roles: TPersonRoles;
-  projects: string[];
+  projects: [];
+  district: string;
 };
 
-export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
+export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
@@ -53,9 +54,9 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
     birthday: "",
     phone: "",
     email: "",
-    district: "",
     roles: [],
     projects: [],
+    district: "",
   };
 
   const form = useForm({
@@ -92,9 +93,8 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
           : /^\S+@\S{2,}\.\S{2,}$/.test(value)
           ? null
           : "Не корректный email",
-      district: (value) =>
-        !value.length ? "Выберите район" : null,
-      roles: (value) => !value.length ? "Выберите роль" : null,
+      district: (value) => (value === "" ? "Выберите район" : null),
+      roles: (value) => (!value.length ? "Выберите роль" : null),
     },
   });
 
@@ -185,12 +185,7 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
         <Select
           id="district"
           label="Район"
-          data={[
-            "Большесельский район",
-            "Борисоглебский район",
-            "город Ярославль",
-            "город Рыбинск",
-          ]}
+          data={districts.map((item) => ({ value: item.id, label: item.name }))}
           key={form.key("district")}
           {...form.getInputProps("district")}
           required
@@ -200,7 +195,10 @@ export const AddForm: FC<TAddForm> = ({ projects, onClose }) => {
         <MultiSelect
           id="roles"
           label="Роль"
-          data={personRoles.map((role) => ({ value: role.value, label: role.label }))}
+          data={personRoles.map((role) => ({
+            value: role.value,
+            label: role.label,
+          }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
           required
