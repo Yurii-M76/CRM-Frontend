@@ -18,7 +18,7 @@ import {
   resetAllChecked,
   getPersonsStatus,
 } from "@/services/person/reducer";
-import { dateFormatForTable } from "@/utils/date-format-for-table";
+import { formatDate } from "@/utils/format-date";
 import { Column, TPerson } from "@/types";
 import {
   ActionButtons,
@@ -31,7 +31,7 @@ import { Loader } from "@/components/loader/loader";
 import { CollapseList } from "@/components/collapse-list/collapse-list";
 import { Modal } from "@/components/modal/modal";
 import { DeleteModalButtons } from "@/components/buttons/delete-modal-buttons";
-import { AddForm } from "../add-form/add-form";
+import { FormSavePerson } from "../forms/form-save-person";
 import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
 import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
@@ -64,58 +64,26 @@ export const PersonsTable = () => {
   const checkedIds = useSelector(getOneChecked);
   const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
-  const [isOpenModalAddForm, setIsOpenModalAddForm] = useState(false);
-  const [isOpenModalToDelete, setIsOpenModalToDelete] = useState(false);
-  const [idToDelete, setIdToDelete] = useState<string | null>(null);
+  const [isOpenCreateForm, setIsOpenCreateForm] = useState(false);
+  const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
+  const [isOpenConfirmAction, setIsOpenConfirmAction] = useState(false);
+  const [personData, setPersonData] = useState<TPerson | undefined>(undefined);
+  const [personId, setPersonId] = useState<string | null>(null);
 
   const isLoading = status.read.loading;
   const loader = isLoading && <Loader />;
   const noData = !isLoading && !persons.length && <NoData />;
 
-  const confirmActionModal = (
-    <Modal
-      title="Подтверждение действия"
-      opened={isOpenModalToDelete}
-      close={() => setIsOpenModalToDelete(!isOpenModalToDelete)}
-      closeButton={false}
-      size="md"
-    >
-      <Text>
-        Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
-      </Text>
-      <DeleteModalButtons
-        loading={status.delete.loading}
-        onClickToCancel={() => {
-          setIsOpenModalToDelete(false);
-          setIdToDelete(null);
-        }}
-        onClickToDelete={() => idToDelete && dispatch(deletePerson(idToDelete))}
-      />
-    </Modal>
-  );
-
-  const addFormModal = (
-    <Modal
-      title="Новый персоналий"
-      opened={isOpenModalAddForm}
-      close={() => setIsOpenModalAddForm(!isOpenModalAddForm)}
-      size="lg"
-    >
-      <AddForm
-        projects={projects}
-        districts={districts}
-        onClose={() => setIsOpenModalAddForm(false)}
-      />
-    </Modal>
-  );
-
-  const onClickFromEdit = (id: string) => {
-    console.log("edit " + id);
+  const updateClickHandler = (id: string) => {
+    setIsOpenUpdateForm(true);
+    setPersonId(id);
+    const dataToUpdate = persons.find((person) => person.id === id);
+    setPersonData(dataToUpdate);
   };
 
-  const onClickFromDelete = (id: string) => {
-    setIsOpenModalToDelete(true);
-    setIdToDelete(id);
+  const deleteClickHandler = (id: string) => {
+    setIsOpenConfirmAction(true);
+    setPersonId(id);
   };
 
   const sortedColumn = (sortBy: keyof TPerson) => {
@@ -183,7 +151,7 @@ export const PersonsTable = () => {
           {item.surname} {item.name} {item.patronymic}
         </Table.Td>
         <Table.Td>{item.phone ?? "-"}</Table.Td>
-        <Table.Td>{dateFormatForTable(item.birthday) ?? "-"}</Table.Td>
+        <Table.Td>{formatDate(new Date(item.birthday), "asc") ?? "-"}</Table.Td>
         <Table.Td>{item.email ?? "-"}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
@@ -204,8 +172,8 @@ export const PersonsTable = () => {
         <Table.Td>{item.districts.map((district) => district.name)}</Table.Td>
         <Table.Td>
           <ActionButtons
-            handleClickFromEdit={() => onClickFromEdit(item.id)}
-            handleClickFromDelete={() => onClickFromDelete(item.id)}
+            handleClickFromEdit={() => updateClickHandler(item.id)}
+            handleClickFromDelete={() => deleteClickHandler(item.id)}
           />
         </Table.Td>
       </Table.Tr>
@@ -219,10 +187,10 @@ export const PersonsTable = () => {
 
   useEffect(() => {
     if (status.create.success) {
-      setIsOpenModalAddForm(false);
+      setIsOpenCreateForm(false);
     }
     if (status.delete.success) {
-      setIsOpenModalToDelete(false);
+      setIsOpenConfirmAction(false);
     }
   }, [status.create.success, status.delete.success]);
 
@@ -232,7 +200,7 @@ export const PersonsTable = () => {
         <PersonsTableToolbar
           isLoading={isLoading}
           isDisabled={!persons.length}
-          openedAddForm={() => setIsOpenModalAddForm(true)}
+          openedAddForm={() => setIsOpenCreateForm(true)}
         />
         <div className={classes.tableBox}>
           <Table
@@ -265,7 +233,7 @@ export const PersonsTable = () => {
         </div>
         <div className={classes.flexGroup}>
           <TableInfoBlock
-            entityTitle="волонтеров"
+            entityTitle="персоналий"
             count={countPersons}
             checkedIds={checkedIds.length}
             resetAllChecked={resetAllChecked}
@@ -278,8 +246,59 @@ export const PersonsTable = () => {
           />
         </div>
       </div>
-      {addFormModal}
-      {confirmActionModal}
+
+      <Modal
+        title="Добавить запись"
+        opened={isOpenCreateForm}
+        close={() => setIsOpenCreateForm(false)}
+        size="lg"
+      >
+        <FormSavePerson
+          projects={projects}
+          districts={districts}
+          onClose={() => setIsOpenCreateForm(false)}
+        />
+      </Modal>
+
+      <Modal
+        title="Редактировать запись"
+        opened={isOpenUpdateForm}
+        close={() => {
+          setIsOpenUpdateForm(false);
+          setPersonId(null);
+        }}
+        size="lg"
+      >
+        <FormSavePerson
+          data={personData}
+          projects={projects}
+          districts={districts}
+          onClose={() => setIsOpenUpdateForm(false)}
+        />
+      </Modal>
+
+      <Modal
+        title="Подтверждение действия"
+        opened={isOpenConfirmAction}
+        close={() => {
+          setIsOpenConfirmAction(!isOpenConfirmAction);
+          setPersonId(null);
+        }}
+        closeButton={false}
+        size="md"
+      >
+        <Text>
+          Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
+        </Text>
+        <DeleteModalButtons
+          loading={status.delete.loading}
+          onClickToCancel={() => {
+            setIsOpenConfirmAction(false);
+            setPersonId(null);
+          }}
+          onClickToDelete={() => personId && dispatch(deletePerson(personId))}
+        />
+      </Modal>
     </>
   );
 };

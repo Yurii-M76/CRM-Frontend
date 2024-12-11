@@ -5,7 +5,7 @@ export type TPerson = {
   surname: string;
   name: string;
   patronymic: string;
-  birthday: string;
+  birthday: Date;
   phone: string;
   email: string;
   roles: TPersonRoles;
