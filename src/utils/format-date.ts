@@ -7,7 +7,7 @@
 export const formatDateToString = (
   date: Date | undefined,
   param: "asc" | "desc"
-): string => {
+): string | undefined => {
   if (date) {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -15,5 +15,5 @@ export const formatDateToString = (
     if (param === "asc") return `${day}.${month}.${year}`;
     if (param === "desc") return `${year}-${month}-${day}`;
   }
-  return "";
+  return undefined;
 };
