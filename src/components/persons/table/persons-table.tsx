@@ -18,7 +18,7 @@ import {
   resetAllChecked,
   getPersonsStatus,
 } from "@/services/person/reducer";
-import { formatDate } from "@/utils/format-date";
+import { formatDateToString } from "@/utils/format-date";
 import { Column, TPerson } from "@/types";
 import {
   ActionButtons,
@@ -41,7 +41,7 @@ import { getAllDistricts } from "@/services/districts/action";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
-  { label: "ФИО", accessor: "surname", size: 260, sorted: true },
+  { label: "ФИО", accessor: "fullName", size: 260, sorted: true },
   { label: "Телефон", accessor: "phone", size: 170, sorted: true },
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
@@ -112,7 +112,9 @@ export const PersonsTable = () => {
             variant={"light"}
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
-            onClick={() => column.sorted && sortedColumn(column.accessor)}
+            onClick={() => {
+              return column.sorted && sortedColumn(column.accessor);
+            }}
             disabled={isLoading || !persons.length}
           >
             {column.label}
@@ -147,11 +149,13 @@ export const PersonsTable = () => {
             onChange={() => dispatch(setOneChecked(item.id))}
           />
         </Table.Td>
-        <Table.Td>
-          {item.surname} {item.name} {item.patronymic}
-        </Table.Td>
+        <Table.Td>{item.fullName}</Table.Td>
         <Table.Td>{item.phone ?? "-"}</Table.Td>
-        <Table.Td>{formatDate(new Date(item.birthday), "asc") ?? "-"}</Table.Td>
+        <Table.Td>
+          {item.birthday
+            ? formatDateToString(new Date(item.birthday), "asc")
+            : "-"}
+        </Table.Td>
         <Table.Td>{item.email ?? "-"}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
@@ -189,10 +193,19 @@ export const PersonsTable = () => {
     if (status.create.success) {
       setIsOpenCreateForm(false);
     }
+  }, [status.create.success]);
+
+  useEffect(() => {
+    if (status.update.success) {
+      setIsOpenUpdateForm(false);
+    }
+  }, [status.update.success]);
+
+  useEffect(() => {
     if (status.delete.success) {
       setIsOpenConfirmAction(false);
     }
-  }, [status.create.success, status.delete.success]);
+  }, [status.delete.success]);
 
   return (
     <>
@@ -270,7 +283,7 @@ export const PersonsTable = () => {
         size="lg"
       >
         <FormSavePerson
-          data={personData}
+          dataToUpdate={personData}
           projects={projects}
           districts={districts}
           onClose={() => setIsOpenUpdateForm(false)}
