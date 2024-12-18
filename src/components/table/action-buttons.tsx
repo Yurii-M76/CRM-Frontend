@@ -1,6 +1,6 @@
-import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { FC } from "react";
+import * as Icons from "../../assets/icons";
 import classes from "@components/table/table.module.css";
 
 type TActionButtons = {
@@ -22,7 +22,7 @@ export const ActionButtons: FC<TActionButtons> = ({
           color="orange"
           onClick={handleClickFromEdit}
         >
-          <IconEdit style={{ width: "20px", height: "20px" }} stroke={1} />
+          <Icons.IconEdit className={classes.iconActionButtons} />
         </ActionIcon>
       </Tooltip>
       <Tooltip label="Удалить">
@@ -33,7 +33,7 @@ export const ActionButtons: FC<TActionButtons> = ({
           color="red"
           onClick={handleClickFromDelete}
         >
-          <IconTrash style={{ width: "20px", height: "20px" }} stroke={1} />
+          <Icons.IconTrash className={classes.iconActionButtons} />
         </ActionIcon>
       </Tooltip>
     </div>

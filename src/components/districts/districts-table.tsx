@@ -7,7 +7,7 @@ import { getAllDistricts } from "@/services/districts/action";
 import { getDistricts, getDistrictsStatus } from "@/services/districts/reducer";
 import { ActionButtons } from "../table";
 import { Loader } from "../loader/loader";
-import { IconPlus } from "@tabler/icons-react";
+import * as Icons from "../../assets/icons"
 import classes from "../table/table.module.css";
 
 const columns: Column<TDistrict>[] = [
@@ -55,7 +55,7 @@ export const DistrictsTable = () => {
     <div className={classes.container} style={{ maxWidth: widthTable }}>
       <div className={classes.tableHeader}>
         <h2>Районы</h2>
-        <Button variant="light" leftSection={<IconPlus size={14} />}>
+        <Button variant="light" leftSection={<Icons.IconPlus className={classes.icon} />}>
           Добавить
         </Button>
       </div>

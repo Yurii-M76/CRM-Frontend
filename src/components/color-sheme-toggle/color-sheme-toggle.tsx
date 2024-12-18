@@ -3,13 +3,11 @@ import {
   useMantineColorScheme,
   useComputedColorScheme,
 } from "@mantine/core";
-import { IconSun, IconMoon } from "@tabler/icons-react";
-import cx from "clsx";
-
+import * as Icons from "../../assets/icons";
 import classes from "./color-sheme-toggle.module.css";
 
 export const ColorSchemeToggle = () => {
-  const { setColorScheme } = useMantineColorScheme();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -23,8 +21,11 @@ export const ColorSchemeToggle = () => {
       size="lg"
       aria-label="Toggle color scheme"
     >
-      <IconSun className={cx(classes.icon, classes.light)} stroke={1.5} />
-      <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5} />
+      {colorScheme === "light" ? (
+        <Icons.IconMoon className={classes.icon} />
+      ) : (
+        <Icons.IconSun className={classes.icon} />
+      )}
     </ActionIcon>
   );
 };

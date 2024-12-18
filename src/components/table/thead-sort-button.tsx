@@ -1,10 +1,7 @@
 import { Button, Tooltip } from "@mantine/core";
-import {
-  IconCircleArrowDown,
-  IconCircleArrowUp,
-  IconXboxX,
-} from "@tabler/icons-react";
 import { FC, useState } from "react";
+import * as Icons from "../../assets/icons";
+import classes from "../table/table.module.css";
 
 type TProps = {
   accessor: string;
@@ -22,7 +19,7 @@ export const THeadSortButton: FC<TProps> = ({
   isDisabled,
 }) => {
   const [isResetSortButton, setIsResetSortButton] = useState(false);
-  const resetSortIcon = () => <IconXboxX size={17} />;
+  const resetSortIcon = () => <Icons.IconXboxX className={classes.icon} />;
   const handleSortClick = () => {
     resetSort();
     setIsResetSortButton(false);
@@ -30,10 +27,10 @@ export const THeadSortButton: FC<TProps> = ({
   const sortIcon = () => {
     if (!isResetSortButton) {
       if (sortOrder === "asc") {
-        return <IconCircleArrowDown size={17} />;
+        return <Icons.IconCircleArrowDown className={classes.icon} />;
       }
       if (sortOrder === "desc") {
-        return <IconCircleArrowUp size={17} />;
+        return <Icons.IconCircleArrowUp className={classes.icon} />;
       }
     } else {
       return resetSortIcon();

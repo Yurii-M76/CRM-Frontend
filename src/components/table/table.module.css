@@ -50,6 +50,18 @@
   gap: 4px;
 }
 
+.icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.6;
+}
+
+.iconActionButtons {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.6;
+}
+
 ul {
   list-style: none;
   margin: 0;
