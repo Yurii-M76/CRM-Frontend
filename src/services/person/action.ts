@@ -1,9 +1,10 @@
-import { TPerson } from "@/types";
+import { TPerson } from "../../types/index";
 import {
   createDataFromApi,
   deleteDataFromApi,
   getAllDataFromApi,
-} from "@/utils";
+  updateDataFromApi,
+} from "../../utils/index";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const createPerson = createAsyncThunk(
@@ -17,8 +18,13 @@ export const getAllPersons = createAsyncThunk(
   async () => await getAllDataFromApi<TPerson[]>("persons")
 );
 
+export const updatePerson = createAsyncThunk(
+  "person/update",
+  async ({ id, data }: { id: string; data: Partial<TPerson> }) =>
+    await updateDataFromApi<TPerson>("persons", id, data)
+);
+
 export const deletePerson = createAsyncThunk(
   "person/delete",
-  async (id: string) =>
-    await deleteDataFromApi<{id: string}>("persons", id)
+  async (id: string) => await deleteDataFromApi<{ id: string }>("persons", id)
 );

@@ -1,0 +1,17 @@
+export { default as IconHome } from "./home-2.svg?react";
+export { default as IconPersons } from "./users.svg?react";
+export { default as IconCalendarEvent } from "./calendar-event.svg?react";
+export { default as IconMail } from "./mail.svg?react";
+export { default as IconSettings } from "./settings.svg?react";
+export { default as IconSun } from "./sun.svg?react";
+export { default as IconMoon } from "./moon.svg?react";
+export { default as IconPlus } from "./plus.svg?react";
+export { default as IconUpload } from "./upload.svg?react";
+export { default as IconDownload } from "./download.svg?react";
+export { default as IconFliter } from "./filter.svg?react";
+export { default as IconCircleArrowUp } from "./circle-arrow-up.svg?react";
+export { default as IconCircleArrowDown } from "./circle-arrow-down.svg?react";
+export { default as IconXboxX } from "./xbox-x.svg?react";
+export { default as IconEdit } from "./edit.svg?react";
+export { default as IconTrash } from "./trash.svg?react";
+export { default as IconIconAdjustmentsAlt } from "./adjustments-alt.svg?react";

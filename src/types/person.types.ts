@@ -5,6 +5,7 @@ export type TPerson = {
   surname: string;
   name: string;
   patronymic: string;
+  fullName: string;
   birthday: string;
   phone: string;
   email: string;
@@ -12,7 +13,6 @@ export type TPerson = {
   districts: TDistrict[];
   projects: TProject[];
   createdAt: Date;
-  updatedAt: Date;
 };
 
 export type TPersonRoles = (keyof typeof Role)[]; // массив ключей Role

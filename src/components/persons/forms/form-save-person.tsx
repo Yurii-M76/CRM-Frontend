@@ -1,7 +1,6 @@
 import {
   Fieldset,
   TextInput,
-  Select,
   MultiSelect,
   InputBase,
 } from "@mantine/core";
@@ -12,10 +11,9 @@ import "dayjs/locale/ru";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
-import { dateFormat } from "@/utils/date-format";
-import { TPersonRoles, TProject, TDistrict } from "@/types";
+import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
-import { AddFormButtons } from "@/components/buttons";
+import { FormButtons } from "@/components/buttons";
 import { getPersonsStatus } from "@/services/person/reducer";
 import { createPerson } from "@/services/person/action";
 import { personRoles } from "../person-roles";
@@ -26,29 +24,35 @@ import {
   validationPhone,
   validationSurname,
 } from "./validation";
-import "@mantine/dates/styles.css";
-import classes from "./add-form.module.css";
 import exceptions from "@/constants/exceptions";
+import "@mantine/dates/styles.css";
+import classes from "./form.module.css";
 
-type TAddForm = {
+type TFormSavePerson = {
+  data?: TPerson;
   projects: TProject[];
   districts: TDistrict[];
   onClose?: () => void;
 };
 
 type TInitialValues = {
-  surname: string;
-  name: string;
-  patronymic: string;
-  birthday: string;
-  phone: string;
-  email: string;
+  surname: string | undefined;
+  name: string | undefined;
+  patronymic: string | undefined;
+  birthday: Date | undefined;
+  phone: string | undefined;
+  email: string | undefined;
   roles: TPersonRoles;
-  projects: string[];
+  projects: string[] | undefined;
   districts: string[];
 };
 
-export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
+export const FormSavePerson: FC<TFormSavePerson> = ({
+  data,
+  projects,
+  districts,
+  onClose,
+}) => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
@@ -56,15 +60,17 @@ export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
   const correctAge = 18; // допустимый возраст волонтера
 
   const initialValues: TInitialValues = {
-    surname: "",
-    name: "",
-    patronymic: "",
-    birthday: "",
-    phone: "",
-    email: "",
-    roles: [],
-    projects: [],
-    districts: [],
+    surname: data?.surname ?? undefined,
+    name: data?.name ?? undefined,
+    patronymic: data?.patronymic ?? undefined,
+    birthday: data?.birthday ? new Date(data?.birthday) : undefined,
+    phone: data?.phone ?? undefined,
+    email: data?.email ?? undefined,
+    roles: data?.roles ?? [],
+    projects: data?.projects
+      ? data?.projects.map((item) => item.id)
+      : undefined,
+    districts: data ? data.districts.map((item) => item.id) : [],
   };
 
   const form = useForm({
@@ -77,9 +83,13 @@ export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
       phone: validationPhone,
       email: validationEmail,
       districts: (value) =>
-        !value.length ? exceptions.persons.formValidate.requiredField : null,
+        !value.length
+          ? exceptions.persons.formValidate.requiredField
+          : undefined,
       roles: (value) =>
-        !value.length ? exceptions.persons.formValidate.requiredField : null,
+        !value.length
+          ? exceptions.persons.formValidate.requiredField
+          : undefined,
     },
   });
 
@@ -88,11 +98,14 @@ export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
       surname: form.getValues().surname || undefined,
       name: form.getValues().name,
       patronymic: form.getValues().patronymic || undefined,
-      birthday: dateFormat(form.getValues().birthday) || undefined,
+      birthday: form.getValues().birthday || undefined,
       phone: phone,
       email: form.getValues().email || undefined,
       roles: form.getValues().roles,
-      districtsIds: [form.getValues().districts],
+      // districtsIds: [form.getValues().districts],
+      districtsIds: Array.isArray(form.getValues().districts)
+        ? form.getValues().districts
+        : [form.getValues().districts],
       projectsIds: form.getValues().projects || undefined,
     };
     dispatch(createPerson(newPerson));
@@ -167,7 +180,7 @@ export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
         </div>
       </Fieldset>
       <Fieldset legend="Адрес" className={classes.fieldset}>
-        <Select
+        <MultiSelect
           id="districts"
           label="Район"
           data={districts.map((item) => ({ value: item.id, label: item.name }))}
@@ -199,7 +212,7 @@ export const AddForm: FC<TAddForm> = ({ projects, districts, onClose }) => {
           {...form.getInputProps("projects")}
         />
       </Fieldset>
-      <AddFormButtons loading={status.create.loading} onClose={onClose} />
+      <FormButtons loading={status.create.loading} onClose={onClose} />
     </form>
   );
 };

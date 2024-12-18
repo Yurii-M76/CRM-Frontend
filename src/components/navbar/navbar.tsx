@@ -1,30 +1,23 @@
-import {
-  IconSettings,
-  IconLayoutDashboardFilled,
-  IconMail,
-  IconCalendarEvent,
-  IconUsers,
-  IconAdjustmentsAlt,
-} from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider } from "@mantine/core";
 import { useDispatch } from "@/services/store";
 import { logout } from "@/services/user/action";
+import * as Icons from "../../assets/icons"
 import classes from "./Navbar.module.css";
 
 const tabs = [
-  { link: "/", label: "Dashboard", icon: IconLayoutDashboardFilled },
-  { link: "persons", label: "Персоналии", icon: IconUsers },
-  { link: "projects", label: "Проекты", icon: IconCalendarEvent },
-  { link: "mailing", label: "Рассылки", icon: IconMail },
-  { link: "settings", label: "Настройки", icon: IconSettings },
+  { link: "/", label: "Dashboard", icon: <Icons.IconHome /> },
+  { link: "persons", label: "Персоналии", icon: <Icons.IconPersons /> },
+  { link: "projects", label: "Проекты", icon: <Icons.IconCalendarEvent /> },
+  { link: "mailing", label: "Рассылки", icon: <Icons.IconMail /> },
+  { link: "settings", label: "Настройки", icon: <Icons.IconSettings /> },
 ];
 
 const adminTabs = [
   {
     link: "admin-page",
     label: "Панель администратора",
-    icon: IconAdjustmentsAlt,
+    icon: <Icons.IconIconAdjustmentsAlt />,
   },
 ];
 
@@ -49,7 +42,7 @@ export function Navbar() {
       }
       key={item.label}
     >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
+      <span className={classes.linkIcon}>{item.icon}</span>
       <span>{item.label}</span>
     </Link>
   ));
@@ -61,7 +54,7 @@ export function Navbar() {
       data-active={location === "/" + item.link || undefined}
       key={item.label}
     >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
+      <span className={classes.linkIcon}>{item.icon}</span>
       <span>{item.label}</span>
     </Link>
   ));

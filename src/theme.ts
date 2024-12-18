@@ -1,5 +1,18 @@
-import { createTheme } from '@mantine/core';
+import { createTheme } from "@mantine/core";
 
 export const theme = createTheme({
-  /** Put your mantine theme override here */
+  components: {
+    Modal: {
+      styles: {
+        title: {
+          fontWeight: "bold",
+          fontSize: "1.1rem",
+          color: "var(--mantine-color-blue-light-color)",
+        },
+        close: {
+          color: "var(--mantine-color-blue-light-color)",
+        }
+      },
+    },
+  },
 });

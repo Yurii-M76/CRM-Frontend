@@ -1,4 +1,4 @@
-import { Modal as MantineModal, Text } from "@mantine/core";
+import { Modal as MantineModal } from "@mantine/core";
 import { FC, ReactNode } from "react";
 
 type TModal = {
@@ -27,16 +27,7 @@ export const Modal: FC<TModal> = ({
       onClose={close}
       withCloseButton={closeButton}
       centered={centered}
-      title={
-        <Text
-          fw={700}
-          variant="gradient"
-          gradient={{ from: "blue", to: "cyan", deg: 90 }}
-          size="1.05rem"
-        >
-          {title}
-        </Text>
-      }
+      title={title}
       size={size ? size : "md"}
     >
       {children}

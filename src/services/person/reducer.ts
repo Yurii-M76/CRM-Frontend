@@ -1,26 +1,32 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createPerson, deletePerson, getAllPersons } from "./action";
-import { TPerson } from "@/types";
-import { filterData, pagination, sortData } from "@/utils";
+import {
+  createPerson,
+  deletePerson,
+  getAllPersons,
+  updatePerson,
+} from "./action";
+import { TPerson } from "../../types/person.types";
+import { filterData, pagination, sortData } from "../../utils/index";
+import { handleAllChecked, handleOneChecked } from "./checked-handlers";
 
-type TStatusData = {
+type TStatus = {
   loading: boolean;
   success: boolean;
-  error?: string | null;
 };
 
-type TInitialState<T> = {
-  status: {
-    create: TStatusData;
-    read: TStatusData;
-    update: TStatusData;
-    delete: TStatusData;
-  };
+type TStatuses = {
+  create: TStatus;
+  read: TStatus;
+  update: TStatus;
+  delete: TStatus;
+};
+
+type TInitialStateTable = {
+  status: TStatuses;
   count: number;
-  items: T[];
-  originalItems: T[];
-  searchResult: T[];
-  sortBy: keyof T;
+  items: TPerson[];
+  originalItems: TPerson[];
+  sortBy: keyof TPerson;
   sortOrder: "asc" | "desc";
   activePage: number;
   rangeOnPage: number;
@@ -28,49 +34,41 @@ type TInitialState<T> = {
   error?: string | null;
 };
 
-const initialState: TInitialState<TPerson> = {
+const defaultStatus = { loading: false, success: false };
+const statusPending = { loading: true, success: false };
+const statusFulfilled = { loading: false, success: true };
+
+const initialState: TInitialStateTable = {
   status: {
-    create: {
-      loading: false,
-      success: false,
-    },
-    read: {
-      loading: false,
-      success: false,
-    },
-    update: {
-      loading: false,
-      success: false,
-    },
-    delete: {
-      loading: false,
-      success: false,
-    },
+    create: defaultStatus,
+    read: defaultStatus,
+    update: defaultStatus,
+    delete: defaultStatus,
   },
   count: 0,
   items: [],
   originalItems: [],
-  searchResult: [],
-  sortBy: "createdAt",
-  sortOrder: "asc",
-  activePage: 1,
-  rangeOnPage: 10,
   checkedIds: [],
+  sortBy: "createdAt",
+  sortOrder: "desc",
+  activePage: 1,
+  rangeOnPage: 5,
   error: null,
 };
 
-const processedData = <T>(state: TInitialState<T>) => {
+const currentState = (state: TInitialStateTable) => {
   return pagination(
-    sortData(
-      state.searchResult.length
-        ? [...state.searchResult]
-        : [...state.originalItems],
-      state.sortBy,
-      state.sortOrder
-    ),
+    sortData(state.originalItems, state.sortBy, state.sortOrder),
     state.activePage,
     state.rangeOnPage
   );
+};
+
+const updatedData = (items: TPerson[], action: PayloadAction<TPerson>) => {
+  const index = items.findIndex((item) => item.id === action.payload.id);
+  if (index !== -1) {
+    items[index] = action.payload;
+  }
 };
 
 export const PersonSlice = createSlice({
@@ -87,64 +85,39 @@ export const PersonSlice = createSlice({
       const { sortBy, sortOrder } = action.payload;
       state.sortBy = sortBy;
       state.sortOrder = sortOrder;
-      state.items = processedData(state);
+      state.items = currentState(state);
     },
     resetSort: (state) => {
       state.sortBy = "createdAt";
-      state.sortOrder = "asc";
-      state.items = processedData(state);
+      state.sortOrder = "desc";
+      state.items = currentState(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
-      state.searchResult = filterData(
-        [...state.originalItems],
-        action.payload,
-        ["surname", "name", "patronymic", "phone", "email", "birthday"]
-      );
-      state.items = state.searchResult;
-      state.count = state.searchResult.length;
+      state.items = filterData([...state.originalItems], action.payload, [
+        "fullName",
+        "phone",
+        "email",
+        "birthday",
+      ]);
+      state.count = state.items.length;
     },
     resetSearch: (state) => {
-      state.searchResult = [];
-      state.items = processedData(state);
+      state.items = currentState(state);
       state.count = state.originalItems.length;
     },
     setActivePage: (state, action: PayloadAction<number>) => {
       state.activePage = action.payload;
-      state.items = processedData(state);
+      state.items = currentState(state);
     },
     setRangeOnPage: (state, action: PayloadAction<number>) => {
       state.rangeOnPage = action.payload;
     },
-    setOneChecked: (state, action: PayloadAction<string>) => {
-      const id = action.payload;
-      if (state.checkedIds.includes(id)) {
-        state.checkedIds = state.checkedIds.filter((item) => item !== id);
-      } else {
-        state.checkedIds.push(id);
-      }
-    },
-    setAllChecked: (state) => {
-      // Проверяем, все ли текущие элементы уже выбраны
-      const allChecked = state.items.every((item) =>
-        state.checkedIds.includes(item.id)
-      );
-      if (allChecked) {
-        // Если все текущие элементы выбраны, снимаем отметки
-        state.checkedIds = state.checkedIds.filter(
-          (id) => !state.items.some((item) => item.id === id)
-        );
-      } else {
-        // Если есть невыбранные элементы, добавляем их в checkedIds
-        state.items.forEach((item) => {
-          if (!state.checkedIds.includes(item.id)) {
-            state.checkedIds.push(item.id);
-          }
-        });
-      }
-    },
+    setOneChecked: (state, action: PayloadAction<string>) =>
+      handleOneChecked(state, action),
+    setAllChecked: (state) => handleAllChecked(state),
     resetAllChecked: (state) => {
       state.checkedIds = [];
-      state.items = processedData(state);
+      state.items = currentState(state);
     },
   },
   selectors: {
@@ -159,71 +132,75 @@ export const PersonSlice = createSlice({
     getErrors: (state) => state.error,
   },
   extraReducers(builder) {
-    // Create new
-    builder
+    builder // Create
       .addCase(createPerson.pending, (state) => {
-        state.status.create.loading = true;
-        state.status.create.success = false;
+        state.status.create = statusPending;
         state.error = null;
       })
       .addCase(createPerson.fulfilled, (state, action) => {
-        state.status.create.loading = false;
-        state.status.create.success = true;
+        state.status.create = statusFulfilled;
         state.error = null;
-        state.items = [...state.items, action.payload];
-        state.originalItems = state.items;
+        state.originalItems = [action.payload, ...state.originalItems];
+        state.items = currentState(state);
         state.count = state.originalItems.length;
       })
       .addCase(createPerson.rejected, (state, action) => {
-        state.status.create.loading = false;
-        state.status.create.success = false;
+        state.status.create = defaultStatus;
         state.error = action.error.message;
       });
 
-    builder
-      // Find all
+    builder // Update
+      .addCase(updatePerson.pending, (state) => {
+        state.status.update = statusPending;
+        state.error = null;
+      })
+      .addCase(updatePerson.fulfilled, (state, action) => {
+        state.status.update = statusFulfilled;
+        state.error = null;
+        updatedData(state.items, action);
+        updatedData(state.originalItems, action);
+      })
+      .addCase(updatePerson.rejected, (state, action) => {
+        state.status.update = defaultStatus;
+        state.error = action.error.message;
+      });
+
+    builder // Find all
       .addCase(getAllPersons.pending, (state) => {
-        state.status.read.loading = true;
-        state.count = 0;
+        state.status.read = statusPending;
         state.error = null;
         state.sortBy = "createdAt";
-        state.sortOrder = "asc";
-        state.searchResult = [];
+        state.sortOrder = "desc";
       })
       .addCase(getAllPersons.fulfilled, (state, action) => {
-        state.status.read.loading = false;
-        state.count = action.payload.length;
-        state.originalItems = action.payload;
-        state.items = processedData(state);
+        state.status.read = statusFulfilled;
         state.error = null;
+        state.originalItems = action.payload;
+        state.items = currentState(state);
+        state.count = state.originalItems.length;
       })
       .addCase(getAllPersons.rejected, (state, action) => {
-        state.status.read.loading = false;
-        state.count = 0;
+        state.status.read = defaultStatus;
         state.error = action.error.message;
       });
 
-    // Delete
-    builder
+    builder // Delete
       .addCase(deletePerson.pending, (state) => {
-        state.status.delete.loading = true;
-        state.status.delete.success = false;
+        state.status.delete = statusPending;
         state.error = null;
       })
       .addCase(deletePerson.fulfilled, (state, action) => {
-        state.status.delete.loading = false;
-        state.status.delete.success = true;
-        state.items = state.items.filter(
-          (item) => item.id !== action.payload.id
-        );
+        state.status.delete = statusFulfilled;
+        state.error = null;
         state.originalItems = state.originalItems.filter(
           (item) => item.id !== action.payload.id
         );
-        state.count = state.items.length;
+        state.items = state.originalItems;
+        state.items = currentState(state);
+        state.count = state.originalItems.length;
       })
       .addCase(deletePerson.rejected, (state, action) => {
-        state.status.delete.loading = false;
-        state.status.delete.success = false;
+        state.status.delete = defaultStatus;
         state.error = action.error.message;
       });
   },

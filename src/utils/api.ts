@@ -167,7 +167,7 @@ export const updateDataFromApi = async <T>(
   data: Partial<T>
 ): Promise<T> => {
   try {
-    const response = await fetch(`${URL}/api/${path}`, {
+    const response = await fetch(`${URL}/api/${path}/${id}`, {
       mode: "cors",
       method: "PATCH",
       headers: {
@@ -175,7 +175,7 @@ export const updateDataFromApi = async <T>(
         authorization: await getValidAccessToken(),
       } as HeadersInit,
       credentials: "include",
-      body: JSON.stringify({ id, data }),
+      body: JSON.stringify(data),
     });
     return await checkResponse<T>(response);
   } catch (error) {

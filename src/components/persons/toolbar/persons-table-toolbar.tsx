@@ -1,13 +1,8 @@
 import { Button, ButtonGroup } from "@mantine/core";
-import {
-  IconDownload,
-  IconFilter,
-  IconPlus,
-  IconUpload,
-} from "@tabler/icons-react";
+import { FC } from "react";
 import { Search } from "@/components/search/search";
 import { resetSearch, setSearch } from "@/services/person/reducer";
-import { FC } from "react";
+import * as Icons from "../../../assets/icons";
 import classes from "@components/table/table.module.css";
 
 type TPersonsTableToolbar = {
@@ -29,7 +24,7 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
             <Button
               variant="light"
               color="green"
-              leftSection={<IconPlus size={14} />}
+              leftSection={<Icons.IconPlus className={classes.icon} />}
               onClick={onClickToOpenAddForm}
               disabled={isLoading}
             >
@@ -37,14 +32,14 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
             </Button>
             <Button
               variant="default"
-              rightSection={<IconUpload size={14} />}
+              rightSection={<Icons.IconUpload className={classes.icon} />}
               disabled
             >
               Загрузить
             </Button>
             <Button
               variant="default"
-              rightSection={<IconDownload size={14} />}
+              rightSection={<Icons.IconDownload className={classes.icon} />}
               disabled
             >
               Скачать
@@ -59,7 +54,7 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
         <div className={classes.flexGroup}>
           <Button
             variant="default"
-            rightSection={<IconFilter size={14} />}
+            rightSection={<Icons.IconFliter className={classes.icon} />}
             disabled
           >
             Фильтры
