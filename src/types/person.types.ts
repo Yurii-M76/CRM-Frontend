@@ -12,6 +12,7 @@ export type TPerson = {
   roles: TPersonRoles;
   districts: TDistrict[];
   projects: TProject[];
+  createdAt: Date;
 };
 
 export type TPersonRoles = (keyof typeof Role)[]; // массив ключей Role
