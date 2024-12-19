@@ -1,5 +1,5 @@
 import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
 import {
@@ -28,16 +28,15 @@ import {
 } from "@/components/table";
 import { Paginator } from "@/components/paginator/paginator";
 import { Loader } from "@/components/loader/loader";
-import { CollapseList } from "@/components/collapse-list/collapse-list";
-import { Modal } from "@/components/modal/modal";
 import { DeleteModalButtons } from "@/components/buttons/delete-modal-buttons";
-import { FormSavePerson } from "../forms/form-save-person";
 import { findAllProjects } from "@/services/project/action";
 import { getProjects } from "@/services/project/reducer";
-import { PersonsTableToolbar } from "../toolbar/persons-table-toolbar";
 import { personRoles } from "../person-roles";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
+import { FormSavePerson, PersonsTableToolbar } from "../";
+const CollapseList = lazy(() => import("@/components/collapse-list/collapse-list"));
+const Modal = lazy(() => import("@/components/modal/modal"));
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -46,8 +45,8 @@ const columns: Column<TPerson>[] = [
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
   { label: "E-Mail", accessor: "email", size: 200, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
-  { label: "Проекты", accessor: "projects", size: 260, sorted: false },
-  { label: "Район", accessor: "districts", size: 210, sorted: true },
+  { label: "Проекты", accessor: "projects", size: 260, sorted: true },
+  { label: "Район", accessor: "districts", size: 210, sorted: false },
   { label: "", accessor: "id", size: 100, sorted: false },
 ];
 
@@ -150,13 +149,13 @@ export const PersonsTable = () => {
           />
         </Table.Td>
         <Table.Td>{item.fullName}</Table.Td>
-        <Table.Td>{item.phone ?? "-"}</Table.Td>
+        <Table.Td>{item.phone}</Table.Td>
         <Table.Td>
           {item.birthday
             ? formatDateToString(new Date(item.birthday), "asc")
             : "-"}
         </Table.Td>
-        <Table.Td>{item.email ?? "-"}</Table.Td>
+        <Table.Td>{item.email || "-"}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
             <Pill key={index} mr={4}>
@@ -167,9 +166,11 @@ export const PersonsTable = () => {
         <Table.Td>
           <CollapseList totalItems={item.projects.length}>
             <ul>
-              {item.projects.map((item) => {
-                return <li key={item.id}>{item.title}</li>;
-              })}
+              {item.projects.length
+                ? item.projects.map((item) => {
+                    return <li key={item.id}>{item.title}</li>;
+                  })
+                : "-"}
             </ul>
           </CollapseList>
         </Table.Td>
@@ -315,3 +316,5 @@ export const PersonsTable = () => {
     </>
   );
 };
+
+export default PersonsTable;
