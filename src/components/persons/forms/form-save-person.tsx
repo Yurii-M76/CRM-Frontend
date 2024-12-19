@@ -1,9 +1,4 @@
-import {
-  Fieldset,
-  TextInput,
-  MultiSelect,
-  InputBase,
-} from "@mantine/core";
+import { Fieldset, TextInput, MultiSelect, InputBase } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -11,12 +6,12 @@ import "dayjs/locale/ru";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useState } from "react";
-import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
 import { FormButtons } from "@/components/buttons";
 import { getPersonsStatus } from "@/services/person/reducer";
-import { createPerson } from "@/services/person/action";
+import { createPerson, updatePerson } from "@/services/person/action";
 import { personRoles } from "../person-roles";
+import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import {
   validationEmail,
   validationName,
@@ -25,11 +20,13 @@ import {
   validationSurname,
 } from "./validation";
 import exceptions from "@/constants/exceptions";
+import { formatDateToString } from "@/utils";
+import { formatName } from "@/utils/format-name";
 import "@mantine/dates/styles.css";
 import classes from "./form.module.css";
 
 type TFormSavePerson = {
-  data?: TPerson;
+  dataToUpdate?: TPerson;
   projects: TProject[];
   districts: TDistrict[];
   onClose?: () => void;
@@ -37,18 +34,21 @@ type TFormSavePerson = {
 
 type TInitialValues = {
   surname: string | undefined;
-  name: string | undefined;
+  name: string;
   patronymic: string | undefined;
   birthday: Date | undefined;
-  phone: string | undefined;
+  phone: string;
   email: string | undefined;
   roles: TPersonRoles;
-  projects: string[] | undefined;
+  projects: string[];
   districts: string[];
 };
 
+dayjs.extend(customParseFormat); // кастомный формат ввода даты
+const correctAge = 18; // допустимый возраст волонтера
+
 export const FormSavePerson: FC<TFormSavePerson> = ({
-  data,
+  dataToUpdate,
   projects,
   districts,
   onClose,
@@ -56,32 +56,34 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
-  dayjs.extend(customParseFormat); // кастомный формат ввода даты
-  const correctAge = 18; // допустимый возраст волонтера
 
   const initialValues: TInitialValues = {
-    surname: data?.surname ?? undefined,
-    name: data?.name ?? undefined,
-    patronymic: data?.patronymic ?? undefined,
-    birthday: data?.birthday ? new Date(data?.birthday) : undefined,
-    phone: data?.phone ?? undefined,
-    email: data?.email ?? undefined,
-    roles: data?.roles ?? [],
-    projects: data?.projects
-      ? data?.projects.map((item) => item.id)
+    surname: dataToUpdate?.surname || "",
+    name: dataToUpdate?.name || "",
+    patronymic: dataToUpdate?.patronymic || "",
+    birthday: dataToUpdate?.birthday
+      ? new Date(dataToUpdate?.birthday)
       : undefined,
-    districts: data ? data.districts.map((item) => item.id) : [],
+    phone: dataToUpdate?.phone || "",
+    email: dataToUpdate?.email || "",
+    roles: dataToUpdate?.roles ?? [],
+    projects: dataToUpdate?.projects
+      ? dataToUpdate?.projects.map((item) => item.id)
+      : [],
+    districts: dataToUpdate
+      ? dataToUpdate.districts.map((item) => item.id)
+      : [],
   };
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: initialValues,
     validate: {
-      surname: validationSurname,
-      name: validationName,
-      patronymic: validationPatronymic,
-      phone: validationPhone,
-      email: validationEmail,
+      surname: (value) => validationSurname(value),
+      name: (value) => validationName(value),
+      patronymic: (value) => validationPatronymic(value),
+      phone: (value) => validationPhone(value || phone),
+      email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length
           ? exceptions.persons.formValidate.requiredField
@@ -94,21 +96,24 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
   });
 
   const handleSubmit = () => {
-    const newPerson = {
-      surname: form.getValues().surname || undefined,
-      name: form.getValues().name,
-      patronymic: form.getValues().patronymic || undefined,
-      birthday: form.getValues().birthday || undefined,
-      phone: phone,
+    const personData = {
+      surname: formatName(form.getValues().surname) || undefined,
+      name: formatName(form.getValues().name),
+      patronymic: formatName(form.getValues().patronymic) || undefined,
+      birthday: form.getValues().birthday
+        ? formatDateToString(form.getValues().birthday, "desc")
+        : undefined,
+      phone: form.getValues().phone || phone,
       email: form.getValues().email || undefined,
       roles: form.getValues().roles,
-      // districtsIds: [form.getValues().districts],
-      districtsIds: Array.isArray(form.getValues().districts)
-        ? form.getValues().districts
-        : [form.getValues().districts],
-      projectsIds: form.getValues().projects || undefined,
+      districtsIds: form.getValues().districts,
+      projectsIds: form.getValues().projects,
     };
-    dispatch(createPerson(newPerson));
+    if (dataToUpdate) {
+      dispatch(updatePerson({ id: dataToUpdate.id, data: personData }));
+    } else {
+      dispatch(createPerson(personData));
+    }
   };
 
   return (
@@ -154,6 +159,7 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
             key={form.key("birthday")}
             {...form.getInputProps("birthday")}
             className={classes.input}
+            clearable
           />
         </div>
       </Fieldset>
@@ -212,7 +218,10 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           {...form.getInputProps("projects")}
         />
       </Fieldset>
-      <FormButtons loading={status.create.loading} onClose={onClose} />
+      <FormButtons
+        loading={status.create.loading || status.update.loading}
+        onClose={onClose}
+      />
     </form>
   );
 };
