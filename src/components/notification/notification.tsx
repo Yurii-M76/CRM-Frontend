@@ -26,7 +26,7 @@ export const CRM_Notification = () => {
           withBorder
           onClose={() => setIsOpen(false)}
         >
-          {"item"}
+          {"errors"}
         </Notification>
       )}
     </Transition>
