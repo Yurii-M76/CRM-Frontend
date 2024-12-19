@@ -11,7 +11,7 @@ import { FC } from "react";
 type TSearch = {
   query: ActionCreatorWithPayload<string>;
   reset: ActionCreatorWithoutPayload;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 };
 
 export const Search: FC<TSearch> = ({ query, reset, isDisabled }) => {

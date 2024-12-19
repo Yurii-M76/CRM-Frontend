@@ -7,13 +7,12 @@ import classes from "@components/table/table.module.css";
 
 type TPersonsTableToolbar = {
   isLoading: boolean;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   openedAddForm?: () => void;
 };
 
 export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
   isLoading,
-  isDisabled,
   openedAddForm: onClickToOpenAddForm,
 }) => {
   return (
@@ -48,7 +47,7 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
           <Search
             query={setSearch}
             reset={resetSearch}
-            isDisabled={isDisabled}
+            isDisabled={isLoading}
           />
         </div>
         <div className={classes.flexGroup}>

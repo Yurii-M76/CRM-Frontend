@@ -1,10 +1,10 @@
 import { Button, ButtonGroup } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { FC, lazy } from "react";
 import { Search } from "@/components/search/search";
 import { resetSearch, setSearch } from "@/services/project/reducer";
-import { Modal } from "../modal/modal";
-import { FC } from "react";
 import * as Icons from "../../assets/icons";
+const Modal = lazy(() => import("@/components/modal/modal"));
 import classes from "../table/table.module.css";
 
 type TProjectsTableToolbar = {

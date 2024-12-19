@@ -1,5 +1,5 @@
 import { Button, Table } from "@mantine/core";
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
 import {
@@ -24,7 +24,7 @@ import {
 } from "@components/table";
 import { Loader } from "../loader/loader";
 import { Paginator } from "../paginator/paginator";
-import { CollapseList } from "../collapse-list/collapse-list";
+const CollapseList = lazy(() => import("@/components/collapse-list/collapse-list"));
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
@@ -35,7 +35,7 @@ const columns: Column<TProject>[] = [
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
 
-export const ProjectsTable = () => {
+const ProjectsTable = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector(getProjectsLoading);
   const projects = useSelector(getProjects);
@@ -166,3 +166,5 @@ export const ProjectsTable = () => {
     </div>
   );
 };
+
+export default ProjectsTable
