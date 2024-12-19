@@ -12,7 +12,7 @@ type TModal = {
   children: ReactNode;
 };
 
-export const Modal: FC<TModal> = ({
+const Modal: FC<TModal> = ({
   opened,
   close,
   closeButton,
@@ -34,3 +34,5 @@ export const Modal: FC<TModal> = ({
     </MantineModal>
   );
 };
+
+export default Modal;

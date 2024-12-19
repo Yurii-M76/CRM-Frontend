@@ -7,7 +7,7 @@ type TScrollBlock = {
   children: ReactNode;
 };
 
-export const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
+const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
   const [expanded, setExpanded] = useState(false);
 
   const count = totalItems > 3 && !expanded && (
@@ -34,3 +34,5 @@ export const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
     </div>
   );
 };
+
+export default CollapseList;
