@@ -1,4 +1,4 @@
-import { ActionIcon, Tooltip } from "@mantine/core";
+import { ActionIcon } from "@mantine/core";
 import { FC } from "react";
 import * as Icons from "../../assets/icons";
 import classes from "@components/table/table.module.css";
