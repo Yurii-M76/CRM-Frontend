@@ -2,10 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import { getCookie, setCookie } from "./cookie";
 import { TAuthResponse, TLoginData, TMe } from "@/types";
 
-// const HOST = import.meta.env.VITE_API_URL;
-// const PORT = import.meta.env.VITE_API_PORT;
-// const URL = `${HOST}:${PORT}`;
-const URL = "https://yurii-m76-crm-backend-809a.twc1.net";
+const URL = import.meta.env.VITE_API_URL;
 
 export const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
