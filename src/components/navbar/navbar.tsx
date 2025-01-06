@@ -3,7 +3,7 @@ import { Button, Divider } from "@mantine/core";
 import { useDispatch } from "@/services/store";
 import { logout } from "@/services/user/action";
 import * as Icons from "../../assets/icons"
-import classes from "./Navbar.module.css";
+import classes from "./navbar.module.css";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: <Icons.IconHome /> },
