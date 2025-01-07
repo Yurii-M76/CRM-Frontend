@@ -1,5 +1,5 @@
 import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
 import {
@@ -35,8 +35,8 @@ import { personRoles } from "../person-roles";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
 import { FormSavePerson, PersonsTableToolbar } from "../";
-const CollapseList = lazy(() => import("@/components/collapse-list/collapse-list"));
-const Modal = lazy(() => import("@/components/modal/modal"));
+import CollapseList from "@/components/collapse-list/collapse-list";
+import Modal from "@/components/modal/modal";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -52,7 +52,7 @@ const columns: Column<TPerson>[] = [
 
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 54;
 
-export const PersonsTable = () => {
+const PersonsTable = () => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const persons = useSelector(getPersons);
