@@ -4,6 +4,7 @@ import { useDispatch } from "@/services/store";
 import { logout } from "@/services/user/action";
 import * as Icons from "../../assets/icons"
 import classes from "./navbar.module.css";
+import { FC } from "react";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: <Icons.IconHome /> },
@@ -21,7 +22,11 @@ const adminTabs = [
   },
 ];
 
-export function Navbar() {
+type TNavbar = {
+  clickHandler: () => void;
+}
+
+export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
   const location = useLocation().pathname;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,6 +46,7 @@ export function Navbar() {
         undefined
       }
       key={item.label}
+      onClick={clickHandler}
     >
       <span className={classes.linkIcon}>{item.icon}</span>
       <span>{item.label}</span>
@@ -53,6 +59,7 @@ export function Navbar() {
       className={classes.link}
       data-active={location === "/" + item.link || undefined}
       key={item.label}
+      onClick={clickHandler}
     >
       <span className={classes.linkIcon}>{item.icon}</span>
       <span>{item.label}</span>

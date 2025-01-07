@@ -1,9 +1,10 @@
-import { Blockquote, Center } from "@mantine/core";
+import { Text } from "@mantine/core";
+import classes from "@components/table/table.module.css";
 
 export const NoData = () => {
   return (
-    <Blockquote color="gray" mt={20} p={12} mb={0}>
-      <Center>нет данных</Center>
-    </Blockquote>
+    <div className={classes.tableNoData}>
+      <Text c="dimmed">нет данных</Text>
+    </div>
   );
 };

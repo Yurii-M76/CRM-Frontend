@@ -5,6 +5,11 @@ export const AdminPage = () => {
   return (
     <>
       <h1 className={classes.pageTitle}>Панель администратора</h1>
+      
+      <div className={classes.pageSection}>
+        <h2>Пользователи</h2>
+        Список пользователей (добавить / редатировать / удалить)
+      </div>
 
       <div className={classes.pageSection}>
         <h2>Персоналии</h2>
