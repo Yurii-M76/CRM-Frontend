@@ -17,7 +17,7 @@ const columns: Column<TDistrict>[] = [
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
 
-export const DistrictsTable = () => {
+const DistrictsTable = () => {
   const dispatch = useDispatch();
   const status = useSelector(getDistrictsStatus);
   const districts = useSelector(getDistricts);
@@ -81,3 +81,5 @@ export const DistrictsTable = () => {
     </div>
   );
 };
+
+export default DistrictsTable;

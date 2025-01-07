@@ -1,5 +1,5 @@
 import { Button, Table } from "@mantine/core";
-import { lazy, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
 import {
@@ -24,7 +24,7 @@ import {
 } from "@components/table";
 import { Loader } from "../loader/loader";
 import { Paginator } from "../paginator/paginator";
-const CollapseList = lazy(() => import("@/components/collapse-list/collapse-list"));
+import CollapseList from "../collapse-list/collapse-list";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
