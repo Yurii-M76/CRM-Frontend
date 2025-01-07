@@ -1,5 +1,5 @@
 import { useDispatch } from "@/services/store";
-import { Pagination, Select, Tooltip } from "@mantine/core";
+import { Pagination, Select } from "@mantine/core";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { FC, useEffect, useState } from "react";
 import classes from "../table/table.module.css";
@@ -41,19 +41,17 @@ export const Paginator: FC<TPaginator> = ({
         siblings={1}
         boundaries={0}
       />
-      <Tooltip label="Строк на странице">
-        <Select
-          data={["5", "10", "25", "50", "100"]}
-          defaultValue={String(rowsOnPage)}
-          w={80}
-          disabled={!totalPages}
-          onChange={(data) => {
-            handleChange(data);
-            setPage(1);
-          }}
-          placeholder="Выберите количество строк на странице"
-        />
-      </Tooltip>
+      <Select
+        data={["5", "10", "25", "50", "100"]}
+        defaultValue={String(rowsOnPage)}
+        w={80}
+        disabled={!totalPages}
+        onChange={(data) => {
+          handleChange(data);
+          setPage(1);
+        }}
+        placeholder="Выберите количество строк на странице"
+      />
     </div>
   );
 };
