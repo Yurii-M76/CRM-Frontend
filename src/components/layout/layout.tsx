@@ -49,7 +49,7 @@ export const Layout = () => {
             />
             <Burger
               opened={desktopOpened}
-              onClick={toggleDesktop}
+              onClick={(toggleDesktop)}
               visibleFrom="sm"
               size="sm"
             />
@@ -65,7 +65,7 @@ export const Layout = () => {
           </Group>
         </AppShell.Header>
         <AppShell.Navbar p="md">
-          <Navbar />
+          <Navbar clickHandler={toggleMobile} />
         </AppShell.Navbar>
         <AppShell.Main>{content}</AppShell.Main>
       </AppShell>
