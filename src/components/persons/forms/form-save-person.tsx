@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { FormButtons } from "@/components/buttons";
 import { getPersonsStatus } from "@/services/person/reducer";
@@ -65,6 +65,8 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
+  const [isDriver, setIsDriver] = useState<boolean>(false);
+  const [isDelegate, setIsDelegate] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     surname: dataToUpdate?.surname || "",
@@ -135,6 +137,21 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     const typeValue = value as TPersonRoles;
     form.setFieldValue("roles", [...typeValue]);
   };
+
+  useEffect(() => {
+    if (form.getValues().roles.includes("DRIVER")) {
+      setIsDriver(true);
+    } else {
+      form.setFieldValue("car", "")
+      setIsDriver(false);
+    }
+    if (form.getValues().roles.includes("DELEGATE")) {
+      setIsDelegate(true);
+    } else {
+      form.setFieldValue("organization", "")
+      setIsDelegate(false);
+    }
+  }, [form]);
 
   return (
     <form
@@ -228,7 +245,7 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           onChange={roleHandler}
           required
         />
-        {form.getValues().roles.includes("DRIVER") && (
+        {isDriver && (
           <TextInput
             id="car"
             label="Данные по автомобилю"
@@ -236,7 +253,7 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
             {...form.getInputProps("car")}
           />
         )}
-        {form.getValues().roles.includes("DELEGATE") && (
+        {isDelegate && (
           <TextInput
             id="organization"
             label="Организация"
