@@ -1,4 +1,10 @@
-import { Fieldset, TextInput, MultiSelect, InputBase, Textarea } from "@mantine/core";
+import {
+  Fieldset,
+  TextInput,
+  MultiSelect,
+  InputBase,
+  Textarea,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -42,6 +48,8 @@ type TInitialValues = {
   roles: TPersonRoles;
   projects: string[];
   districts: string[];
+  car: string;
+  organization: string;
   note: string | undefined;
 };
 
@@ -74,6 +82,8 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     districts: dataToUpdate
       ? dataToUpdate.districts.map((item) => item.id)
       : [],
+    car: dataToUpdate?.car || "",
+    organization: dataToUpdate?.organization || "",
     note: dataToUpdate?.note || "",
   };
 
@@ -110,6 +120,8 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
+      car: form.getValues().car || undefined,
+      organization: form.getValues().organization || undefined,
       note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
@@ -117,6 +129,11 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     } else {
       dispatch(createPerson(personData));
     }
+  };
+
+  const roleHandler = (value: string[]) => {
+    const typeValue = value as TPersonRoles;
+    form.setFieldValue("roles", [...typeValue]);
   };
 
   return (
@@ -208,8 +225,25 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
+          onChange={roleHandler}
           required
         />
+        {form.getValues().roles.includes("DRIVER") && (
+          <TextInput
+            id="car"
+            label="Данные по автомобилю"
+            key={form.key("car")}
+            {...form.getInputProps("car")}
+          />
+        )}
+        {form.getValues().roles.includes("DELEGATE") && (
+          <TextInput
+            id="organization"
+            label="Организация"
+            key={form.key("organization")}
+            {...form.getInputProps("organization")}
+          />
+        )}
         <MultiSelect
           id="projects"
           label="Проекты"
