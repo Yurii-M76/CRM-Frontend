@@ -1,4 +1,4 @@
-import { Fieldset, TextInput, MultiSelect, InputBase } from "@mantine/core";
+import { Fieldset, TextInput, MultiSelect, InputBase, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -42,6 +42,7 @@ type TInitialValues = {
   roles: TPersonRoles;
   projects: string[];
   districts: string[];
+  note: string | undefined;
 };
 
 dayjs.extend(customParseFormat); // кастомный формат ввода даты
@@ -73,6 +74,7 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     districts: dataToUpdate
       ? dataToUpdate.districts.map((item) => item.id)
       : [],
+    note: dataToUpdate?.note || "",
   };
 
   const form = useForm({
@@ -108,6 +110,7 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
+      note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
       dispatch(updatePerson({ id: dataToUpdate.id, data: personData }));
@@ -216,6 +219,15 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           searchable
           nothingFoundMessage="нет данных"
           {...form.getInputProps("projects")}
+        />
+        <Textarea
+          id="note"
+          label="Примечание"
+          key={form.key("note")}
+          {...form.getInputProps("note")}
+          autosize
+          minRows={2}
+          maxRows={8}
         />
       </Fieldset>
       <FormButtons
