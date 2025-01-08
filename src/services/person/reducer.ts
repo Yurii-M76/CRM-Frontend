@@ -52,7 +52,7 @@ const initialState: TInitialStateTable = {
   sortBy: "createdAt",
   sortOrder: "desc",
   activePage: 1,
-  rangeOnPage: 5,
+  rangeOnPage: 25,
   error: null,
 };
 
