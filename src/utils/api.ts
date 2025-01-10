@@ -29,7 +29,7 @@ export const refreshTokens = async (): Promise<TAuthResponse> => {
       method: "GET",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
-        authorization: getCookie("accessToken"),
+        authorization: getCookie("accessToken")?.replace("Bearer ", ""),
       } as HeadersInit,
       credentials: "include",
     });
