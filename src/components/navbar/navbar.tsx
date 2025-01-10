@@ -32,7 +32,7 @@ export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getMeData);
-  const isAdmin = user?.roles.includes("ADMIN");
+  const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = () => {
     dispatch(logout());

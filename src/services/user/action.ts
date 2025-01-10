@@ -29,4 +29,4 @@ export const logout = createAsyncThunk(
   async () => await logoutUserApi()
 );
 
-export const getMe = createAsyncThunk("user/me", async () => await getMeApi());
+export const getMe = createAsyncThunk("user/me", async (id: string) => await getMeApi(id));

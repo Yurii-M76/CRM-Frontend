@@ -8,12 +8,12 @@ import {
   ProjectsPage,
   SettingsPage,
 } from "./pages";
-import { getMeData } from "@/services/user/reducer";
 import { useSelector } from "./services/store";
+import { getMeData } from "./services/user/reducer";
 
 export function Router() {
   const user = useSelector(getMeData);
-  const isAdmin = user?.roles.includes("ADMIN");
+  const isAdmin = user?.role === "ADMIN";
   const adminPage = isAdmin ? <AdminPage /> : "Ошибка 403. Доступ запрещен";
 
   const router = createBrowserRouter(

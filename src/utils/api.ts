@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { getCookie, setCookie } from "./cookie";
-import { TAuthResponse, TLoginData, TMe } from "@/types";
+import { TAuthResponse, TLoginData, TUser } from "@/types";
 
 const URL = import.meta.env.VITE_API_URL;
 
@@ -8,7 +8,7 @@ export const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
 // Проверка актуальности access токена
-const getValidAccessToken = async (): Promise<string> => {
+const getValidAccessToken = async () => {
   const token = getCookie("accessToken");
   if (!token) {
     const refreshedToken = await refreshTokens();
@@ -35,6 +35,7 @@ export const refreshTokens = async (): Promise<TAuthResponse> => {
     });
     const data = await checkResponse<TAuthResponse>(response);
     setCookie("accessToken", data.accessToken);
+    setCookie("refreshToken", data.refreshToken.token);
     return data;
   } catch (error) {
     console.error("Error refreshing tokens:", error);
@@ -79,9 +80,9 @@ export const logoutUserApi = async () => {
   }
 };
 
-export const getMeApi = async () => {
+export const getMeApi = async (id: string) => {
   try {
-    const response = await fetch(`${URL}/api/user`, {
+    const response = await fetch(`${URL}/api/users/${id}`, {
       mode: "cors",
       method: "GET",
       headers: {
@@ -90,7 +91,7 @@ export const getMeApi = async () => {
       } as HeadersInit,
       credentials: "include",
     });
-    return await checkResponse<TMe>(response);
+    return await checkResponse<TUser>(response);
   } catch (error) {
     console.error("Request failed (get me):", error);
     return Promise.reject(error);
