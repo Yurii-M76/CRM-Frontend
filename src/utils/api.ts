@@ -7,35 +7,60 @@ const URL = import.meta.env.VITE_API_URL;
 export const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
+let isRefreshing = false; // Флаг для отслеживания процесса обновления токенов
+let pendingRequests: Array<(token: string) => void> = []; // Массив для хранения ожидающих запросов
+
 // Проверка актуальности access токена
 const getValidAccessToken = async () => {
   const token = getCookie("accessToken");
-  if (!token) {
-    const refreshedToken = await refreshTokens();
-    return refreshedToken.accessToken;
-  }
-  const { exp } = jwtDecode(token);
-  if (exp && Date.now() >= exp * 1000) {
-    const refreshedToken = await refreshTokens();
-    return refreshedToken.accessToken;
+  if (token) {
+    const { exp } = jwtDecode(token);
+    if (exp && Date.now() >= exp * 1000) {
+      if (!isRefreshing) {
+        isRefreshing = true; // Устанавливаем флаг, что обновление начато
+        try {
+          const newToken = (await refreshTokens()).accessToken;
+          pendingRequests.forEach((callback) => callback(newToken)); // Разрешаем все ожидающие запросы
+          pendingRequests = []; // Очищаем массив ожидающих запросов
+          return newToken;
+        } finally {
+          isRefreshing = false; // Сбрасываем флаг после завершения обновления
+        }
+      } else {
+        // Если обновление уже происходит, возвращаем промис
+        return new Promise((resolve) => {
+          pendingRequests.push(resolve); // Добавляем текущий запрос в массив ожидания
+        });
+      }
+    }
   }
   return token;
 };
+// Проверка актуальности access токена (old)
+// const getValidAccessToken = async () => {
+//   const token = getCookie("accessToken");
+//   if (token) {
+//     const { exp } = jwtDecode(token);
+//     if (exp && Date.now() >= exp * 1000) {
+//       return (await refreshTokens()).accessToken;
+//     }
+//   }
+//   return token;
+// };
 
 export const refreshTokens = async (): Promise<TAuthResponse> => {
   try {
+    const token = getCookie("refreshToken");
     const response = await fetch(`${URL}/api/auth/refresh-tokens`, {
-      mode: "cors",
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
-        authorization: getCookie("accessToken"),
       } as HeadersInit,
-      credentials: "include",
+      body: JSON.stringify({ refreshTokens: token }),
     });
     const data = await checkResponse<TAuthResponse>(response);
     setCookie("accessToken", data.accessToken);
-    // setCookie("refreshToken", data.refreshToken.token);
+    setCookie("refreshToken", data.refreshToken.token);
     return data;
   } catch (error) {
     console.error("Error refreshing tokens:", error);

@@ -39,7 +39,7 @@ export const authSlice = createSlice({
         state.isAuthChecked = true;
         state.error = null;
         setCookie("accessToken", action.payload.accessToken);
-        // setCookie("refreshToken", action.payload.refreshToken.token);
+        setCookie("refreshToken", action.payload.refreshToken.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.isAuthChecked = false;
