@@ -35,7 +35,7 @@ export const refreshTokens = async (): Promise<TAuthResponse> => {
     });
     const data = await checkResponse<TAuthResponse>(response);
     setCookie("accessToken", data.accessToken);
-    setCookie("refreshToken", data.refreshToken.token);
+    // setCookie("refreshToken", data.refreshToken.token);
     return data;
   } catch (error) {
     console.error("Error refreshing tokens:", error);
