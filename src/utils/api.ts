@@ -46,11 +46,13 @@ export const refreshTokens = async (): Promise<TAuthResponse> => {
 export const loginUserApi = async (data: TLoginData) => {
   try {
     const response = await fetch(`${URL}/api/auth/login`, {
+      mode: "cors",
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify(data),
+      credentials: "include",
     });
     return await checkResponse<TAuthResponse>(response);
   } catch (error) {
