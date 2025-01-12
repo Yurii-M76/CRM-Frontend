@@ -75,15 +75,16 @@ export const loginUserApi = async (data: TLoginData) => {
 
 export const logoutUserApi = async () => {
   try {
-    const token = getCookie("refreshToken");
+    const accessToken = getCookie("accessToken");
+    const refreshToken = getCookie("refreshToken");
     const response = await fetch(`${URL}/api/auth/logout`, {
       mode: "cors",
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
-        authorization: await getValidAccessToken(),
+        authorization: accessToken,
       } as HeadersInit,
-      body: JSON.stringify({ refreshToken: token }),
+      body: JSON.stringify({ refreshToken: refreshToken }),
       credentials: "include",
     });
     if (response.ok) {
