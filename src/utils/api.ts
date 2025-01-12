@@ -76,16 +76,17 @@ export const loginUserApi = async (data: TLoginData) => {
 export const logoutUserApi = async () => {
   try {
     const token = getCookie("refreshToken");
-    if (!token) return null;
-    const response = await fetch(`${URL}/api/auth/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      } as HeadersInit,
-      body: JSON.stringify({ refreshToken: token }),
-    });
-    if (response.ok) {
-      return { success: true };
+    if (token) {
+      const response = await fetch(`${URL}/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        } as HeadersInit,
+        body: JSON.stringify({ refreshToken: token }),
+      });
+      if (response.ok) {
+        return { success: true };
+      }
     }
     return { success: false };
   } catch (error) {
