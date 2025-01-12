@@ -36,17 +36,6 @@ const getValidAccessToken = async () => {
   }
   return token;
 };
-// Проверка актуальности access токена (old)
-// const getValidAccessToken = async () => {
-//   const token = getCookie("accessToken");
-//   if (token) {
-//     const { exp } = jwtDecode(token);
-//     if (exp && Date.now() >= exp * 1000) {
-//       return (await refreshTokens()).accessToken;
-//     }
-//   }
-//   return token;
-// };
 
 export const refreshTokens = async (): Promise<TAuthResponse> => {
   try {
@@ -56,7 +45,7 @@ export const refreshTokens = async (): Promise<TAuthResponse> => {
       headers: {
         "Content-Type": "application/json;charset=utf-8",
       } as HeadersInit,
-      body: JSON.stringify({ refreshTokens: token }),
+      body: JSON.stringify({ refreshToken: token }),
     });
     const data = await checkResponse<TAuthResponse>(response);
     setCookie("accessToken", data.accessToken);
@@ -86,13 +75,15 @@ export const loginUserApi = async (data: TLoginData) => {
 
 export const logoutUserApi = async () => {
   try {
+    const token = getCookie("refreshToken");
     const response = await fetch(`${URL}/api/auth/logout`, {
       mode: "cors",
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
         authorization: await getValidAccessToken(),
       } as HeadersInit,
+      body: JSON.stringify({ refreshToken: token }),
       credentials: "include",
     });
     if (response.ok) {
