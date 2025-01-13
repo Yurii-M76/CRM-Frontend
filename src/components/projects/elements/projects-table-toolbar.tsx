@@ -1,18 +1,17 @@
 import { Button, ButtonGroup } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, lazy } from "react";
-import { Search } from "@/components/search/search";
+import { FC } from "react";
+import * as Icons from "@assets/icons";
+import { Search, Modal } from "@components";
 import { resetSearch, setSearch } from "@/services/project/reducer";
-import * as Icons from "../../assets/icons";
-const Modal = lazy(() => import("@/components/modal/modal"));
-import classes from "../table/table.module.css";
+import classes from "../../table/table.module.css";
 
 type TProjectsTableToolbar = {
   isLoading: boolean;
   isDisabled: boolean;
 };
 
-export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
+const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
   isLoading,
   isDisabled,
 }) => {
@@ -61,3 +60,5 @@ export const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
     </>
   );
 };
+
+export default ProjectsTableToolbar;

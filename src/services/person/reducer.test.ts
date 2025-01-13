@@ -195,6 +195,9 @@ describe("Test Persons Slice", () => {
           roles: [],
           districts: [],
           projects: [],
+          car: "BMW",
+          organization: "test",
+          note: "text",
           createdAt: new Date("1990-01-01"),
         },
       ];
@@ -210,6 +213,9 @@ describe("Test Persons Slice", () => {
         roles: [],
         districts: [],
         projects: [],
+        car: "BMW",
+        organization: "test",
+        note: "text",
         createdAt: new Date("1990-01-01"),
       };
       const initialState: TInitialStateTable = {
@@ -410,6 +416,9 @@ describe("Test Persons Slice", () => {
           roles: [],
           districts: [],
           projects: [],
+          car: "BMW",
+          organization: "test",
+          note: "text",
           createdAt: new Date("1990-01-01"),
         },
       ];

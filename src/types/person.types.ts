@@ -12,6 +12,9 @@ export type TPerson = {
   roles: TPersonRoles;
   districts: TDistrict[];
   projects: TProject[];
+  car: string;
+  organization: string;
+  note: string;
   createdAt: Date;
 };
 

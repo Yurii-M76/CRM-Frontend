@@ -20,23 +20,23 @@ import {
 } from "@/services/person/reducer";
 import { formatDateToString } from "@/utils/format-date";
 import { Column, TPerson } from "@/types";
+import { findAllProjects } from "@/services/project/action";
+import { getProjects } from "@/services/project/reducer";
+import { getDistricts } from "@/services/districts/reducer";
+import { getAllDistricts } from "@/services/districts/action";
 import {
+  DeleteModalButtons,
+  Loader,
+  Modal,
+  CollapseList,
+  Paginator,
   ActionButtons,
   NoData,
   TableInfoBlock,
   THeadSortButton,
-} from "@/components/table";
-import { Paginator } from "@/components/paginator/paginator";
-import { Loader } from "@/components/loader/loader";
-import { DeleteModalButtons } from "@/components/buttons/delete-modal-buttons";
-import { findAllProjects } from "@/services/project/action";
-import { getProjects } from "@/services/project/reducer";
-import { personRoles } from "../person-roles";
-import { getDistricts } from "@/services/districts/reducer";
-import { getAllDistricts } from "@/services/districts/action";
-import { FormSavePerson, PersonsTableToolbar } from "../";
-import CollapseList from "@/components/collapse-list/collapse-list";
-import Modal from "@/components/modal/modal";
+} from "@components";
+import { personRoles } from "./person-roles";
+import { FormSavePerson, PersonsTableToolbar } from "./elements";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [

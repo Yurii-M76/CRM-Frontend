@@ -11,7 +11,7 @@ type TProps = {
   isDisabled: boolean;
 };
 
-export const THeadSortButton: FC<TProps> = ({
+const THeadSortButton: FC<TProps> = ({
   accessor,
   sortBy,
   sortOrder,
@@ -54,3 +54,5 @@ export const THeadSortButton: FC<TProps> = ({
     )
   );
 };
+
+export default THeadSortButton;

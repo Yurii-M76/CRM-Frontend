@@ -1,16 +1,22 @@
-import { Fieldset, TextInput, MultiSelect, InputBase } from "@mantine/core";
+import {
+  Fieldset,
+  TextInput,
+  MultiSelect,
+  InputBase,
+  Textarea,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { FormButtons } from "@/components/buttons";
+import { FormButtons } from "../../..";
 import { getPersonsStatus } from "@/services/person/reducer";
 import { createPerson, updatePerson } from "@/services/person/action";
-import { personRoles } from "../person-roles";
+import { personRoles } from "../../person-roles";
 import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import {
   validationEmail,
@@ -42,12 +48,15 @@ type TInitialValues = {
   roles: TPersonRoles;
   projects: string[];
   districts: string[];
+  car: string;
+  organization: string;
+  note: string | undefined;
 };
 
 dayjs.extend(customParseFormat); // кастомный формат ввода даты
 const correctAge = 18; // допустимый возраст волонтера
 
-export const FormSavePerson: FC<TFormSavePerson> = ({
+const FormSavePerson: FC<TFormSavePerson> = ({
   dataToUpdate,
   projects,
   districts,
@@ -56,6 +65,8 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const [phone, setPhone] = useState<string | "">("");
+  const [isDriver, setIsDriver] = useState<boolean>(false);
+  const [isDelegate, setIsDelegate] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     surname: dataToUpdate?.surname || "",
@@ -73,6 +84,9 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     districts: dataToUpdate
       ? dataToUpdate.districts.map((item) => item.id)
       : [],
+    car: dataToUpdate?.car || "",
+    organization: dataToUpdate?.organization || "",
+    note: dataToUpdate?.note || "",
   };
 
   const form = useForm({
@@ -108,6 +122,9 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
+      car: form.getValues().car || undefined,
+      organization: form.getValues().organization || undefined,
+      note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
       dispatch(updatePerson({ id: dataToUpdate.id, data: personData }));
@@ -115,6 +132,26 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
       dispatch(createPerson(personData));
     }
   };
+
+  const roleHandler = (value: string[]) => {
+    const typeValue = value as TPersonRoles;
+    form.setFieldValue("roles", [...typeValue]);
+  };
+
+  useEffect(() => {
+    if (form.getValues().roles.includes("DRIVER")) {
+      setIsDriver(true);
+    } else {
+      form.setFieldValue("car", "")
+      setIsDriver(false);
+    }
+    if (form.getValues().roles.includes("DELEGATE")) {
+      setIsDelegate(true);
+    } else {
+      form.setFieldValue("organization", "")
+      setIsDelegate(false);
+    }
+  }, [form]);
 
   return (
     <form
@@ -205,8 +242,25 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
+          onChange={roleHandler}
           required
         />
+        {isDriver && (
+          <TextInput
+            id="car"
+            label="Данные по автомобилю"
+            key={form.key("car")}
+            {...form.getInputProps("car")}
+          />
+        )}
+        {isDelegate && (
+          <TextInput
+            id="organization"
+            label="Организация"
+            key={form.key("organization")}
+            {...form.getInputProps("organization")}
+          />
+        )}
         <MultiSelect
           id="projects"
           label="Проекты"
@@ -217,6 +271,15 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
           nothingFoundMessage="нет данных"
           {...form.getInputProps("projects")}
         />
+        <Textarea
+          id="note"
+          label="Примечание"
+          key={form.key("note")}
+          {...form.getInputProps("note")}
+          autosize
+          minRows={2}
+          maxRows={8}
+        />
       </Fieldset>
       <FormButtons
         loading={status.create.loading || status.update.loading}
@@ -225,3 +288,5 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     </form>
   );
 };
+
+export default FormSavePerson;

@@ -5,8 +5,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { getAllDistricts } from "@/services/districts/action";
 import { getDistricts, getDistrictsStatus } from "@/services/districts/reducer";
-import { ActionButtons } from "../table";
-import { Loader } from "../loader/loader";
+import { ActionButtons, Loader } from "@components";
 import * as Icons from "../../assets/icons"
 import classes from "../table/table.module.css";
 
@@ -17,7 +16,7 @@ const columns: Column<TDistrict>[] = [
 ];
 const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
 
-export const DistrictsTable = () => {
+const DistrictsTable = () => {
   const dispatch = useDispatch();
   const status = useSelector(getDistrictsStatus);
   const districts = useSelector(getDistricts);
@@ -81,3 +80,5 @@ export const DistrictsTable = () => {
     </div>
   );
 };
+
+export default DistrictsTable;

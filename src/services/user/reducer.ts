@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getMe, login, logout } from "./action";
 import { deleteCookie, setCookie } from "../../utils/cookie";
-import { TMe } from "@/types";
+import { TUser } from "@/types";
 
 type TInitialState = {
   isAuthChecked: boolean;
   error?: string | null;
-  user: TMe | null;
+  user: TUser | null;
 };
 
 const initialState: TInitialState = {

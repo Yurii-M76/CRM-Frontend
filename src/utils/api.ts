@@ -1,40 +1,55 @@
 import { jwtDecode } from "jwt-decode";
 import { getCookie, setCookie } from "./cookie";
-import { TAuthResponse, TLoginData, TMe } from "@/types";
+import { TAuthResponse, TLoginData, TUser } from "@/types";
 
 const URL = import.meta.env.VITE_API_URL;
 
 export const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
+let isRefreshing = false; // Флаг для отслеживания процесса обновления токенов
+let pendingRequests: Array<(token: string) => void> = []; // Массив для хранения ожидающих запросов
+
 // Проверка актуальности access токена
-const getValidAccessToken = async (): Promise<string> => {
+const getValidAccessToken = async () => {
   const token = getCookie("accessToken");
-  if (!token) {
-    const refreshedToken = await refreshTokens();
-    return refreshedToken.accessToken;
-  }
-  const { exp } = jwtDecode(token);
-  if (exp && Date.now() >= exp * 1000) {
-    const refreshedToken = await refreshTokens();
-    return refreshedToken.accessToken;
+  if (token) {
+    const { exp } = jwtDecode(token);
+    if (exp && Date.now() >= exp * 1000) {
+      if (!isRefreshing) {
+        isRefreshing = true; // Устанавливаем флаг, что обновление начато
+        try {
+          const newToken = (await refreshTokens()).accessToken;
+          pendingRequests.forEach((callback) => callback(newToken)); // Разрешаем все ожидающие запросы
+          pendingRequests = []; // Очищаем массив ожидающих запросов
+          return newToken;
+        } finally {
+          isRefreshing = false; // Сбрасываем флаг после завершения обновления
+        }
+      } else {
+        // Если обновление уже происходит, возвращаем промис
+        return new Promise((resolve) => {
+          pendingRequests.push(resolve); // Добавляем текущий запрос в массив ожидания
+        });
+      }
+    }
   }
   return token;
 };
 
 export const refreshTokens = async (): Promise<TAuthResponse> => {
   try {
+    const token = getCookie("refreshToken");
     const response = await fetch(`${URL}/api/auth/refresh-tokens`, {
-      mode: "cors",
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
-        authorization: getCookie("accessToken"),
       } as HeadersInit,
-      credentials: "include",
+      body: JSON.stringify({ refreshToken: token }),
     });
     const data = await checkResponse<TAuthResponse>(response);
     setCookie("accessToken", data.accessToken);
+    setCookie("refreshToken", data.refreshToken.token);
     return data;
   } catch (error) {
     console.error("Error refreshing tokens:", error);
@@ -60,17 +75,18 @@ export const loginUserApi = async (data: TLoginData) => {
 
 export const logoutUserApi = async () => {
   try {
-    const response = await fetch(`${URL}/api/auth/logout`, {
-      mode: "cors",
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-        authorization: await getValidAccessToken(),
-      } as HeadersInit,
-      credentials: "include",
-    });
-    if (response.ok) {
-      return { success: true };
+    const token = getCookie("refreshToken");
+    if (token) {
+      const response = await fetch(`${URL}/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        } as HeadersInit,
+        body: JSON.stringify({ refreshToken: token }),
+      });
+      if (response.ok) {
+        return { success: true };
+      }
     }
     return { success: false };
   } catch (error) {
@@ -79,9 +95,9 @@ export const logoutUserApi = async () => {
   }
 };
 
-export const getMeApi = async () => {
+export const getMeApi = async (id: string) => {
   try {
-    const response = await fetch(`${URL}/api/user`, {
+    const response = await fetch(`${URL}/api/users/${id}`, {
       mode: "cors",
       method: "GET",
       headers: {
@@ -90,7 +106,7 @@ export const getMeApi = async () => {
       } as HeadersInit,
       credentials: "include",
     });
-    return await checkResponse<TMe>(response);
+    return await checkResponse<TUser>(response);
   } catch (error) {
     console.error("Request failed (get me):", error);
     return Promise.reject(error);

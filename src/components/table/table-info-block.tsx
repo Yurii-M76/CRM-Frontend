@@ -10,7 +10,7 @@ type TTableInfoBlock = {
   entityTitle?: string;
 };
 
-export const TableInfoBlock: FC<TTableInfoBlock> = ({
+const TableInfoBlock: FC<TTableInfoBlock> = ({
   count,
   checkedIds,
   resetAllChecked,
@@ -40,3 +40,5 @@ export const TableInfoBlock: FC<TTableInfoBlock> = ({
     </Group>
   );
 };
+
+export default TableInfoBlock;

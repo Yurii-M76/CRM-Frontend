@@ -11,7 +11,7 @@ type TPaginator = {
   setRangeOnPage: ActionCreatorWithPayload<number>;
 };
 
-export const Paginator: FC<TPaginator> = ({
+const Paginator: FC<TPaginator> = ({
   count,
   rowsOnPage,
   setActivePage,
@@ -55,3 +55,5 @@ export const Paginator: FC<TPaginator> = ({
     </div>
   );
 };
+
+export default Paginator;

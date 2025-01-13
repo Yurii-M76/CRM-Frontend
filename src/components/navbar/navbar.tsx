@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider } from "@mantine/core";
-import { useDispatch } from "@/services/store";
+import { useDispatch, useSelector } from "@/services/store";
 import { logout } from "@/services/user/action";
-import * as Icons from "../../assets/icons"
-import classes from "./navbar.module.css";
 import { FC } from "react";
+import { getMeData } from "@/services/user/reducer";
+import * as Icons from "../../assets/icons";
+import classes from "./navbar.module.css";
 
 const tabs = [
   { link: "/", label: "Dashboard", icon: <Icons.IconHome /> },
@@ -24,12 +25,14 @@ const adminTabs = [
 
 type TNavbar = {
   clickHandler: () => void;
-}
+};
 
-export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
+const Navbar: FC<TNavbar> = ({ clickHandler }) => {
   const location = useLocation().pathname;
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector(getMeData);
+  const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = () => {
     dispatch(logout());
@@ -70,8 +73,12 @@ export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
     <>
       <div className={classes.navbarMain}>
         {links}
-        <Divider mt={10} mb={10} />
-        {adminLinks}
+        {isAdmin && (
+          <>
+            <Divider mt={10} mb={10} />
+            {adminLinks}
+          </>
+        )}
       </div>
 
       <div className={classes.footer}>
@@ -81,4 +88,6 @@ export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
       </div>
     </>
   );
-}
+};
+
+export default Navbar;

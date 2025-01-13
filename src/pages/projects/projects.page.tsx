@@ -1,6 +1,6 @@
 import { Loader } from "@mantine/core";
 import { lazy, Suspense } from "react";
-const ProjectsTable = lazy(() => import("../../components/projects/projects-table"));
+const ProjectsTable = lazy(() => import("@components/projects/projects-table"));
 import classes from "../page.module.css";
 
 export const ProjectsPage = () => {

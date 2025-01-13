@@ -1,31 +1,32 @@
-import {
-  AppShell,
-  Box,
-  Burger,
-  Group,
-  Title,
-} from "@mantine/core";
+import { AppShell, Box, Burger, Group, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Outlet, useLocation } from "react-router-dom";
-import { ColorSchemeToggle } from "../color-sheme-toggle/color-sheme-toggle";
-import { DashboardPage } from "@/pages/dashboard/dashboard.page";
-import { Navbar } from "../navbar/navbar";
-import { useDispatch, useSelector } from "@/services/store";
-import { getMeData } from "@/services/user/reducer";
 import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { ColorSchemeToggle, Navbar, CRM_Notification } from "@components";
+import { DashboardPage } from "@/pages/dashboard/dashboard.page";
+import { useDispatch, useSelector } from "@/services/store";
+import { getCookie } from "@/utils";
+import { jwtDecode } from "jwt-decode";
 import { getMe } from "@/services/user/action";
-import { CRM_Notification } from "../notification/notification";
+import { getMeData } from "@/services/user/reducer";
 import classes from "./layout.module.css";
 
-export const Layout = () => {
+const Layout = () => {
   const dispatch = useDispatch();
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const content = useLocation().pathname === "/" ? <DashboardPage /> : <Outlet />;
-  const user = useSelector(getMeData);
+  const currentUser = useSelector(getMeData);
+  const content =
+    useLocation().pathname === "/" ? <DashboardPage /> : <Outlet />;
 
   useEffect(() => {
-    dispatch(getMe());
+    const token = getCookie("accessToken");
+    if (token) {
+      const { sub } = jwtDecode(token);
+      if (sub) {
+        dispatch(getMe(sub));
+      }
+    }
   }, [dispatch]);
 
   return (
@@ -49,7 +50,7 @@ export const Layout = () => {
             />
             <Burger
               opened={desktopOpened}
-              onClick={(toggleDesktop)}
+              onClick={toggleDesktop}
               visibleFrom="sm"
               size="sm"
             />
@@ -58,7 +59,7 @@ export const Layout = () => {
                 CRM
               </Title>
               <Group ml="xl" gap={16}>
-                <p>{user?.name}</p>
+                <p>{currentUser && currentUser.name}</p>
                 <ColorSchemeToggle />
               </Group>
             </Group>
@@ -73,3 +74,5 @@ export const Layout = () => {
     </Box>
   );
 };
+
+export default Layout;

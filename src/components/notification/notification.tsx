@@ -1,7 +1,7 @@
 import { Notification, Transition } from "@mantine/core";
 import { useState } from "react";
 
-export const CRM_Notification = () => {
+const CRM_Notification = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -32,3 +32,5 @@ export const CRM_Notification = () => {
     </Transition>
   );
 };
+
+export default CRM_Notification;
