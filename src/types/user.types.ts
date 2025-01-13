@@ -6,3 +6,7 @@ export type TUser = {
   role: string;
   isBlocked: boolean;
 };
+
+export type TUsers = {
+  items: TUser[]
+}
