@@ -61,12 +61,7 @@ const ProjectsTable = () => {
   };
 
   const thead = columns.map((column, index) => (
-    <Table.Th
-      miw={column.size - 200}
-      maw={column.size}
-      key={index}
-      className={classes.tableTh}
-    >
+    <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label && (
         <Button.Group>
           <Button

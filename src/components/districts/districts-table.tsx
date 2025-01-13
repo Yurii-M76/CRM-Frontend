@@ -6,15 +6,19 @@ import { useDispatch, useSelector } from "@/services/store";
 import { getAllDistricts } from "@/services/districts/action";
 import { getDistricts, getDistrictsStatus } from "@/services/districts/reducer";
 import { ActionButtons, Loader } from "@components";
-import * as Icons from "@assets/icons"
+import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 
 const columns: Column<TDistrict>[] = [
-  { label: "#", accessor: "id", size: 60 },
   { label: "Наименование района", accessor: "name", size: 400 },
-  { label: "Действия", accessor: "id", size: 100 },
 ];
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
+
+const widthColumnFromIndex = 60;
+const widthColumnFromActionButtons = 60;
+const widthTable =
+  columns.reduce((sum, column) => sum + column.size, 0) +
+  widthColumnFromIndex +
+  widthColumnFromActionButtons;
 
 const DistrictsTable = () => {
   const dispatch = useDispatch();
@@ -23,12 +27,7 @@ const DistrictsTable = () => {
   const isLoading = status.read.loading;
 
   const thead = columns.map((column, index) => (
-    <Table.Th
-      miw={column.size}
-      maw={column.size}
-      key={index}
-      className={classes.tableTh}
-    >
+    <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label}
     </Table.Th>
   ));
@@ -54,7 +53,10 @@ const DistrictsTable = () => {
     <div className={classes.container} style={{ maxWidth: widthTable }}>
       <div className={classes.tableHeader}>
         <h2>Районы</h2>
-        <Button variant="light" leftSection={<Icons.IconPlus className={classes.icon} />}>
+        <Button
+          variant="light"
+          leftSection={<Icons.IconPlus className={classes.icon} />}
+        >
           Добавить
         </Button>
       </div>
@@ -70,7 +72,11 @@ const DistrictsTable = () => {
           className={classes.table}
         >
           <Table.Thead>
-            <Table.Tr>{thead}</Table.Tr>
+            <Table.Tr>
+              <Table.Th w={widthColumnFromIndex}>#</Table.Th>
+              {thead}
+              <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
+            </Table.Tr>
           </Table.Thead>
 
           <Table.Tbody>{!isLoading && rows}</Table.Tbody>
