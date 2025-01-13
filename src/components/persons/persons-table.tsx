@@ -47,10 +47,14 @@ const columns: Column<TPerson>[] = [
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: true },
   { label: "Район", accessor: "districts", size: 210, sorted: false },
-  { label: "", accessor: "id", size: 100, sorted: false },
 ];
 
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 54;
+const widthColumnFromCheckbox = 60;
+const widthColumnFromActionButtons = 60;
+const widthTable =
+  columns.reduce((sum, column) => sum + column.size, 0) +
+  widthColumnFromCheckbox +
+  widthColumnFromActionButtons;
 
 const PersonsTable = () => {
   const dispatch = useDispatch();
@@ -104,7 +108,12 @@ const PersonsTable = () => {
   const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
   const thead = columns.map((column, index) => (
-    <Table.Th miw={column.size} key={index} className={classes.tableTh}>
+    <Table.Th
+      miw={column.size - 200}
+      maw={column.size}
+      key={index}
+      className={classes.tableTh}
+    >
       {column.label && (
         <Button.Group>
           <Button
@@ -218,6 +227,7 @@ const PersonsTable = () => {
         />
         <div className={classes.tableBox}>
           <Table
+            maw={widthTable}
             striped
             highlightOnHover
             horizontalSpacing="md"
@@ -227,7 +237,7 @@ const PersonsTable = () => {
           >
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>
+                <Table.Th w={widthColumnFromCheckbox}>
                   <Checkbox
                     checked={isAllCheched}
                     indeterminate={indeterminate}
@@ -238,6 +248,7 @@ const PersonsTable = () => {
                   />
                 </Table.Th>
                 {thead}
+                <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{!isLoading && rows}</Table.Tbody>
