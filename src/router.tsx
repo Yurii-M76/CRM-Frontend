@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Layout } from "./components/layout/layout";
+import { Layout } from "@components";
 import {
   AdminPage,
   MailingPage,

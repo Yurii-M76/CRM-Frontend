@@ -8,7 +8,7 @@ import { getIsAuthChecked, setIsAuthChecked } from "./services/user/reducer";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 import { getCookie, refreshTokens } from "./utils";
-import { AuthLoader } from "./components/auth-loader/auth-loader";
+import { AuthLoader } from "@components";
 import "@mantine/core/styles.css";
 
 function App() {

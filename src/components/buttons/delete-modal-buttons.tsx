@@ -7,7 +7,7 @@ type TDeleteModalButtons = {
   loading: boolean;
 };
 
-export const DeleteModalButtons: FC<TDeleteModalButtons> = ({
+const DeleteModalButtons: FC<TDeleteModalButtons> = ({
   onClickToCancel,
   onClickToDelete,
   loading,
@@ -33,3 +33,5 @@ export const DeleteModalButtons: FC<TDeleteModalButtons> = ({
     </Group>
   );
 };
+
+export default DeleteModalButtons;

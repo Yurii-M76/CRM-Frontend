@@ -1,8 +1,8 @@
 import { Button, ButtonGroup } from "@mantine/core";
 import { FC } from "react";
-import { Search } from "@/components/search/search";
+import { Search } from "../../..";
 import { resetSearch, setSearch } from "@/services/person/reducer";
-import * as Icons from "../../../assets/icons";
+import * as Icons from "../../../../assets/icons";
 import classes from "@components/table/table.module.css";
 
 type TPersonsTableToolbar = {
@@ -11,7 +11,7 @@ type TPersonsTableToolbar = {
   openedAddForm?: () => void;
 };
 
-export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
+const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
   isLoading,
   openedAddForm: onClickToOpenAddForm,
 }) => {
@@ -63,3 +63,5 @@ export const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
     </>
   );
 };
+
+export default PersonsTableToolbar;

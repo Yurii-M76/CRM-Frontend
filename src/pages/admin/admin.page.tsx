@@ -1,9 +1,13 @@
 import { Loader } from "@mantine/core";
 import { lazy, Suspense } from "react";
-const DistrictsTable = lazy(() => import("../../components/districts/districts-table"));
+
+const Users = lazy(() => import("@components").then((module) => ({ default: module.Users })));
+const DistrictsTable = lazy(() => import("@components").then((module) => ({ default: module.DistrictsTable })));
+
 import classes from "../page.module.css";
 
 export const AdminPage = () => {
+  const loader = <div>Загрузка...</div>;
   return (
     <>
       <h1 className={classes.pageTitle}>Панель администратора</h1>
@@ -11,7 +15,9 @@ export const AdminPage = () => {
       <Suspense fallback={<Loader color="blue" size={26} />}>
         <div className={classes.pageSection}>
           <h2>Пользователи</h2>
-          Список пользователей (добавить / редатировать / удалить)
+          <Suspense fallback={loader}>
+            <Users />
+          </Suspense>
         </div>
 
         <div className={classes.pageSection}>
@@ -20,7 +26,9 @@ export const AdminPage = () => {
         </div>
 
         <div className={classes.pageSection}>
-          <DistrictsTable />
+          <Suspense fallback={loader}>
+            <DistrictsTable />
+          </Suspense>
         </div>
       </Suspense>
     </>

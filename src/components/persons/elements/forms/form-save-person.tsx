@@ -13,10 +13,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { FormButtons } from "@/components/buttons";
+import { FormButtons } from "../../..";
 import { getPersonsStatus } from "@/services/person/reducer";
 import { createPerson, updatePerson } from "@/services/person/action";
-import { personRoles } from "../person-roles";
+import { personRoles } from "../../person-roles";
 import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import {
   validationEmail,
@@ -56,7 +56,7 @@ type TInitialValues = {
 dayjs.extend(customParseFormat); // кастомный формат ввода даты
 const correctAge = 18; // допустимый возраст волонтера
 
-export const FormSavePerson: FC<TFormSavePerson> = ({
+const FormSavePerson: FC<TFormSavePerson> = ({
   dataToUpdate,
   projects,
   districts,
@@ -288,3 +288,5 @@ export const FormSavePerson: FC<TFormSavePerson> = ({
     </form>
   );
 };
+
+export default FormSavePerson;

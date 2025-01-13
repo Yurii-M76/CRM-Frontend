@@ -27,7 +27,7 @@ type TNavbar = {
   clickHandler: () => void;
 };
 
-export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
+const Navbar: FC<TNavbar> = ({ clickHandler }) => {
   const location = useLocation().pathname;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -89,3 +89,5 @@ export const Navbar: FC<TNavbar> = ({ clickHandler }) => {
     </>
   );
 };
+
+export default Navbar;

@@ -1,19 +1,17 @@
 import { AppShell, Box, Burger, Group, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Outlet, useLocation } from "react-router-dom";
-import { ColorSchemeToggle } from "../color-sheme-toggle/color-sheme-toggle";
-import { DashboardPage } from "@/pages/dashboard/dashboard.page";
-import { Navbar } from "../navbar/navbar";
-import { useDispatch, useSelector } from "@/services/store";
 import { useEffect } from "react";
-import { CRM_Notification } from "../notification/notification";
+import { Outlet, useLocation } from "react-router-dom";
+import { ColorSchemeToggle, Navbar, CRM_Notification } from "@components";
+import { DashboardPage } from "@/pages/dashboard/dashboard.page";
+import { useDispatch, useSelector } from "@/services/store";
 import { getCookie } from "@/utils";
 import { jwtDecode } from "jwt-decode";
 import { getMe } from "@/services/user/action";
 import { getMeData } from "@/services/user/reducer";
 import classes from "./layout.module.css";
 
-export const Layout = () => {
+const Layout = () => {
   const dispatch = useDispatch();
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
@@ -76,3 +74,5 @@ export const Layout = () => {
     </Box>
   );
 };
+
+export default Layout;

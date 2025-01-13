@@ -6,7 +6,7 @@ type TFormButtons = {
   onClose?: () => void;
 };
 
-export const FormButtons: FC<TFormButtons> = ({ loading, onClose }) => {
+const FormButtons: FC<TFormButtons> = ({ loading, onClose }) => {
   return (
     <Group mt="lg" justify="flex-end">
       <Button
@@ -23,3 +23,5 @@ export const FormButtons: FC<TFormButtons> = ({ loading, onClose }) => {
     </Group>
   );
 };
+
+export default FormButtons;

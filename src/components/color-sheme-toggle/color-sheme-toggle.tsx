@@ -6,7 +6,7 @@ import {
 import * as Icons from "../../assets/icons";
 import classes from "./color-sheme-toggle.module.css";
 
-export const ColorSchemeToggle = () => {
+const ColorSchemeToggle = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -29,3 +29,5 @@ export const ColorSchemeToggle = () => {
     </ActionIcon>
   );
 };
+
+export default ColorSchemeToggle;

@@ -1,6 +1,6 @@
 import { Loader } from "@mantine/core";
 import { lazy, Suspense } from "react";
-const PersonsTable = lazy(() => import("../../components/persons/table/persons-table"));
+const PersonsTable = lazy(() => import("@components/persons/persons-table"));
 import classes from "../page.module.css";
 
 export const PersonsPage = () => {

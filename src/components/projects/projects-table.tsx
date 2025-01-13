@@ -15,16 +15,16 @@ import {
   resetSort,
 } from "@/services/project/reducer";
 import { Column, TProject } from "@/types";
-import { ProjectsTableToolbar } from ".";
 import {
-  THeadSortButton,
-  NoData,
-  TableInfoBlock,
+  Loader,
+  Paginator,
+  CollapseList,
   ActionButtons,
-} from "@components/table";
-import { Loader } from "../loader/loader";
-import { Paginator } from "../paginator/paginator";
-import CollapseList from "../collapse-list/collapse-list";
+  NoData,
+  THeadSortButton,
+  TableInfoBlock,
+} from "@components";
+import ProjectsTableToolbar from "./elements/projects-table-toolbar";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
@@ -167,4 +167,4 @@ const ProjectsTable = () => {
   );
 };
 
-export default ProjectsTable
+export default ProjectsTable;

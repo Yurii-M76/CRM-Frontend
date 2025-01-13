@@ -8,7 +8,7 @@ type TActionButtons = {
   handleClickFromDelete: () => void;
 };
 
-export const ActionButtons: FC<TActionButtons> = ({
+const ActionButtons: FC<TActionButtons> = ({
   handleClickFromEdit,
   handleClickFromDelete,
 }) => {
@@ -35,3 +35,5 @@ export const ActionButtons: FC<TActionButtons> = ({
     </div>
   );
 };
+
+export default ActionButtons;
