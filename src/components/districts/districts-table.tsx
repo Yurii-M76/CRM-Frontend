@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "@/services/store";
 import { getAllDistricts } from "@/services/districts/action";
 import { getDistricts, getDistrictsStatus } from "@/services/districts/reducer";
 import { ActionButtons, Loader } from "@components";
-import * as Icons from "../../assets/icons"
+import * as Icons from "@assets/icons"
 import classes from "../table/table.module.css";
 
 const columns: Column<TDistrict>[] = [
