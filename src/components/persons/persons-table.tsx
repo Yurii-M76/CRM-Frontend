@@ -40,17 +40,21 @@ import { FormSavePerson, PersonsTableToolbar } from "./elements";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
-  { label: "ФИО", accessor: "fullName", size: 260, sorted: true },
-  { label: "Телефон", accessor: "phone", size: 170, sorted: true },
+  { label: "ФИО", accessor: "fullName", size: 200, sorted: true },
+  { label: "Телефон", accessor: "phone", size: 180, sorted: true },
   { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
-  { label: "E-Mail", accessor: "email", size: 200, sorted: true },
+  { label: "E-Mail", accessor: "email", size: 180, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: true },
-  { label: "Район", accessor: "districts", size: 210, sorted: false },
-  { label: "", accessor: "id", size: 100, sorted: false },
+  { label: "Район", accessor: "districts", size: 200, sorted: false },
 ];
 
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 54;
+const widthColumnFromCheckbox = 60;
+const widthColumnFromActionButtons = 60;
+const widthTable =
+  columns.reduce((sum, column) => sum + column.size, 0) +
+  widthColumnFromCheckbox +
+  widthColumnFromActionButtons;
 
 const PersonsTable = () => {
   const dispatch = useDispatch();
@@ -104,7 +108,7 @@ const PersonsTable = () => {
   const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
   const thead = columns.map((column, index) => (
-    <Table.Th miw={column.size} key={index} className={classes.tableTh}>
+    <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label && (
         <Button.Group>
           <Button
@@ -174,7 +178,13 @@ const PersonsTable = () => {
             </ul>
           </CollapseList>
         </Table.Td>
-        <Table.Td>{item.districts.map((district) => district.name)}</Table.Td>
+        <Table.Td>
+          {item.districts.map((district) => (
+            <Pill key={district.id} mr={4}>
+              {district.name}
+            </Pill>
+          ))}
+        </Table.Td>
         <Table.Td>
           <ActionButtons
             handleClickFromEdit={() => updateClickHandler(item.id)}
@@ -218,6 +228,7 @@ const PersonsTable = () => {
         />
         <div className={classes.tableBox}>
           <Table
+            maw={widthTable}
             striped
             highlightOnHover
             horizontalSpacing="md"
@@ -227,7 +238,7 @@ const PersonsTable = () => {
           >
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>
+                <Table.Th w={widthColumnFromCheckbox}>
                   <Checkbox
                     checked={isAllCheched}
                     indeterminate={indeterminate}
@@ -238,6 +249,7 @@ const PersonsTable = () => {
                   />
                 </Table.Th>
                 {thead}
+                <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{!isLoading && rows}</Table.Tbody>

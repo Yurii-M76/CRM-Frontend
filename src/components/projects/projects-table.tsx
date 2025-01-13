@@ -31,9 +31,14 @@ const columns: Column<TProject>[] = [
   { label: "Название", accessor: "title", size: 300, sorted: true },
   { label: "Описание", accessor: "describe", size: 400, sorted: true },
   { label: "Участники", accessor: "persons", size: 320, sorted: false },
-  { label: "", accessor: "id", size: 100, sorted: false },
 ];
-const widthTable = columns.reduce((sum, column) => sum + column.size, 0) + 2;
+
+const widthColumnFromCheckbox = 60;
+const widthColumnFromActionButtons = 60;
+const widthTable =
+  columns.reduce((sum, column) => sum + column.size, 0) +
+  widthColumnFromCheckbox +
+  widthColumnFromActionButtons;
 
 const ProjectsTable = () => {
   const dispatch = useDispatch();
@@ -56,7 +61,7 @@ const ProjectsTable = () => {
   };
 
   const thead = columns.map((column, index) => (
-    <Table.Th miw={column.size} key={index} className={classes.tableTh}>
+    <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label && (
         <Button.Group>
           <Button
@@ -142,7 +147,7 @@ const ProjectsTable = () => {
           <Table.Thead>
             <Table.Tr>
               {thead}
-              {/* <Table.Th w={100}>actions</Table.Th> */}
+              <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{!isLoading && rows}</Table.Tbody>
