@@ -1,7 +1,13 @@
 export default {
   auth: {},
   users: {},
-  persons: {},
+  persons: {
+    forms: {
+      save: {
+        conflictPhone: "Телефон уже используется",
+      },
+    },
+  },
   projects: {},
   districts: {},
   formValidate: {

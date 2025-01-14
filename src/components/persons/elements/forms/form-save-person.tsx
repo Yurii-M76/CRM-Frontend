@@ -14,8 +14,12 @@ import { IMaskInput } from "react-imask";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { FormButtons } from "../../..";
-import { getPersonsStatus } from "@/services/person/reducer";
-import { createPerson, updatePerson } from "@/services/person/action";
+import { getCheckPhone, getPersonsStatus } from "@/services/person/reducer";
+import {
+  checkPhone,
+  createPerson,
+  updatePerson,
+} from "@/services/person/action";
 import { personRoles } from "../../person-roles";
 import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import {
@@ -64,9 +68,11 @@ const FormSavePerson: FC<TFormSavePerson> = ({
 }) => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
+  const getIsPhone = useSelector(getCheckPhone);
   const [phone, setPhone] = useState<string | "">("");
   const [isDriver, setIsDriver] = useState<boolean>(false);
   const [isDelegate, setIsDelegate] = useState<boolean>(false);
+  const [conflictPhone, setConflictPhone] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     surname: dataToUpdate?.surname || "",
@@ -96,16 +102,12 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       surname: (value) => validationSurname(value),
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
-      phone: (value) => validationPhone(value || phone),
+      phone: (value) => conflictPhone ? "Телефон уже используется" : validationPhone(value || phone),
       email: (value) => validationEmail(value),
       districts: (value) =>
-        !value.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined,
+        !value.length ? exceptions.formValidate.all.requiredField : undefined,
       roles: (value) =>
-        !value.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined,
+        !value.length ? exceptions.formValidate.all.requiredField : undefined,
     },
   });
 
@@ -142,16 +144,32 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     if (form.getValues().roles.includes("DRIVER")) {
       setIsDriver(true);
     } else {
-      form.setFieldValue("car", "")
+      form.setFieldValue("car", "");
       setIsDriver(false);
     }
     if (form.getValues().roles.includes("DELEGATE")) {
       setIsDelegate(true);
     } else {
-      form.setFieldValue("organization", "")
+      form.setFieldValue("organization", "");
       setIsDelegate(false);
     }
   }, [form]);
+
+  useEffect(() => {
+    if (phone.length === 18) {
+      dispatch(checkPhone(phone));
+    }
+  }, [dispatch, phone]);
+
+  useEffect(() => {
+    const personId = dataToUpdate?.id;
+    const personIdFoundPhone = getIsPhone?.id
+    if (personIdFoundPhone && personIdFoundPhone !== personId) {
+      setConflictPhone(true);
+    } else {
+      setConflictPhone(false);
+    }
+  }, [conflictPhone, getIsPhone])
 
   return (
     <form

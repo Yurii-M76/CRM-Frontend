@@ -11,8 +11,8 @@ import { FormButtons } from "../buttons";
 import { UserRole } from "@/types";
 import { useDispatch } from "@/services/store";
 import { createUser } from "@/services/users/actions";
-import classes from "./forms.module.css";
 import exceptions from "@/constants/exceptions";
+import classes from "./forms.module.css";
 
 type TFormSaveUser = {
   onClose?: () => void;
@@ -67,7 +67,6 @@ export const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
 
   const handleSubmit = () => {
     dispatch(createUser(form.getValues()));
-    console.log(form.getValues());
   };
 
   return (

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  checkPhone,
   createPerson,
   deletePerson,
   getAllPersons,
@@ -32,6 +33,7 @@ type TInitialStateTable = {
   rangeOnPage: number;
   checkedIds: string[];
   error?: string | null;
+  checkPhone: { id: string } | null;
 };
 
 const defaultStatus = { loading: false, success: false };
@@ -54,6 +56,7 @@ const initialState: TInitialStateTable = {
   activePage: 1,
   rangeOnPage: 25,
   error: null,
+  checkPhone: null,
 };
 
 const currentState = (state: TInitialStateTable) => {
@@ -130,6 +133,7 @@ export const PersonSlice = createSlice({
     getRangeOnPage: (state) => state.rangeOnPage,
     getOneChecked: (state) => state.checkedIds,
     getErrors: (state) => state.error,
+    getCheckPhone: (state) => state.checkPhone,
   },
   extraReducers(builder) {
     builder // Create
@@ -203,6 +207,14 @@ export const PersonSlice = createSlice({
         state.status.delete = defaultStatus;
         state.error = action.error.message;
       });
+
+    builder // Check phone
+      .addCase(checkPhone.pending, (state) => {
+        state.checkPhone = null;
+      })
+      .addCase(checkPhone.fulfilled, (state, action) => {
+        state.checkPhone = action.payload;
+      });
   },
 });
 
@@ -227,5 +239,6 @@ export const {
   getRangeOnPage,
   getOneChecked,
   getErrors,
+  getCheckPhone,
 } = PersonSlice.selectors;
 export default PersonSlice;
