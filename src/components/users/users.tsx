@@ -5,6 +5,9 @@ import { Column, TUser } from "@/types";
 import { Button, Switch, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { ActionButtons } from "../table";
+import { useDisclosure } from "@mantine/hooks";
+import { FormSaveUser } from "../forms/form-save-user";
+import Modal from "../modal/modal";
 import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 
@@ -24,6 +27,7 @@ const Users = () => {
   const dispath = useDispatch();
   const users = useSelector(getUsers);
   const isLoading = useSelector(getIsLoadingUsers);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const thead = columns.map((column, index) => (
     <Table.Th w={column.size} key={index} className={classes.tableTh}>
@@ -66,35 +70,41 @@ const Users = () => {
   }, [dispath]);
 
   return (
-    <div className={classes.container} style={{ maxWidth: widthTable }}>
-      <div className={classes.tableHeader}>
-        <h2>Пользователи</h2>
-        <Button
-          variant="light"
-          leftSection={<Icons.IconPlus className={classes.icon} />}
-        >
-          Добавить
-        </Button>
+    <>
+      <div className={classes.container} style={{ maxWidth: widthTable }}>
+        <div className={classes.tableHeader}>
+          <h2>Пользователи</h2>
+          <Button
+            variant="light"
+            leftSection={<Icons.IconPlus className={classes.icon} />}
+            onClick={open}
+          >
+            Добавить
+          </Button>
+        </div>
+        <div className={classes.tableBox}>
+          <Table
+            striped
+            highlightOnHover
+            horizontalSpacing="md"
+            withColumnBorders
+            withTableBorder
+            className={classes.table}
+          >
+            <Table.Thead>
+              <Table.Tr>
+                {thead}
+                <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{!isLoading && rows}</Table.Tbody>
+          </Table>
+        </div>
       </div>
-      <div className={classes.tableBox}>
-        <Table
-          striped
-          highlightOnHover
-          horizontalSpacing="md"
-          withColumnBorders
-          withTableBorder
-          className={classes.table}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              {thead}
-              <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{!isLoading && rows}</Table.Tbody>
-        </Table>
-      </div>
-    </div>
+      <Modal title="Новый пользователь" opened={opened} close={close} size="sm">
+        <FormSaveUser onClose={close} />
+      </Modal>
+    </>
   );
 };
 
