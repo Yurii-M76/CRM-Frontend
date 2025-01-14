@@ -100,11 +100,11 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length
-          ? exceptions.persons.formValidate.requiredField
+          ? exceptions.formValidate.all.requiredField
           : undefined,
       roles: (value) =>
         !value.length
-          ? exceptions.persons.formValidate.requiredField
+          ? exceptions.formValidate.all.requiredField
           : undefined,
     },
   });
