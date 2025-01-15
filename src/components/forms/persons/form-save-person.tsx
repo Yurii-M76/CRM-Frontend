@@ -20,7 +20,7 @@ import {
   updatePerson,
 } from "@/services/person/action";
 import { personRoles } from "../../persons/person-roles";
-import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
+import { TProject, TDistrict, TPerson } from "@/types";
 import {
   validationEmail,
   validationName,
@@ -48,7 +48,7 @@ type TInitialValues = {
   birthday: Date | undefined;
   phone: string;
   email: string | undefined;
-  roles: TPersonRoles;
+  roles: string[];
   projects: string[];
   districts: string[];
   car: string;
@@ -69,9 +69,10 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   const status = useSelector(getPersonsStatus);
   const getIsPhone = useSelector(getCheckPhone);
   const [phone, setPhone] = useState<string | "">("");
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [conflictPhone, setConflictPhone] = useState<boolean>(false);
   const [isDriver, setIsDriver] = useState<boolean>(false);
   const [isDelegate, setIsDelegate] = useState<boolean>(false);
-  const [conflictPhone, setConflictPhone] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     surname: dataToUpdate?.surname || "",
@@ -107,12 +108,23 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
-      roles: (value) =>
-        !value.length ? exceptions.formValidate.all.requiredField : undefined,
+      roles: () =>
+        !selectedRoles.length
+          ? exceptions.formValidate.all.requiredField
+          : undefined,
+      car: (value) =>
+        isDriver && !value.length
+          ? exceptions.formValidate.all.requiredField
+          : undefined,
+      organization: (value) =>
+        isDelegate && !value.length
+          ? exceptions.formValidate.all.requiredField
+          : undefined,
     },
   });
 
   const handleSubmit = () => {
+    form.setFieldValue("roles", selectedRoles);
     const personData = {
       surname: formatName(form.getValues().surname) || undefined,
       name: formatName(form.getValues().name),
@@ -125,8 +137,8 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
-      car: form.getValues().car || undefined,
-      organization: form.getValues().organization || undefined,
+      car: isDriver ? form.getValues().car : undefined,
+      organization: isDelegate ? form.getValues().organization : undefined,
       note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
@@ -135,26 +147,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       dispatch(createPerson(personData));
     }
   };
-
-  const roleHandler = (value: string[]) => {
-    const typeValue = value as TPersonRoles;
-    form.setFieldValue("roles", [...typeValue]);
-  };
-
-  useEffect(() => {
-    if (form.getValues().roles.includes("DRIVER")) {
-      setIsDriver(true);
-    } else {
-      form.setFieldValue("car", "");
-      setIsDriver(false);
-    }
-    if (form.getValues().roles.includes("DELEGATE")) {
-      setIsDelegate(true);
-    } else {
-      form.setFieldValue("organization", "");
-      setIsDelegate(false);
-    }
-  }, [form]);
 
   useEffect(() => {
     if (phone.length === 18) {
@@ -171,6 +163,16 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       setConflictPhone(false);
     }
   }, [conflictPhone, getIsPhone]);
+
+  useEffect(() => {
+    setIsDriver(selectedRoles.includes("DRIVER"));
+    setIsDelegate(selectedRoles.includes("DELEGATE"));
+  }, [selectedRoles]);
+
+  useEffect(() => {
+    setIsDriver(dataToUpdate?.roles.includes("DRIVER") ? true : false);
+    setIsDelegate(dataToUpdate?.roles.includes("DELEGATE") ? true : false);
+  }, []);
 
   return (
     <form
@@ -261,7 +263,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
-          onChange={roleHandler}
+          onChange={setSelectedRoles}
           required
         />
         {isDriver && (
@@ -270,6 +272,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             label="Данные по автомобилю"
             key={form.key("car")}
             {...form.getInputProps("car")}
+            required={isDriver}
           />
         )}
         {isDelegate && (
@@ -278,6 +281,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             label="Организация"
             key={form.key("organization")}
             {...form.getInputProps("organization")}
+            required={isDelegate}
           />
         )}
         <MultiSelect
