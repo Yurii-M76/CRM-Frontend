@@ -1,9 +1,10 @@
 import { Button, ButtonGroup } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC } from "react";
-import * as Icons from "@assets/icons";
-import { Search, Modal } from "@components";
+import { Modal } from "@components";
+import { Search } from "@components/forms";
 import { resetSearch, setSearch } from "@/services/project/reducer";
+import * as Icons from "@assets/icons";
 import classes from "../../table/table.module.css";
 
 type TProjectsTableToolbar = {

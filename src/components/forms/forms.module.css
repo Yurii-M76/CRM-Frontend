@@ -4,12 +4,22 @@
   gap: 20px;
 }
 
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .inputsGroupOnRow {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
+
+  @media (width <= 500px) {
+    flex-direction: column;
+  }
 }
 
 .inputsGroupOnColumn {
@@ -19,9 +29,13 @@
   gap: 10px;
 }
 
+.formInput {
+  width: 100%;
+}
+
 .inputHeight {
   display: flex;
   flex-direction: column;
-  height: 36px;
   justify-content: center;
+  height: 36px;
 }

@@ -7,12 +7,12 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
-import { FormButtons } from "../buttons";
 import { UserRole } from "@/types";
 import { useDispatch } from "@/services/store";
 import { createUser } from "@/services/users/actions";
+import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
 import exceptions from "@/constants/exceptions";
-import classes from "./forms.module.css";
+import classes from "../forms.module.css";
 
 type TFormSaveUser = {
   onClose?: () => void;
@@ -27,7 +27,7 @@ type TInitialValues = {
   isBlocked: boolean;
 };
 
-export const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
+const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const initialValues: TInitialValues = {
@@ -112,7 +112,9 @@ export const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           className={classes.inputHeight}
         />
       </div>
-      <FormButtons onClose={onClose} />
+      <ButtonsDefaultFromForm onClose={onClose} />
     </form>
   );
 };
+
+export default FormSaveUser;

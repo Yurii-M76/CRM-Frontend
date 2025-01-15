@@ -6,7 +6,7 @@ import { Button, Switch, Table } from "@mantine/core";
 import { useEffect } from "react";
 import { ActionButtons } from "../table";
 import { useDisclosure } from "@mantine/hooks";
-import { FormSaveUser } from "../forms/form-save-user";
+import { FormSaveUser } from "@components/forms";
 import Modal from "../modal/modal";
 import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";

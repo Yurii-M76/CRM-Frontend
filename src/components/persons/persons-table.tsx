@@ -25,7 +25,6 @@ import { getProjects } from "@/services/project/reducer";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
 import {
-  DeleteModalButtons,
   Loader,
   Modal,
   CollapseList,
@@ -34,9 +33,11 @@ import {
   NoData,
   TableInfoBlock,
   THeadSortButton,
+  ButtonsFromDeleteForm,
 } from "@components";
 import { personRoles } from "./person-roles";
-import { FormSavePerson, PersonsTableToolbar } from "./elements";
+import { PersonsTableToolbar } from "./elements";
+import { FormSavePerson } from "@components/forms";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -316,7 +317,7 @@ const PersonsTable = () => {
         <Text>
           Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
         </Text>
-        <DeleteModalButtons
+        <ButtonsFromDeleteForm
           loading={status.delete.loading}
           onClickToCancel={() => {
             setIsOpenConfirmAction(false);

@@ -13,14 +13,13 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { FormButtons } from "../../..";
 import { getCheckPhone, getPersonsStatus } from "@/services/person/reducer";
 import {
   checkPhone,
   createPerson,
   updatePerson,
 } from "@/services/person/action";
-import { personRoles } from "../../person-roles";
+import { personRoles } from "../../persons/person-roles";
 import { TPersonRoles, TProject, TDistrict, TPerson } from "@/types";
 import {
   validationEmail,
@@ -29,11 +28,11 @@ import {
   validationPhone,
   validationSurname,
 } from "./validation";
-import exceptions from "@/constants/exceptions";
 import { formatDateToString } from "@/utils";
 import { formatName } from "@/utils/format-name";
-import "@mantine/dates/styles.css";
-import classes from "./form.module.css";
+import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
+import exceptions from "@/constants/exceptions";
+import classes from "../forms.module.css";
 
 type TFormSavePerson = {
   dataToUpdate?: TPerson;
@@ -102,7 +101,9 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       surname: (value) => validationSurname(value),
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
-      phone: (value) => conflictPhone ? "Телефон уже используется" : validationPhone(value || phone),
+      phone: (value) =>
+        validationPhone(value || phone) ||
+        (conflictPhone && exceptions.persons.forms.save.conflictPhone),
       email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
@@ -163,13 +164,13 @@ const FormSavePerson: FC<TFormSavePerson> = ({
 
   useEffect(() => {
     const personId = dataToUpdate?.id;
-    const personIdFoundPhone = getIsPhone?.id
+    const personIdFoundPhone = getIsPhone?.id;
     if (personIdFoundPhone && personIdFoundPhone !== personId) {
       setConflictPhone(true);
     } else {
       setConflictPhone(false);
     }
-  }, [conflictPhone, getIsPhone])
+  }, [conflictPhone, getIsPhone]);
 
   return (
     <form
@@ -178,30 +179,30 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       noValidate
     >
       <Fieldset legend="Персональная информация" className={classes.fieldset}>
-        <div className={classes.input_group}>
+        <div className={classes.inputsGroupOnRow}>
           <TextInput
             id="surname"
             label="Фамилия"
             key={form.key("surname")}
             {...form.getInputProps("surname")}
-            className={classes.input}
+            className={classes.formInput}
           />
           <TextInput
             id="name"
             label="Имя"
             key={form.key("name")}
             {...form.getInputProps("name")}
-            className={classes.input}
+            className={classes.formInput}
             required
           />
         </div>
-        <div className={classes.input_group}>
+        <div className={classes.inputsGroupOnRow}>
           <TextInput
             id="patronymic"
             label="Отчество"
             key={form.key("patronymic")}
             {...form.getInputProps("patronymic")}
-            className={classes.input}
+            className={classes.formInput}
           />
           <DateInput
             id="birthday"
@@ -213,13 +214,13 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             valueFormat="DD.MM.YYYY"
             key={form.key("birthday")}
             {...form.getInputProps("birthday")}
-            className={classes.input}
+            className={classes.formInput}
             clearable
           />
         </div>
       </Fieldset>
       <Fieldset legend="Контакты" className={classes.fieldset}>
-        <div className={classes.input_group}>
+        <div className={classes.inputsGroupOnRow}>
           <InputBase
             id="phone"
             label="Телефон"
@@ -228,7 +229,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             onAccept={(value) => setPhone(value)}
             key={form.key("phone")}
             {...form.getInputProps("phone")}
-            className={classes.input}
+            className={classes.formInput}
             required
           />
           <TextInput
@@ -236,7 +237,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             label="Email"
             key={form.key("email")}
             {...form.getInputProps("email")}
-            className={classes.input}
+            className={classes.formInput}
           />
         </div>
       </Fieldset>
@@ -250,7 +251,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           required
         />
       </Fieldset>
-      <Fieldset legend="" className={classes.fieldset}>
+      <Fieldset legend="Прочее" className={classes.fieldset}>
         <MultiSelect
           id="roles"
           label="Роль"
@@ -299,7 +300,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           maxRows={8}
         />
       </Fieldset>
-      <FormButtons
+      <ButtonsDefaultFromForm
         loading={status.create.loading || status.update.loading}
         onClose={onClose}
       />

@@ -1,12 +1,15 @@
 import { Button, Group } from "@mantine/core";
 import { FC } from "react";
 
-type TFormButtons = {
+type TButtonsDefaultFromForm = {
   loading?: boolean;
   onClose?: () => void;
 };
 
-const FormButtons: FC<TFormButtons> = ({ loading, onClose }) => {
+const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
+  loading,
+  onClose,
+}) => {
   return (
     <Group mt="lg" justify="flex-end">
       <Button
@@ -24,4 +27,4 @@ const FormButtons: FC<TFormButtons> = ({ loading, onClose }) => {
   );
 };
 
-export default FormButtons;
+export default ButtonsDefaultFromForm;

@@ -1,8 +1,8 @@
 import { Button, ButtonGroup } from "@mantine/core";
 import { FC } from "react";
-import { Search } from "../../..";
 import { resetSearch, setSearch } from "@/services/person/reducer";
-import * as Icons from "../../../../assets/icons";
+import { Search } from "@/components/forms";
+import * as Icons from "@assets/icons";
 import classes from "@components/table/table.module.css";
 
 type TPersonsTableToolbar = {
