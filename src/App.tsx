@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import { getCookie, refreshTokens } from "./utils";
 import { AuthLoader } from "@components";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 
 function App() {
   const dispatch = useDispatch();
