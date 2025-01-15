@@ -108,10 +108,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
-      roles: () =>
-        !selectedRoles.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined,
+      roles: () => !selectedRoles.length && !dataToUpdate?.roles.length ? exceptions.formValidate.all.requiredField : undefined,
       car: (value) =>
         isDriver && !value.length
           ? exceptions.formValidate.all.requiredField
@@ -124,7 +121,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   });
 
   const handleSubmit = () => {
-    form.setFieldValue("roles", selectedRoles);
     const personData = {
       surname: formatName(form.getValues().surname) || undefined,
       name: formatName(form.getValues().name),
@@ -134,7 +130,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
         : undefined,
       phone: form.getValues().phone || phone,
       email: form.getValues().email || undefined,
-      roles: form.getValues().roles,
+      roles: selectedRoles.length ? selectedRoles : dataToUpdate?.roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
       car: isDriver ? form.getValues().car : undefined,
@@ -263,7 +259,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
-          onChange={setSelectedRoles}
+          onChange={(value) => setSelectedRoles(value)}
           required
         />
         {isDriver && (
