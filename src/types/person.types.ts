@@ -9,7 +9,7 @@ export type TPerson = {
   birthday: string;
   phone: string;
   email: string;
-  roles: TPersonRoles;
+  roles: string[];
   districts: TDistrict[];
   projects: TProject[];
   car: string;
@@ -18,7 +18,7 @@ export type TPerson = {
   createdAt: Date;
 };
 
-export type TPersonRoles = (keyof typeof Role)[]; // массив ключей Role
+// export type TPersonRoles = (keyof typeof Role)[]; // массив ключей Role
 
 export enum Role {
   GUEST = "Участник",
