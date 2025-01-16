@@ -37,6 +37,7 @@ const Users = () => {
             variant="light"
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
+            m={0}
             disabled={isLoading || !users.length}
           >
             {column.label}

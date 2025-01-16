@@ -47,6 +47,7 @@ const THeadSortButton: FC<TProps> = ({
           onMouseEnter={() => setIsResetSortButton(true)}
           onMouseLeave={() => setIsResetSortButton(false)}
           disabled={isDisabled}
+          m={0}
         >
           {sortIcon()}
         </Button>
