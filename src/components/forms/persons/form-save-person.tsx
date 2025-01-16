@@ -67,9 +67,8 @@ const FormSavePerson: FC<TFormSavePerson> = ({
 }) => {
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
-  const getIsPhone = useSelector(getCheckPhone);
+  const personIdOnPhoneChecking = useSelector(getCheckPhone);
   const [phone, setPhone] = useState<string | "">("");
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [conflictPhone, setConflictPhone] = useState<boolean>(false);
   const [isDriver, setIsDriver] = useState<boolean>(false);
   const [isDelegate, setIsDelegate] = useState<boolean>(false);
@@ -96,19 +95,23 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   };
 
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: initialValues,
     validate: {
       surname: (value) => validationSurname(value),
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
       phone: (value) =>
-        validationPhone(value || phone) ||
+        validationPhone(value) ||
         (conflictPhone && exceptions.persons.forms.save.conflictPhone),
       email: (value) => validationEmail(value),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
-      roles: () => !selectedRoles.length && !dataToUpdate?.roles.length ? exceptions.formValidate.all.requiredField : undefined,
+      roles: (value) => {
+        return !value.length
+          ? exceptions.formValidate.all.requiredField
+          : undefined;
+      },
       car: (value) =>
         isDriver && !value.length
           ? exceptions.formValidate.all.requiredField
@@ -128,13 +131,13 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       birthday: form.getValues().birthday
         ? formatDateToString(form.getValues().birthday, "desc")
         : undefined,
-      phone: form.getValues().phone || phone,
+      phone: form.getValues().phone,
       email: form.getValues().email || undefined,
-      roles: selectedRoles.length ? selectedRoles : dataToUpdate?.roles,
+      roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
-      car: isDriver ? form.getValues().car : undefined,
-      organization: isDelegate ? form.getValues().organization : undefined,
+      car: isDriver && form.getValues().car || undefined,
+      organization: isDelegate && form.getValues().organization || undefined,
       note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
@@ -145,30 +148,32 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   };
 
   useEffect(() => {
+    setPhone(form.getValues().phone);
+  }, [form]);
+
+  useEffect(() => {
     if (phone.length === 18) {
       dispatch(checkPhone(phone));
     }
   }, [dispatch, phone]);
 
   useEffect(() => {
-    const personId = dataToUpdate?.id;
-    const personIdFoundPhone = getIsPhone?.id;
-    if (personIdFoundPhone && personIdFoundPhone !== personId) {
+    const id = personIdOnPhoneChecking?.id;
+    if (id && id !== dataToUpdate?.id) {
       setConflictPhone(true);
     } else {
       setConflictPhone(false);
     }
-  }, [conflictPhone, getIsPhone]);
+  }, [conflictPhone, personIdOnPhoneChecking]);
 
   useEffect(() => {
-    setIsDriver(selectedRoles.includes("DRIVER"));
-    setIsDelegate(selectedRoles.includes("DELEGATE"));
-  }, [selectedRoles]);
-
-  useEffect(() => {
-    setIsDriver(dataToUpdate?.roles.includes("DRIVER") ? true : false);
-    setIsDelegate(dataToUpdate?.roles.includes("DELEGATE") ? true : false);
-  }, []);
+    setIsDriver(
+      form.getInputProps("roles").value.includes("DRIVER") ? true : false
+    );
+    setIsDelegate(
+      form.getInputProps("roles").value.includes("DELEGATE") ? true : false
+    );
+  }, [form]);
 
   return (
     <form
@@ -224,7 +229,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             label="Телефон"
             component={IMaskInput}
             mask="+7 (000) 000-00-00"
-            onAccept={(value) => setPhone(value)}
             key={form.key("phone")}
             {...form.getInputProps("phone")}
             className={classes.formInput}
@@ -259,7 +263,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           }))}
           key={form.key("roles")}
           {...form.getInputProps("roles")}
-          onChange={(value) => setSelectedRoles(value)}
           required
         />
         {isDriver && (
