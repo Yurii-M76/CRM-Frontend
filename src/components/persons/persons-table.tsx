@@ -116,6 +116,7 @@ const PersonsTable = () => {
             variant={"light"}
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
+            m={0}
             onClick={() => {
               return column.sorted && sortedColumn(column.accessor);
             }}
