@@ -17,7 +17,7 @@
   align-items: flex-start;
   gap: 10px;
 
-  @media (width <= 500px) {
+  @media (max-width: 500px) {
     flex-direction: column;
   }
 }

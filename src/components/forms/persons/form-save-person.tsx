@@ -136,8 +136,8 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
       projectsIds: form.getValues().projects,
-      car: isDriver && form.getValues().car || undefined,
-      organization: isDelegate && form.getValues().organization || undefined,
+      car: (isDriver && form.getValues().car) || undefined,
+      organization: (isDelegate && form.getValues().organization) || undefined,
       note: form.getValues().note || undefined,
     };
     if (dataToUpdate) {
@@ -181,127 +181,141 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       onSubmit={form.onSubmit(handleSubmit)}
       noValidate
     >
-      <Fieldset legend="Персональная информация" className={classes.fieldset}>
-        <div className={classes.inputsGroupOnRow}>
-          <TextInput
-            id="surname"
-            label="Фамилия"
-            key={form.key("surname")}
-            {...form.getInputProps("surname")}
-            className={classes.formInput}
-          />
-          <TextInput
-            id="name"
-            label="Имя"
-            key={form.key("name")}
-            {...form.getInputProps("name")}
-            className={classes.formInput}
+      <Fieldset legend="Персональная информация">
+        <div className={classes.fieldset}>
+          <div className={classes.inputsGroupOnRow}>
+            <TextInput
+              id="surname"
+              label="Фамилия"
+              key={form.key("surname")}
+              {...form.getInputProps("surname")}
+              className={classes.formInput}
+            />
+            <TextInput
+              id="name"
+              label="Имя"
+              key={form.key("name")}
+              {...form.getInputProps("name")}
+              className={classes.formInput}
+              required
+            />
+          </div>
+          <div className={classes.inputsGroupOnRow}>
+            <TextInput
+              id="patronymic"
+              label="Отчество"
+              key={form.key("patronymic")}
+              {...form.getInputProps("patronymic")}
+              className={classes.formInput}
+            />
+            <DateInput
+              id="birthday"
+              label="Дата рождения"
+              maxDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
+              minDate={dayjs(new Date()).add(-100, "year").toDate()}
+              defaultDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
+              locale="ru"
+              valueFormat="DD.MM.YYYY"
+              key={form.key("birthday")}
+              {...form.getInputProps("birthday")}
+              className={classes.formInput}
+              clearable
+            />
+          </div>
+        </div>
+      </Fieldset>
+      <Fieldset legend="Контакты">
+        <div className={classes.fieldset}>
+          <div className={classes.inputsGroupOnRow}>
+            <InputBase
+              id="phone"
+              label="Телефон"
+              component={IMaskInput}
+              mask="+7 (000) 000-00-00"
+              key={form.key("phone")}
+              {...form.getInputProps("phone")}
+              className={classes.formInput}
+              required
+            />
+            <TextInput
+              id="email"
+              label="Email"
+              key={form.key("email")}
+              {...form.getInputProps("email")}
+              className={classes.formInput}
+            />
+          </div>
+        </div>
+      </Fieldset>
+      <Fieldset legend="Адрес">
+        <div className={classes.fieldset}>
+          <MultiSelect
+            id="districts"
+            label="Район"
+            data={districts.map((item) => ({
+              value: item.id,
+              label: item.name,
+            }))}
+            key={form.key("districts")}
+            {...form.getInputProps("districts")}
             required
           />
         </div>
-        <div className={classes.inputsGroupOnRow}>
-          <TextInput
-            id="patronymic"
-            label="Отчество"
-            key={form.key("patronymic")}
-            {...form.getInputProps("patronymic")}
-            className={classes.formInput}
+      </Fieldset>
+      <Fieldset legend="Прочее">
+        <div className={classes.fieldset}>
+          <MultiSelect
+            id="roles"
+            label="Роль"
+            data={personRoles.map((role) => ({
+              value: role.value,
+              label: role.label,
+            }))}
+            key={form.key("roles")}
+            {...form.getInputProps("roles")}
+            required
           />
-          <DateInput
-            id="birthday"
-            label="Дата рождения"
-            maxDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
-            minDate={dayjs(new Date()).add(-100, "year").toDate()}
-            defaultDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
-            locale="ru"
-            valueFormat="DD.MM.YYYY"
-            key={form.key("birthday")}
-            {...form.getInputProps("birthday")}
-            className={classes.formInput}
+          {isDriver && (
+            <TextInput
+              id="car"
+              label="Данные по автомобилю"
+              key={form.key("car")}
+              {...form.getInputProps("car")}
+              required={isDriver}
+            />
+          )}
+          {isDelegate && (
+            <TextInput
+              id="organization"
+              label="Организация"
+              key={form.key("organization")}
+              {...form.getInputProps("organization")}
+              required={isDelegate}
+            />
+          )}
+          <MultiSelect
+            id="projects"
+            label="Проекты"
+            data={projects.map((item) => ({
+              value: item.id,
+              label: item.title,
+            }))}
+            key={form.key("projects")}
             clearable
+            searchable
+            nothingFoundMessage="нет данных"
+            {...form.getInputProps("projects")}
+          />
+          <Textarea
+            id="note"
+            label="Примечание"
+            key={form.key("note")}
+            {...form.getInputProps("note")}
+            autosize
+            minRows={2}
+            maxRows={8}
           />
         </div>
-      </Fieldset>
-      <Fieldset legend="Контакты" className={classes.fieldset}>
-        <div className={classes.inputsGroupOnRow}>
-          <InputBase
-            id="phone"
-            label="Телефон"
-            component={IMaskInput}
-            mask="+7 (000) 000-00-00"
-            key={form.key("phone")}
-            {...form.getInputProps("phone")}
-            className={classes.formInput}
-            required
-          />
-          <TextInput
-            id="email"
-            label="Email"
-            key={form.key("email")}
-            {...form.getInputProps("email")}
-            className={classes.formInput}
-          />
-        </div>
-      </Fieldset>
-      <Fieldset legend="Адрес" className={classes.fieldset}>
-        <MultiSelect
-          id="districts"
-          label="Район"
-          data={districts.map((item) => ({ value: item.id, label: item.name }))}
-          key={form.key("districts")}
-          {...form.getInputProps("districts")}
-          required
-        />
-      </Fieldset>
-      <Fieldset legend="Прочее" className={classes.fieldset}>
-        <MultiSelect
-          id="roles"
-          label="Роль"
-          data={personRoles.map((role) => ({
-            value: role.value,
-            label: role.label,
-          }))}
-          key={form.key("roles")}
-          {...form.getInputProps("roles")}
-          required
-        />
-        {isDriver && (
-          <TextInput
-            id="car"
-            label="Данные по автомобилю"
-            key={form.key("car")}
-            {...form.getInputProps("car")}
-            required={isDriver}
-          />
-        )}
-        {isDelegate && (
-          <TextInput
-            id="organization"
-            label="Организация"
-            key={form.key("organization")}
-            {...form.getInputProps("organization")}
-            required={isDelegate}
-          />
-        )}
-        <MultiSelect
-          id="projects"
-          label="Проекты"
-          data={projects.map((item) => ({ value: item.id, label: item.title }))}
-          key={form.key("projects")}
-          clearable
-          searchable
-          nothingFoundMessage="нет данных"
-          {...form.getInputProps("projects")}
-        />
-        <Textarea
-          id="note"
-          label="Примечание"
-          key={form.key("note")}
-          {...form.getInputProps("note")}
-          autosize
-          minRows={2}
-          maxRows={8}
-        />
       </Fieldset>
       <ButtonsDefaultFromForm
         loading={status.create.loading || status.update.loading}

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { FC } from "react";
 import { resetSearch, setSearch } from "@/services/person/reducer";
 import { Search } from "@/components/forms";
@@ -19,13 +19,14 @@ const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
     <>
       <div className={classes.tableToolbar}>
         <div className={classes.flexGroup}>
-          <ButtonGroup>
+          <Button.Group>
             <Button
               variant="light"
               color="green"
               leftSection={<Icons.IconPlus className={classes.icon} />}
               onClick={onClickToOpenAddForm}
               disabled={isLoading}
+              m={0}
             >
               Добавить
             </Button>
@@ -33,6 +34,7 @@ const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
               variant="default"
               rightSection={<Icons.IconUpload className={classes.icon} />}
               disabled
+              m={0}
             >
               Загрузить
             </Button>
@@ -40,10 +42,11 @@ const PersonsTableToolbar: FC<TPersonsTableToolbar> = ({
               variant="default"
               rightSection={<Icons.IconDownload className={classes.icon} />}
               disabled
+              m={0}
             >
               Скачать
             </Button>
-          </ButtonGroup>
+          </Button.Group>
           <Search
             query={setSearch}
             reset={resetSearch}
