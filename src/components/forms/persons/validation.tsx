@@ -47,18 +47,36 @@ export const validationPatronymic = (value: string | undefined) => {
   return errors.length ? validationErrorMessagesList(errors) : undefined;
 };
 
-export const validationPhone = (value: string | undefined) => {
+export const validationPhone = (
+  value: string | undefined,
+  requiredField: boolean
+) => {
   const errors: string[] = [];
-  if (!value) return exceptions.formValidate.all.requiredField;
-  if (!/^.{18}$/.test(value))
-    errors.push(exceptions.formValidate.all.invalidInput);
-  return errors.length ? validationErrorMessagesList(errors) : undefined;
+  if (value) {
+    if (!/^.{18}$/.test(value))
+      errors.push(exceptions.formValidate.all.invalidInput);
+    return errors.length ? validationErrorMessagesList(errors) : undefined;
+  }
+  if (!requiredField) {
+    return undefined;
+  } else {
+    return exceptions.formValidate.all.requiredField;
+  }
 };
 
-export const validationEmail = (value: string | undefined) => {
+export const validationEmail = (
+  value: string | undefined,
+  requiredField: boolean
+) => {
   const errors: string[] = [];
-  if (!value) return undefined;
-  if (!/^\S+@\S{2,}\.\S{2,}$/.test(value))
-    errors.push(exceptions.formValidate.all.invalidInput);
-  return errors.length ? validationErrorMessagesList(errors) : undefined;
+  if (value) {
+    if (!/^\S+@\S{2,}\.\S{2,}$/.test(value))
+      errors.push(exceptions.formValidate.all.invalidInput);
+    return errors.length ? validationErrorMessagesList(errors) : undefined;
+  }
+  if (!requiredField) {
+    return undefined;
+  } else {
+    return exceptions.formValidate.all.requiredField;
+  }
 };
