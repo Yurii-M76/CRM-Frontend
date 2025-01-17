@@ -1,0 +1,41 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inputsGroupOnRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
+}
+
+.inputsGroupOnColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.formInput {
+  width: 100%;
+}
+
+.inputHeight {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 36px;
+}

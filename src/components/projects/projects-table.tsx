@@ -68,6 +68,7 @@ const ProjectsTable = () => {
             variant="light"
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
+            m={0}
             onClick={() => column.sorted && sortedColumn(column.accessor)}
             disabled={isLoading || !projects.length}
           >

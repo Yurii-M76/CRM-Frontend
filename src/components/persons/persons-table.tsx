@@ -25,7 +25,6 @@ import { getProjects } from "@/services/project/reducer";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
 import {
-  DeleteModalButtons,
   Loader,
   Modal,
   CollapseList,
@@ -34,9 +33,11 @@ import {
   NoData,
   TableInfoBlock,
   THeadSortButton,
+  ButtonsFromDeleteForm,
 } from "@components";
 import { personRoles } from "./person-roles";
-import { FormSavePerson, PersonsTableToolbar } from "./elements";
+import { PersonsTableToolbar } from "./elements";
+import { FormSavePerson } from "@components/forms";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -76,6 +77,7 @@ const PersonsTable = () => {
   const isLoading = status.read.loading;
   const loader = isLoading && <Loader />;
   const noData = !isLoading && !persons.length && <NoData />;
+  const emptyLineForCell = "-"; // заглушка для ячеек без данных
 
   const updateClickHandler = (id: string) => {
     setIsOpenUpdateForm(true);
@@ -115,6 +117,7 @@ const PersonsTable = () => {
             variant={"light"}
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
+            m={0}
             onClick={() => {
               return column.sorted && sortedColumn(column.accessor);
             }}
@@ -153,13 +156,13 @@ const PersonsTable = () => {
           />
         </Table.Td>
         <Table.Td>{item.fullName}</Table.Td>
-        <Table.Td>{item.phone}</Table.Td>
+        <Table.Td>{item.phone || emptyLineForCell}</Table.Td>
         <Table.Td>
           {item.birthday
             ? formatDateToString(new Date(item.birthday), "asc")
-            : "-"}
+            : emptyLineForCell}
         </Table.Td>
-        <Table.Td>{item.email || "-"}</Table.Td>
+        <Table.Td>{item.email || emptyLineForCell}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
             <Pill key={index} mr={4}>
@@ -174,7 +177,7 @@ const PersonsTable = () => {
                 ? item.projects.map((item) => {
                     return <li key={item.id}>{item.title}</li>;
                   })
-                : "-"}
+                : emptyLineForCell}
             </ul>
           </CollapseList>
         </Table.Td>
@@ -316,7 +319,7 @@ const PersonsTable = () => {
         <Text>
           Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
         </Text>
-        <DeleteModalButtons
+        <ButtonsFromDeleteForm
           loading={status.delete.loading}
           onClickToCancel={() => {
             setIsOpenConfirmAction(false);

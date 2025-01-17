@@ -1,5 +1,5 @@
 export type TUser = {
-  id: string;
+  id?: string;
   name: string;
   email: string;
   password?: string;
@@ -7,6 +7,8 @@ export type TUser = {
   isBlocked: boolean;
 };
 
-export type TUsers = {
-  items: TUser[]
+export enum UserRole {
+  READER = "Только чтение",
+  USER = "Пользователь",
+  ADMIN = "Администратор",
 }

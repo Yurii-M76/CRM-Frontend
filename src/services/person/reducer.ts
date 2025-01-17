@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  checkEmail,
+  checkPhone,
   createPerson,
   deletePerson,
   getAllPersons,
@@ -32,6 +34,8 @@ type TInitialStateTable = {
   rangeOnPage: number;
   checkedIds: string[];
   error?: string | null;
+  checkPhone: { id: string } | null;
+  checkEmail: { id: string } | null;
 };
 
 const defaultStatus = { loading: false, success: false };
@@ -54,6 +58,8 @@ const initialState: TInitialStateTable = {
   activePage: 1,
   rangeOnPage: 25,
   error: null,
+  checkPhone: null,
+  checkEmail: null,
 };
 
 const currentState = (state: TInitialStateTable) => {
@@ -130,6 +136,8 @@ export const PersonSlice = createSlice({
     getRangeOnPage: (state) => state.rangeOnPage,
     getOneChecked: (state) => state.checkedIds,
     getErrors: (state) => state.error,
+    getCheckPhone: (state) => state.checkPhone,
+    getCheckEmail: (state) => state.checkEmail,
   },
   extraReducers(builder) {
     builder // Create
@@ -203,6 +211,22 @@ export const PersonSlice = createSlice({
         state.status.delete = defaultStatus;
         state.error = action.error.message;
       });
+
+    builder // Check phone
+      .addCase(checkPhone.pending, (state) => {
+        state.checkPhone = null;
+      })
+      .addCase(checkPhone.fulfilled, (state, action) => {
+        state.checkPhone = action.payload;
+      });
+
+    builder // Check email
+      .addCase(checkEmail.pending, (state) => {
+        state.checkEmail = null;
+      })
+      .addCase(checkEmail.fulfilled, (state, action) => {
+        state.checkEmail = action.payload;
+      });
   },
 });
 
@@ -227,5 +251,7 @@ export const {
   getRangeOnPage,
   getOneChecked,
   getErrors,
+  getCheckPhone,
+  getCheckEmail,
 } = PersonSlice.selectors;
 export default PersonSlice;

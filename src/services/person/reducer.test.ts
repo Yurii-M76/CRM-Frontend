@@ -31,6 +31,8 @@ type TInitialStateTable = {
   rangeOnPage: number;
   checkedIds: string[];
   error?: string | null;
+  checkPhone: { id: string } | null;
+  checkEmail: { id: string } | null;
 };
 
 const defaultStatus = { loading: false, success: false };
@@ -56,6 +58,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = { type: createPerson.pending.type };
@@ -81,6 +85,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const newData = {
@@ -142,6 +148,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {
@@ -173,6 +181,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = { type: updatePerson.pending.type };
@@ -234,6 +244,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {
@@ -261,6 +273,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {
@@ -291,6 +305,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = { type: getAllPersons.pending.type };
@@ -334,6 +350,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = { type: getAllPersons.fulfilled.type, payload: mockData };
@@ -363,6 +381,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {
@@ -394,6 +414,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = { type: deletePerson.pending.type };
@@ -438,6 +460,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {
@@ -467,6 +491,8 @@ describe("Test Persons Slice", () => {
         rangeOnPage: 5,
         checkedIds: [],
         error: null,
+        checkPhone: null,
+        checkEmail: null,
       };
 
       const action = {

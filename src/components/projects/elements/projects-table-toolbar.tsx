@@ -1,9 +1,10 @@
-import { Button, ButtonGroup } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC } from "react";
-import * as Icons from "@assets/icons";
-import { Search, Modal } from "@components";
+import { Modal } from "@components";
+import { Search } from "@components/forms";
 import { resetSearch, setSearch } from "@/services/project/reducer";
+import * as Icons from "@assets/icons";
 import classes from "../../table/table.module.css";
 
 type TProjectsTableToolbar = {
@@ -23,13 +24,14 @@ const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
       </Modal>
       <div className={classes.tableToolbar}>
         <div className={classes.flexGroup}>
-          <ButtonGroup>
+          <Button.Group>
             <Button
               variant="light"
               color="green"
               leftSection={<Icons.IconPlus className={classes.icon} />}
               onClick={open}
               disabled={isLoading}
+              m={0}
             >
               Добавить
             </Button>
@@ -37,10 +39,11 @@ const ProjectsTableToolbar: FC<TProjectsTableToolbar> = ({
               variant="default"
               rightSection={<Icons.IconDownload className={classes.icon} />}
               disabled
+              m={0}
             >
               Скачать
             </Button>
-          </ButtonGroup>
+          </Button.Group>
           <Search
             query={setSearch}
             reset={resetSearch}

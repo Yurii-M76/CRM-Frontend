@@ -7,9 +7,8 @@ export { default as DistrictsTable } from "./districts/districts-table";
 export { default as Modal } from "./modal/modal";
 export { default as Navbar } from "./navbar/navbar";
 export { default as Paginator } from "./paginator/paginator";
-export { default as Search } from "./search/search";
 export { default as Users } from "./users/users";
 export { default as CRM_Notification } from "./notification/notification";
 
-export { DeleteModalButtons, FormButtons } from "./buttons";
+export { ButtonsFromDeleteForm, ButtonsDefaultFromForm } from "./forms";
 export { ActionButtons, THeadSortButton, TableInfoBlock, NoData } from "./table";

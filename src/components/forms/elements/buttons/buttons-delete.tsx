@@ -1,21 +1,21 @@
 import { Button, Group } from "@mantine/core";
 import { FC } from "react";
 
-type TDeleteModalButtons = {
+type TButtonsFromDeleteForm = {
   onClickToCancel: () => void;
   onClickToDelete: () => void;
   loading: boolean;
 };
 
-const DeleteModalButtons: FC<TDeleteModalButtons> = ({
+const ButtonsFromDeleteForm: FC<TButtonsFromDeleteForm> = ({
   onClickToCancel,
   onClickToDelete,
   loading,
 }) => {
   return (
-    <Group mt="lg" justify="flex-end">
+    <Group mt="lg" justify="flex-end" gap={8}>
       <Button
-        variant="default"
+        variant="subtle"
         color="gray"
         onClick={onClickToCancel}
         disabled={loading}
@@ -34,4 +34,4 @@ const DeleteModalButtons: FC<TDeleteModalButtons> = ({
   );
 };
 
-export default DeleteModalButtons;
+export default ButtonsFromDeleteForm;

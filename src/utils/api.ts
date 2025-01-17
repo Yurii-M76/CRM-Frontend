@@ -218,3 +218,43 @@ export const deleteDataFromApi = async <T>(
     return Promise.reject(error);
   }
 };
+
+export const findPhoneOnPersonsFromApi = async <T>(
+  phone: string
+): Promise<T> => {
+  try {
+    const response = await fetch(`${URL}/api/persons/phone/${phone}`, {
+      mode: "cors",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+        authorization: await getValidAccessToken(),
+      } as HeadersInit,
+      credentials: "include",
+    });
+    return await checkResponse<T>(response);
+  } catch (error) {
+    console.error(`Request failed (find persons/phone):`, error);
+    return Promise.reject(error);
+  }
+};
+
+export const findEmailOnPersonsFromApi = async <T>(
+  email: string
+): Promise<T> => {
+  try {
+    const response = await fetch(`${URL}/api/persons/email/${email}`, {
+      mode: "cors",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+        authorization: await getValidAccessToken(),
+      } as HeadersInit,
+      credentials: "include",
+    });
+    return await checkResponse<T>(response);
+  } catch (error) {
+    console.error(`Request failed (find persons/email):`, error);
+    return Promise.reject(error);
+  }
+};

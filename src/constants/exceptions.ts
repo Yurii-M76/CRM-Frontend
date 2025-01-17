@@ -2,7 +2,27 @@ export default {
   auth: {},
   users: {},
   persons: {
-    formValidate: {
+    forms: {
+      save: {
+        conflictPhone: "Телефон уже используется",
+        conflictEmail: "Email уже используется",
+      },
+    },
+  },
+  projects: {},
+  districts: {},
+  formValidate: {
+    all: {
+      invalidInput: "Некорректный ввод",
+      requiredField: "Обязательное поле",
+    },
+    users: {
+      moreLetters: {
+        name: "Имя должно состоять как минимум из трех букв",
+        password: "Пароль должен состоять как минимум из шести символов",
+      },
+    },
+    persons: {
       surname: {
         cyrillicOnly: "Фамилия должна включать только буквы русского алфавита",
         moreLetters: "Фамилия должна состоять как минимум из двух букв",
@@ -18,10 +38,6 @@ export default {
         moreLetters: "Отчество должно содержать пять и более букв",
         noSpaces: "Отчество не должно содержать пробелы",
       },
-      invalidInput: "Некорректный ввод",
-      requiredField: "Обязательное поле",
     },
   },
-  projects: {},
-  districts: {},
 };

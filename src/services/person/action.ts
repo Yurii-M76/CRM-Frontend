@@ -2,9 +2,11 @@ import { TPerson } from "../../types/index";
 import {
   createDataFromApi,
   deleteDataFromApi,
+  findEmailOnPersonsFromApi,
+  findPhoneOnPersonsFromApi,
   getAllDataFromApi,
   updateDataFromApi,
-} from "../../utils/index";
+} from "@utils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const createPerson = createAsyncThunk(
@@ -27,4 +29,16 @@ export const updatePerson = createAsyncThunk(
 export const deletePerson = createAsyncThunk(
   "person/delete",
   async (id: string) => await deleteDataFromApi<{ id: string }>("persons", id)
+);
+
+export const checkPhone = createAsyncThunk(
+  "person/checkPhone",
+  async (phone: string) =>
+    await findPhoneOnPersonsFromApi<{ id: string }>(phone)
+);
+
+export const checkEmail = createAsyncThunk(
+  "person/checkEmail",
+  async (phone: string) =>
+    await findEmailOnPersonsFromApi<{ id: string }>(phone)
 );
