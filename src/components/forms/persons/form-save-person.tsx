@@ -276,7 +276,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
               key={form.key("phone")}
               {...form.getInputProps("phone")}
               className={classes.formInput}
-              required={email === ""}
+              required={!email}
             />
             <TextInput
               id="email"
@@ -286,7 +286,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
               key={form.key("email")}
               {...form.getInputProps("email")}
               className={classes.formInput}
-              required={phone?.length !== correctPhoneLength}
+              required={!phone}
             />
           </div>
         </div>
