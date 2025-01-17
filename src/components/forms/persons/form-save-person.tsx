@@ -75,8 +75,8 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   const status = useSelector(getPersonsStatus);
   const personIdOnPhoneChecking = useSelector(getCheckPhone);
   const personIdOnEmailChecking = useSelector(getCheckEmail);
-  const [phone, setPhone] = useState<string | undefined>("");
-  const [email, setEmail] = useState<string | undefined>("");
+  const [phone, setPhone] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string | undefined>(undefined);
   const [conflictPhone, setConflictPhone] = useState<boolean>(false);
   const [conflictEmail, setConflictEmail] = useState<boolean>(false);
   const [isDriver, setIsDriver] = useState<boolean>(false);
@@ -116,7 +116,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           conflictPhone &&
           exceptions.persons.forms.save.conflictPhone),
       email: (value) =>
-        // validationEmail(value, phone?.length !== correctPhoneLength),
         validationEmail(value, phone?.length !== correctPhoneLength) ||
         (email !== "" &&
           conflictEmail &&
@@ -164,18 +163,20 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   };
 
   useEffect(() => {
-    const _phone = form.getValues().phone
-    if (_phone && /^.{18}$/.test(_phone)) {
-      setPhone(_phone); 
-      console.log(_phone)   
+    const _phone = form.getValues().phone;
+    const _email = form.getValues().email;
+
+    if (_phone && _phone.length === correctPhoneLength) {
+      setPhone(_phone);
+    } else if (_phone === "") {
+      setPhone(undefined);
     }
 
-    const _email = form.getValues().email
-    if (_email && /^\S+@\S{2,}\.\S{2,}$/.test(_email)) {
-      setEmail(form.getValues().email);
-      
+    if (_email === "") {
+      setEmail(undefined);
+    } else if (_email && /^\S+@\S{2,}\.\S{2,}$/.test(_email)) {
+      setEmail(_email);
     }
-
   }, [form]);
 
   useEffect(() => {
