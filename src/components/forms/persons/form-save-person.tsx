@@ -13,8 +13,13 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { IMaskInput } from "react-imask";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { getCheckPhone, getPersonsStatus } from "@/services/person/reducer";
 import {
+  getCheckEmail,
+  getCheckPhone,
+  getPersonsStatus,
+} from "@/services/person/reducer";
+import {
+  checkEmail,
   checkPhone,
   createPerson,
   updatePerson,
@@ -46,7 +51,7 @@ type TInitialValues = {
   name: string;
   patronymic: string | undefined;
   birthday: Date | undefined;
-  phone: string;
+  phone: string | undefined;
   email: string | undefined;
   roles: string[];
   projects: string[];
@@ -58,6 +63,7 @@ type TInitialValues = {
 
 dayjs.extend(customParseFormat); // кастомный формат ввода даты
 const correctAge = 18; // допустимый возраст волонтера
+const correctPhoneLength = 18; // допустимая длина номера телефона
 
 const FormSavePerson: FC<TFormSavePerson> = ({
   dataToUpdate,
@@ -68,8 +74,11 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   const dispatch = useDispatch();
   const status = useSelector(getPersonsStatus);
   const personIdOnPhoneChecking = useSelector(getCheckPhone);
-  const [phone, setPhone] = useState<string | "">("");
+  const personIdOnEmailChecking = useSelector(getCheckEmail);
+  const [phone, setPhone] = useState<string | undefined>("");
+  const [email, setEmail] = useState<string | undefined>("");
   const [conflictPhone, setConflictPhone] = useState<boolean>(false);
+  const [conflictEmail, setConflictEmail] = useState<boolean>(false);
   const [isDriver, setIsDriver] = useState<boolean>(false);
   const [isDelegate, setIsDelegate] = useState<boolean>(false);
 
@@ -102,9 +111,16 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
       phone: (value) =>
-        validationPhone(value) ||
-        (conflictPhone && exceptions.persons.forms.save.conflictPhone),
-      email: (value) => validationEmail(value),
+        validationPhone(value, email === "") ||
+        (phone?.length === correctPhoneLength &&
+          conflictPhone &&
+          exceptions.persons.forms.save.conflictPhone),
+      email: (value) =>
+        // validationEmail(value, phone?.length !== correctPhoneLength),
+        validationEmail(value, phone?.length !== correctPhoneLength) ||
+        (email !== "" &&
+          conflictEmail &&
+          exceptions.persons.forms.save.conflictEmail),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
       roles: (value) => {
@@ -131,7 +147,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       birthday: form.getValues().birthday
         ? formatDateToString(form.getValues().birthday, "desc")
         : undefined,
-      phone: form.getValues().phone,
+      phone: form.getValues().phone || undefined,
       email: form.getValues().email || undefined,
       roles: form.getValues().roles,
       districtsIds: form.getValues().districts,
@@ -148,11 +164,22 @@ const FormSavePerson: FC<TFormSavePerson> = ({
   };
 
   useEffect(() => {
-    setPhone(form.getValues().phone);
+    const _phone = form.getValues().phone
+    if (_phone && /^.{18}$/.test(_phone)) {
+      setPhone(_phone); 
+      console.log(_phone)   
+    }
+
+    const _email = form.getValues().email
+    if (_email && /^\S+@\S{2,}\.\S{2,}$/.test(_email)) {
+      setEmail(form.getValues().email);
+      
+    }
+
   }, [form]);
 
   useEffect(() => {
-    if (phone.length === 18) {
+    if (phone?.length === correctPhoneLength) {
       dispatch(checkPhone(phone));
     }
   }, [dispatch, phone]);
@@ -165,6 +192,21 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       setConflictPhone(false);
     }
   }, [conflictPhone, personIdOnPhoneChecking]);
+
+  useEffect(() => {
+    if (email) {
+      dispatch(checkEmail(email));
+    }
+  }, [dispatch, email]);
+
+  useEffect(() => {
+    const id = personIdOnEmailChecking?.id;
+    if (id && id !== dataToUpdate?.id) {
+      setConflictEmail(true);
+    } else {
+      setConflictEmail(false);
+    }
+  }, [conflictEmail, personIdOnEmailChecking]);
 
   useEffect(() => {
     setIsDriver(
@@ -230,19 +272,24 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             <InputBase
               id="phone"
               label="Телефон"
+              description="Обязательно, при отсутствии email"
+              type="tel"
               component={IMaskInput}
               mask="+7 (000) 000-00-00"
               key={form.key("phone")}
               {...form.getInputProps("phone")}
               className={classes.formInput}
-              required
+              required={email === ""}
             />
             <TextInput
               id="email"
               label="Email"
+              type="email"
+              description="Обязательно, при отсутствии телефона"
               key={form.key("email")}
               {...form.getInputProps("email")}
               className={classes.formInput}
+              required={phone?.length !== correctPhoneLength}
             />
           </div>
         </div>
