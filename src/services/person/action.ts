@@ -2,6 +2,7 @@ import { TPerson } from "../../types/index";
 import {
   createDataFromApi,
   deleteDataFromApi,
+  findEmailOnPersonsFromApi,
   findPhoneOnPersonsFromApi,
   getAllDataFromApi,
   updateDataFromApi,
@@ -34,4 +35,10 @@ export const checkPhone = createAsyncThunk(
   "person/checkPhone",
   async (phone: string) =>
     await findPhoneOnPersonsFromApi<{ id: string }>(phone)
+);
+
+export const checkEmail = createAsyncThunk(
+  "person/checkEmail",
+  async (phone: string) =>
+    await findEmailOnPersonsFromApi<{ id: string }>(phone)
 );

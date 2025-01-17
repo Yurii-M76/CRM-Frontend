@@ -5,6 +5,7 @@ export default {
     forms: {
       save: {
         conflictPhone: "Телефон уже используется",
+        conflictEmail: "Email уже используется",
       },
     },
   },
