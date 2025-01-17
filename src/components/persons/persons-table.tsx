@@ -77,6 +77,7 @@ const PersonsTable = () => {
   const isLoading = status.read.loading;
   const loader = isLoading && <Loader />;
   const noData = !isLoading && !persons.length && <NoData />;
+  const emptyLineForCell = "-"; // заглушка для ячеек без данных
 
   const updateClickHandler = (id: string) => {
     setIsOpenUpdateForm(true);
@@ -155,13 +156,13 @@ const PersonsTable = () => {
           />
         </Table.Td>
         <Table.Td>{item.fullName}</Table.Td>
-        <Table.Td>{item.phone}</Table.Td>
+        <Table.Td>{item.phone || emptyLineForCell}</Table.Td>
         <Table.Td>
           {item.birthday
             ? formatDateToString(new Date(item.birthday), "asc")
-            : "-"}
+            : emptyLineForCell}
         </Table.Td>
-        <Table.Td>{item.email || "-"}</Table.Td>
+        <Table.Td>{item.email || emptyLineForCell}</Table.Td>
         <Table.Td>
           {item.roles.map((role, index) => (
             <Pill key={index} mr={4}>
@@ -176,7 +177,7 @@ const PersonsTable = () => {
                 ? item.projects.map((item) => {
                     return <li key={item.id}>{item.title}</li>;
                   })
-                : "-"}
+                : emptyLineForCell}
             </ul>
           </CollapseList>
         </Table.Td>
