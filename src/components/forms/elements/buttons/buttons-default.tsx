@@ -13,7 +13,7 @@ const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
   return (
     <Group mt="lg" justify="flex-end" gap={8}>
       <Button
-        variant="default"
+        variant="subtle"
         color="gray"
         disabled={loading}
         onClick={onClose}

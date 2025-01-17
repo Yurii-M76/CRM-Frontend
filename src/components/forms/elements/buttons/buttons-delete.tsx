@@ -15,7 +15,7 @@ const ButtonsFromDeleteForm: FC<TButtonsFromDeleteForm> = ({
   return (
     <Group mt="lg" justify="flex-end" gap={8}>
       <Button
-        variant="default"
+        variant="subtle"
         color="gray"
         onClick={onClickToCancel}
         disabled={loading}
