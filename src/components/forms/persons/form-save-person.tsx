@@ -111,15 +111,11 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
       phone: (value) =>
-        validationPhone(value, email === "") ||
-        (phone?.length === correctPhoneLength &&
-          conflictPhone &&
-          exceptions.persons.forms.save.conflictPhone),
+        validationPhone(value, !email) ||
+        (phone && conflictPhone && exceptions.persons.forms.save.conflictPhone),
       email: (value) =>
-        validationEmail(value, phone?.length !== correctPhoneLength) ||
-        (email !== "" &&
-          conflictEmail &&
-          exceptions.persons.forms.save.conflictEmail),
+        validationEmail(value, !phone) ||
+        (email && conflictEmail && exceptions.persons.forms.save.conflictEmail),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
       roles: (value) => {
