@@ -27,7 +27,6 @@ import {
   Loader,
   Modal,
   CollapseList,
-  Paginator,
   ActionButtons,
   NoData,
   TableInfoBlock,
@@ -35,6 +34,7 @@ import {
   ButtonsFromDeleteForm,
 } from "@components";
 const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+const Paginator = lazy(() => import("@components/paginator/paginator"));
 import { FormSavePerson, Search } from "@components/forms";
 import { formatDateToString } from "@/utils/format-date";
 import { Column, TPerson } from "@/types";

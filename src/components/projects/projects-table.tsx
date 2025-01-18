@@ -16,7 +16,6 @@ import {
 } from "@/services/project/reducer";
 import {
   Loader,
-  Paginator,
   CollapseList,
   ActionButtons,
   NoData,
@@ -24,6 +23,7 @@ import {
   TableInfoBlock,
 } from "@components";
 const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+const Paginator = lazy(() => import("@components/paginator/paginator"));
 import { Column, TProject } from "@/types";
 import classes from "../table/table.module.css";
 
