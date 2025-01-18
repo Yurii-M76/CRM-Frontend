@@ -1,0 +1,44 @@
+.tableToolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 431px) {
+    justify-content: center;
+  }
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 431px) {
+    justify-content: center;
+  }
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 431px) {
+    justify-content: center;
+  }
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.6;
+}

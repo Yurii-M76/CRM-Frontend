@@ -1,5 +1,5 @@
 import { Button, Table } from "@mantine/core";
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
 import {
@@ -14,7 +14,6 @@ import {
   getSortOrder,
   resetSort,
 } from "@/services/project/reducer";
-import { Column, TProject } from "@/types";
 import {
   Loader,
   Paginator,
@@ -24,7 +23,8 @@ import {
   THeadSortButton,
   TableInfoBlock,
 } from "@components";
-import ProjectsTableToolbar from "./elements/projects-table-toolbar";
+const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+import { Column, TProject } from "@/types";
 import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
@@ -132,9 +132,20 @@ const ProjectsTable = () => {
 
   return (
     <div className={classes.container} style={{ maxWidth: widthTable }}>
-      <ProjectsTableToolbar
+      <TableToolbar
         isLoading={isLoading}
-        isDisabled={!projects.length}
+        openedSaveForm={() => ""}
+        buttons={{
+          addButton: true,
+          downloadButton: false,
+          uploadButton: true,
+          filterButton: true,
+        }}
+        disabledButtons={{
+          addButton: false,
+          uploadButton: true,
+          filterButton: true,
+        }}
       />
       <div className={classes.tableBox}>
         <Table

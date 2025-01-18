@@ -11,4 +11,4 @@ export { default as Users } from "./users/users";
 export { default as CRM_Notification } from "./notification/notification";
 
 export { ButtonsFromDeleteForm, ButtonsDefaultFromForm } from "./forms";
-export { ActionButtons, THeadSortButton, TableInfoBlock, NoData } from "./table";
+export { TableToolbar, ActionButtons, THeadSortButton, TableInfoBlock, NoData } from "./table";
