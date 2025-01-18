@@ -7,8 +7,8 @@ import { DashboardPage } from "@/pages/dashboard/dashboard.page";
 import { useDispatch, useSelector } from "@/services/store";
 import { getCookie } from "@/utils";
 import { jwtDecode } from "jwt-decode";
-import { getMe } from "@/services/user/action";
-import { getMeData } from "@/services/user/reducer";
+import { getMe } from "@/services/auth/action";
+import { getMeData } from "@/services/auth/reducer";
 const Navbar = lazy(() => import("@components/navbar/navbar"));
 import classes from "./layout.module.css";
 

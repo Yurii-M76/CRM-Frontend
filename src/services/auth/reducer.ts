@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getMe, login, logout } from "./action";
-import { deleteCookie, setCookie } from "../../utils/cookie";
+import { deleteCookie, setCookie } from "@/utils/cookie";
 import { TUser } from "@/types";
 
 type TInitialState = {
