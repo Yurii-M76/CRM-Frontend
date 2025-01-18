@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { ActionButtons } from "../table";
 import { useDisclosure } from "@mantine/hooks";
 import { FormSaveUser } from "@components/forms";
-import Modal from "../modal/modal";
+import Modal from "@components/modal/modal";
 import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 

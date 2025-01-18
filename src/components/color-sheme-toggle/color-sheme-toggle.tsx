@@ -3,7 +3,7 @@ import {
   useMantineColorScheme,
   useComputedColorScheme,
 } from "@mantine/core";
-import * as Icons from "../../assets/icons";
+import * as Icons from "@assets/icons";
 import classes from "./color-sheme-toggle.module.css";
 
 const ColorSchemeToggle = () => {

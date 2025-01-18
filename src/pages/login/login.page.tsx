@@ -11,7 +11,7 @@ import {
   Box,
   Center,
 } from "@mantine/core";
-import { login } from "@/services/user/action";
+import { login } from "@/services/auth/action";
 import { useDispatch } from "@/services/store";
 import classes from "./login.module.css";
 
