@@ -8,8 +8,8 @@ import {
   ProjectsPage,
   SettingsPage,
 } from "./pages";
-import { useSelector } from "./services/store";
-import { getMeData } from "./services/user/reducer";
+import { useSelector } from "@services/store";
+import { getMeData } from "@services/auth/reducer";
 
 export function Router() {
   const user = useSelector(getMeData);

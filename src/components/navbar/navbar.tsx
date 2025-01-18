@@ -1,10 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider } from "@mantine/core";
 import { useDispatch, useSelector } from "@/services/store";
-import { logout } from "@/services/user/action";
+import { logout } from "@/services/auth/action";
 import { FC } from "react";
-import { getMeData } from "@/services/user/reducer";
-import * as Icons from "../../assets/icons";
+import { getMeData } from "@/services/auth/reducer";
+import * as Icons from "@assets/icons";
 import classes from "./navbar.module.css";
 
 const tabs = [

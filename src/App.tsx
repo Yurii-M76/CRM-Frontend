@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Router } from "./router";
 import { theme } from "./theme";
 import { LoginPage } from "./pages";
-import { getIsAuthChecked, setIsAuthChecked } from "./services/user/reducer";
+import { getIsAuthChecked, setIsAuthChecked } from "@services/auth/reducer";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 import { getCookie, refreshTokens } from "./utils";

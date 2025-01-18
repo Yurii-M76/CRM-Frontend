@@ -4,14 +4,14 @@ import {
   useDispatch as dispatchHook,
   useSelector as selectorHook,
 } from "react-redux";
-import userSlice from "./user/reducer";
+import authSlice from "./auth/reducer";
 import PersonSlice from "./person/reducer";
 import projectSlice from "./project/reducer";
 import districtsSlice from "./districts/reducer";
 import usersSlice from "./users/reducer";
 
 export const rootReducer = combineReducers({
-  [userSlice.reducerPath]: userSlice.reducer,
+  [authSlice.reducerPath]: authSlice.reducer,
   [PersonSlice.reducerPath]: PersonSlice.reducer,
   [projectSlice.reducerPath]: projectSlice.reducer,
   [districtsSlice.reducerPath]: districtsSlice.reducer,

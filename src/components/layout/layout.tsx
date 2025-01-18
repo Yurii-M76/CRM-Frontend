@@ -1,14 +1,15 @@
 import { AppShell, Box, Burger, Group, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { ColorSchemeToggle, Navbar, CRM_Notification } from "@components";
+import { ColorSchemeToggle } from "@components";
 import { DashboardPage } from "@/pages/dashboard/dashboard.page";
 import { useDispatch, useSelector } from "@/services/store";
 import { getCookie } from "@/utils";
 import { jwtDecode } from "jwt-decode";
-import { getMe } from "@/services/user/action";
-import { getMeData } from "@/services/user/reducer";
+import { getMe } from "@/services/auth/action";
+import { getMeData } from "@/services/auth/reducer";
+const Navbar = lazy(() => import("@components/navbar/navbar"));
 import classes from "./layout.module.css";
 
 const Layout = () => {
@@ -66,11 +67,12 @@ const Layout = () => {
           </Group>
         </AppShell.Header>
         <AppShell.Navbar p="md">
-          <Navbar clickHandler={toggleMobile} />
+          <Suspense fallback="">
+            <Navbar clickHandler={toggleMobile} />
+          </Suspense>
         </AppShell.Navbar>
         <AppShell.Main>{content}</AppShell.Main>
       </AppShell>
-      <CRM_Notification />
     </Box>
   );
 };

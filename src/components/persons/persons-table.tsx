@@ -1,7 +1,9 @@
 import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
+import { findAllProjects } from "@/services/project/action";
+import { getAllDistricts } from "@/services/districts/action";
 import {
   getCountPersons,
   getOneChecked,
@@ -18,26 +20,25 @@ import {
   resetAllChecked,
   getPersonsStatus,
 } from "@/services/person/reducer";
-import { formatDateToString } from "@/utils/format-date";
-import { Column, TPerson } from "@/types";
-import { findAllProjects } from "@/services/project/action";
+import { resetSearch, setSearch } from "@/services/person/reducer";
 import { getProjects } from "@/services/project/reducer";
 import { getDistricts } from "@/services/districts/reducer";
-import { getAllDistricts } from "@/services/districts/action";
 import {
   Loader,
   Modal,
   CollapseList,
-  Paginator,
   ActionButtons,
   NoData,
   TableInfoBlock,
   THeadSortButton,
   ButtonsFromDeleteForm,
 } from "@components";
+const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+const Paginator = lazy(() => import("@components/paginator/paginator"));
+import { FormSavePerson, Search } from "@components/forms";
+import { formatDateToString } from "@/utils/format-date";
+import { Column, TPerson } from "@/types";
 import { personRoles } from "./person-roles";
-import { PersonsTableToolbar } from "./elements";
-import { FormSavePerson } from "@components/forms";
 import classes from "@components/table/table.module.css";
 
 const columns: Column<TPerson>[] = [
@@ -224,10 +225,28 @@ const PersonsTable = () => {
   return (
     <>
       <div className={classes.container} style={{ maxWidth: widthTable }}>
-        <PersonsTableToolbar
+        <TableToolbar
           isLoading={isLoading}
-          isDisabled={!persons.length}
-          openedAddForm={() => setIsOpenCreateForm(true)}
+          openedSaveForm={() => setIsOpenCreateForm(true)}
+          buttons={{
+            addButton: true,
+            downloadButton: true,
+            uploadButton: true,
+            filterButton: true,
+          }}
+          disabledButtons={{
+            addButton: false,
+            downloadButton: true,
+            uploadButton: true,
+            filterButton: true,
+          }}
+          search={
+            <Search
+              query={setSearch}
+              reset={resetSearch}
+              isDisabled={isLoading}
+            />
+          }
         />
         <div className={classes.tableBox}>
           <Table

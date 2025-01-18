@@ -10,19 +10,6 @@
   overflow-y: auto;
 }
 
-.tableToolbar {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-
-  @media (max-width: 431px) {
-    justify-content: center;
-  }
-}
-
 .table tbody {
   font-size: 0.95rem;
 }

@@ -1,6 +1,6 @@
 import { Button, Tooltip } from "@mantine/core";
 import { FC, useState } from "react";
-import * as Icons from "../../assets/icons";
+import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 
 type TProps = {

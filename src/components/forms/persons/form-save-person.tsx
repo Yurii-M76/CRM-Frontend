@@ -35,7 +35,7 @@ import {
 } from "./validation";
 import { formatDateToString } from "@/utils";
 import { formatName } from "@/utils/format-name";
-import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
+import { ButtonsDefaultFromForm, } from "@/components/";
 import exceptions from "@/constants/exceptions";
 import classes from "../forms.module.css";
 

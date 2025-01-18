@@ -1,1 +1,0 @@
-export { default as PersonsTableToolbar } from "./toolbar/persons-table-toolbar";
