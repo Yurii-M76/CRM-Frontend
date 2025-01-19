@@ -1,9 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button, Divider } from "@mantine/core";
-import { useDispatch, useSelector } from "@/services/store";
-import { logout } from "@/services/auth/action";
+import { Button, Center, Divider, Text } from "@mantine/core";
 import { FC } from "react";
-import { getMeData } from "@/services/auth/reducer";
+import { logout } from "@/services/auth/action";
+import { useDispatch, useSelector } from "@/services/store";
+import {
+  getAuthErrors,
+  getIsLoadinAuth,
+  getMeData,
+} from "@/services/auth/reducer";
 import * as Icons from "@assets/icons";
 import classes from "./navbar.module.css";
 
@@ -32,6 +36,8 @@ const Navbar: FC<TNavbar> = ({ clickHandler }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getMeData);
+  const isLogoutLoader = useSelector(getIsLoadinAuth);
+  const logoutErrors = useSelector(getAuthErrors);
   const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = () => {
@@ -82,9 +88,22 @@ const Navbar: FC<TNavbar> = ({ clickHandler }) => {
       </div>
 
       <div className={classes.footer}>
-        <Button fullWidth variant="light" color="red" onClick={handleLogout}>
+        <Button
+          fullWidth
+          variant="light"
+          color="red"
+          onClick={handleLogout}
+          loading={isLogoutLoader}
+        >
           Выйти
         </Button>
+        {logoutErrors && (
+          <Center pt={24}>
+            <Text c="red" size="xs">
+              {logoutErrors}
+            </Text>
+          </Center>
+        )}
       </div>
     </>
   );
