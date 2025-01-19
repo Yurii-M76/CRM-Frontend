@@ -4,6 +4,8 @@ import {
   MultiSelect,
   InputBase,
   Textarea,
+  OptionsFilter,
+  ComboboxItem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
@@ -133,6 +135,15 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           : undefined,
     },
   });
+
+  const optionsFilter: OptionsFilter = ({ options, search }) => {
+    const filtered = (options as ComboboxItem[]).filter((option) =>
+      option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
+    );
+  
+    filtered.sort((a, b) => a.label.localeCompare(b.label));
+    return filtered;
+  };
 
   const handleSubmit = () => {
     const personData = {
@@ -304,6 +315,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             }))}
             key={form.key("districts")}
             {...form.getInputProps("districts")}
+            filter={optionsFilter}
             required
           />
         </div>
@@ -351,6 +363,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             searchable
             nothingFoundMessage="нет данных"
             {...form.getInputProps("projects")}
+            filter={optionsFilter}
           />
           <Textarea
             id="note"
