@@ -35,7 +35,7 @@ import {
 } from "./validation";
 import { formatDateToString } from "@/utils";
 import { formatName } from "@/utils/format-name";
-import { ButtonsDefaultFromForm, } from "@/components/";
+import { ButtonsDefaultFromForm } from "@/components/";
 import exceptions from "@/constants/exceptions";
 import classes from "../forms.module.css";
 
@@ -274,6 +274,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
               placeholder="(###) ###-##-##"
               component={IMaskInput}
               mask="(000) 000-00-00"
+              onAccept={(value) => form.setFieldValue("phone", value)}
               key={form.key("phone")}
               {...form.getInputProps("phone")}
               className={classes.formInput}
