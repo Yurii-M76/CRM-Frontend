@@ -16,7 +16,7 @@ import { login } from "@/services/auth/action";
 import { getAuthErrors, getIsLoadinAuth } from "@/services/auth/reducer";
 import classes from "./login-form.module.css";
 
-export const LoginForm = (props: PaperProps) => {
+const LoginForm = (props: PaperProps) => {
   const dispatch = useDispatch();
   const isLoading = useSelector(getIsLoadinAuth);
   const errors = useSelector(getAuthErrors);
@@ -97,3 +97,5 @@ export const LoginForm = (props: PaperProps) => {
     </Box>
   );
 };
+
+export default LoginForm;
