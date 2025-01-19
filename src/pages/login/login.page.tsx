@@ -12,11 +12,14 @@ import {
   Center,
 } from "@mantine/core";
 import { login } from "@/services/auth/action";
-import { useDispatch } from "@/services/store";
+import { useDispatch, useSelector } from "@/services/store";
+import { getAuthErrors, getIsLoadinAuth } from "@/services/auth/reducer";
 import classes from "./login.module.css";
 
 export const LoginPage = (props: PaperProps) => {
   const dispatch = useDispatch();
+  const isLoading = useSelector(getIsLoadinAuth);
+  const errors = useSelector(getAuthErrors);
 
   const form = useForm({
     initialValues: {
@@ -50,7 +53,7 @@ export const LoginPage = (props: PaperProps) => {
             Авторизация
           </Text>
         </Center>
-        <Divider label="***" labelPosition="center" my="sm" />
+        <Divider label="CRM" labelPosition="center" my="sm" />
 
         <form onSubmit={form.onSubmit(handleFormSubmit)}>
           <Stack>
@@ -79,12 +82,19 @@ export const LoginPage = (props: PaperProps) => {
           </Stack>
 
           <Center mt="xl">
-            <Button type="submit" fullWidth>
+            <Button type="submit" fullWidth loading={isLoading}>
               Войти
             </Button>
           </Center>
+          {errors && (
+            <Center pt={24}>
+              <Text c="red" size="xs">
+                {errors}
+              </Text>
+            </Center>
+          )}
         </form>
       </Paper>
     </Box>
   );
-}
+};

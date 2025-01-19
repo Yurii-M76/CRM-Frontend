@@ -4,12 +4,14 @@ import { deleteCookie, setCookie } from "@/utils/cookie";
 import { TUser } from "@/types";
 
 type TInitialState = {
+  isLoading: boolean;
   isAuthChecked: boolean;
   error?: string | null;
   user: TUser | null;
 };
 
 const initialState: TInitialState = {
+  isLoading: false,
   isAuthChecked: false,
   error: null,
   user: null,
@@ -24,24 +26,28 @@ export const authSlice = createSlice({
     },
   },
   selectors: {
+    getIsLoadinAuth: (state) => state.isLoading,
     getIsAuthChecked: (state) => state.isAuthChecked,
     getMeData: (state) => state.user,
-    getErrors: (state) => state.error,
+    getAuthErrors: (state) => state.error,
   },
   extraReducers(builder) {
     builder
       // Авторизация
       .addCase(login.pending, (state) => {
+        state.isLoading = true;
         state.isAuthChecked = false;
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.isAuthChecked = true;
         state.error = null;
         setCookie("accessToken", action.payload.accessToken);
         setCookie("refreshToken", action.payload.refreshToken.token);
       })
       .addCase(login.rejected, (state, action) => {
+        state.isLoading = false;
         state.isAuthChecked = false;
         state.error = action.error.message;
       });
@@ -49,10 +55,12 @@ export const authSlice = createSlice({
     builder
       // Выход
       .addCase(logout.pending, (state) => {
+        state.isLoading = true;
         state.isAuthChecked = true;
         state.error = null;
       })
       .addCase(logout.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.isAuthChecked = false;
         state.error = null;
         if (action.payload.success) {
@@ -61,6 +69,7 @@ export const authSlice = createSlice({
         }
       })
       .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
         state.isAuthChecked = true;
         state.error = action.error.message;
       });
@@ -81,5 +90,6 @@ export const authSlice = createSlice({
 });
 
 export const { setIsAuthChecked } = authSlice.actions;
-export const { getIsAuthChecked, getMeData, getErrors } = authSlice.selectors;
+export const { getIsLoadinAuth, getIsAuthChecked, getMeData, getAuthErrors } =
+  authSlice.selectors;
 export default authSlice;
