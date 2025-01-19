@@ -77,6 +77,12 @@ const updatedData = (items: TPerson[], action: PayloadAction<TPerson>) => {
   }
 };
 
+const formatPhoneNumber = (number: string) => {
+  const phoneNumber = number.split("");
+  const phoneFormatNumber = `(${phoneNumber[0]}${phoneNumber[1]}${phoneNumber[2]}) ${phoneNumber[3]}${phoneNumber[4]}${phoneNumber[5]}-${phoneNumber[6]}${phoneNumber[7]}-${phoneNumber[8]}${phoneNumber[9]}`;
+  return phoneFormatNumber;
+}
+
 export const PersonSlice = createSlice({
   name: "person",
   initialState,
@@ -99,7 +105,12 @@ export const PersonSlice = createSlice({
       state.items = currentState(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
-      state.items = filterData([...state.originalItems], action.payload, [
+      const query = action.payload;
+      const regex = new RegExp(`^[0-9]{10}$`);
+      const isPhone = regex.test(query);
+      const search = isPhone ? formatPhoneNumber(query) : query;
+
+      state.items = filterData([...state.originalItems], search, [
         "fullName",
         "phone",
         "email",

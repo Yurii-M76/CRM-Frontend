@@ -4,6 +4,8 @@ import {
   MultiSelect,
   InputBase,
   Textarea,
+  OptionsFilter,
+  ComboboxItem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
@@ -35,7 +37,7 @@ import {
 } from "./validation";
 import { formatDateToString } from "@/utils";
 import { formatName } from "@/utils/format-name";
-import { ButtonsDefaultFromForm, } from "@/components/";
+import { ButtonsDefaultFromForm } from "@/components/";
 import exceptions from "@/constants/exceptions";
 import classes from "../forms.module.css";
 
@@ -63,7 +65,7 @@ type TInitialValues = {
 
 dayjs.extend(customParseFormat); // кастомный формат ввода даты
 const correctAge = 18; // допустимый возраст волонтера
-const correctPhoneLength = 18; // допустимая длина номера телефона
+const correctPhoneLength = 15; // допустимая длина номера телефона
 
 const FormSavePerson: FC<TFormSavePerson> = ({
   dataToUpdate,
@@ -111,7 +113,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
       phone: (value) =>
-        validationPhone(value, !email) ||
+        validationPhone(value, !email, correctPhoneLength) ||
         (phone && conflictPhone && exceptions.persons.forms.save.conflictPhone),
       email: (value) =>
         validationEmail(value, !phone) ||
@@ -133,6 +135,15 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           : undefined,
     },
   });
+
+  const optionsFilter: OptionsFilter = ({ options, search }) => {
+    const filtered = (options as ComboboxItem[]).filter((option) =>
+      option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
+    );
+  
+    filtered.sort((a, b) => a.label.localeCompare(b.label));
+    return filtered;
+  };
 
   const handleSubmit = () => {
     const personData = {
@@ -271,8 +282,10 @@ const FormSavePerson: FC<TFormSavePerson> = ({
               label="Телефон"
               description="Обязательно, при отсутствии email"
               type="tel"
+              placeholder="(###) ###-##-##"
               component={IMaskInput}
-              mask="+7 (000) 000-00-00"
+              mask="(000) 000-00-00"
+              onAccept={(value) => form.setFieldValue("phone", value)}
               key={form.key("phone")}
               {...form.getInputProps("phone")}
               className={classes.formInput}
@@ -302,6 +315,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             }))}
             key={form.key("districts")}
             {...form.getInputProps("districts")}
+            filter={optionsFilter}
             required
           />
         </div>
@@ -349,6 +363,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             searchable
             nothingFoundMessage="нет данных"
             {...form.getInputProps("projects")}
+            filter={optionsFilter}
           />
           <Textarea
             id="note"

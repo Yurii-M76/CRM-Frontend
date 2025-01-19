@@ -49,11 +49,13 @@ export const validationPatronymic = (value: string | undefined) => {
 
 export const validationPhone = (
   value: string | undefined,
-  requiredField: boolean
+  requiredField: boolean,
+  phoneLength: number
 ) => {
   const errors: string[] = [];
+  const regex = new RegExp(`^.{${phoneLength}}$`);
   if (value) {
-    if (!/^.{18}$/.test(value))
+    if (!regex.test(value))
       errors.push(exceptions.formValidate.all.invalidInput);
     return errors.length ? validationErrorMessagesList(errors) : undefined;
   }
