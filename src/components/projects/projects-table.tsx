@@ -1,5 +1,5 @@
 import { Button, Table } from "@mantine/core";
-import { lazy, useEffect } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
 import {
@@ -21,9 +21,17 @@ import {
   NoData,
   THeadSortButton,
   TableInfoBlock,
+  Modal,
 } from "@components";
-const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+const TableToolbar = lazy(
+  () => import("@components/table/table-toolbar/table-toolbar")
+);
 const Paginator = lazy(() => import("@components/paginator/paginator"));
+import { getPersons } from "@/services/person/reducer";
+import { getAllPersons } from "@/services/person/action";
+import { getDistricts } from "@/services/districts/reducer";
+import { getAllDistricts } from "@/services/districts/action";
+import { FormSaveProject } from "../forms";
 import { Column, TProject } from "@/types";
 import classes from "../table/table.module.css";
 
@@ -44,10 +52,13 @@ const ProjectsTable = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector(getProjectsLoading);
   const projects = useSelector(getProjects);
+  const persons = useSelector(getPersons);
+  const districts = useSelector(getDistricts);
   const sortBy = useSelector(getSortBy);
   const sortOrder = useSelector(getSortOrder);
   const countProjects = useSelector(getCountProjects);
   const rowsOnPage = useSelector(getRangeOnPage);
+  const [isOpenSaveProject, setIsOpenSaveProject] = useState<boolean>(false);
   const loader = isLoading && <Loader />;
   const noData = !isLoading && !projects.length && <NoData />;
 
@@ -128,59 +139,75 @@ const ProjectsTable = () => {
 
   useEffect(() => {
     dispatch(findAllProjects());
+    dispatch(getAllPersons());
+    dispatch(getAllDistricts());
   }, [dispatch]);
 
   return (
-    <div className={classes.container} style={{ maxWidth: widthTable }}>
-      <TableToolbar
-        isLoading={isLoading}
-        openedSaveForm={() => ""}
-        buttons={{
-          addButton: true,
-          downloadButton: false,
-          uploadButton: true,
-          filterButton: true,
-        }}
-        disabledButtons={{
-          addButton: false,
-          uploadButton: true,
-          filterButton: true,
-        }}
-      />
-      <div className={classes.tableBox}>
-        <Table
-          striped
-          highlightOnHover
-          horizontalSpacing="md"
-          withColumnBorders
-          withTableBorder
-          className={classes.table}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              {thead}
-              <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{!isLoading && rows}</Table.Tbody>
-        </Table>
-        {loader}
-        {noData}
-      </div>
-      <div className={classes.flexGroup}>
-        <TableInfoBlock
-          entityTitle="проектов"
-          count={countProjects}
-          checkedIds={0}
+    <>
+      <div className={classes.container} style={{ maxWidth: widthTable }}>
+        <TableToolbar
+          isLoading={isLoading}
+          openedSaveForm={() => setIsOpenSaveProject(true)}
+          buttons={{
+            addButton: true,
+            downloadButton: false,
+            uploadButton: true,
+            filterButton: true,
+          }}
+          disabledButtons={{
+            addButton: false,
+            uploadButton: true,
+            filterButton: true,
+          }}
         />
-        <Paginator
-          count={countProjects}
-          rowsOnPage={rowsOnPage}
-          setActivePage={setActivePage}
-          setRangeOnPage={setRangeOnPage}
-        />
+        <div className={classes.tableBox}>
+          <Table
+            striped
+            highlightOnHover
+            horizontalSpacing="md"
+            withColumnBorders
+            withTableBorder
+            className={classes.table}
+          >
+            <Table.Thead>
+              <Table.Tr>
+                {thead}
+                <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{!isLoading && rows}</Table.Tbody>
+          </Table>
+          {loader}
+          {noData}
+        </div>
+        <div className={classes.flexGroup}>
+          <TableInfoBlock
+            entityTitle="проектов"
+            count={countProjects}
+            checkedIds={0}
+          />
+          <Paginator
+            count={countProjects}
+            rowsOnPage={rowsOnPage}
+            setActivePage={setActivePage}
+            setRangeOnPage={setRangeOnPage}
+          />
+        </div>
       </div>
-    </div>
+      <Modal
+        title="Добавить запись"
+        opened={isOpenSaveProject}
+        close={() => setIsOpenSaveProject(false)}
+        size="lg"
+      >
+        <FormSaveProject
+          persons={persons}
+          districts={districts}
+          onClose={() => setIsOpenSaveProject(false)}
+        />
+      </Modal>
+    </>
   );
 };
 
