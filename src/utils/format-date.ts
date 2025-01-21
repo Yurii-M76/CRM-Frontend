@@ -5,7 +5,7 @@
  */
 
 export const formatDateToString = (
-  date: Date | undefined,
+  date: Date | undefined | null,
   param: "asc" | "desc"
 ): string | undefined => {
   if (date) {
