@@ -3,7 +3,7 @@ import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { findAllProjects } from "@/services/project/action";
 import {
-  getProjectsLoading,
+  getProjectsStatus,
   getProjects,
   setSort,
   getSortBy,
@@ -37,7 +37,7 @@ import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
   { label: "Название", accessor: "title", size: 300, sorted: true },
-  { label: "Описание", accessor: "describe", size: 400, sorted: true },
+  { label: "Описание", accessor: "description", size: 400, sorted: true },
   { label: "Участники", accessor: "persons", size: 320, sorted: false },
 ];
 
@@ -50,7 +50,7 @@ const widthTable =
 
 const ProjectsTable = () => {
   const dispatch = useDispatch();
-  const isLoading = useSelector(getProjectsLoading);
+  const status = useSelector(getProjectsStatus);
   const projects = useSelector(getProjects);
   const persons = useSelector(getPersons);
   const districts = useSelector(getDistricts);
@@ -59,8 +59,8 @@ const ProjectsTable = () => {
   const countProjects = useSelector(getCountProjects);
   const rowsOnPage = useSelector(getRangeOnPage);
   const [isOpenSaveProject, setIsOpenSaveProject] = useState<boolean>(false);
-  const loader = isLoading && <Loader />;
-  const noData = !isLoading && !projects.length && <NoData />;
+  const loader = status.read.loading && <Loader />;
+  const noData = !status.read.loading && !projects.length && <NoData />;
 
   const sortedColumn = (sortBy: keyof TProject) => {
     dispatch(
@@ -81,7 +81,7 @@ const ProjectsTable = () => {
             size="compact-sm"
             m={0}
             onClick={() => column.sorted && sortedColumn(column.accessor)}
-            disabled={isLoading || !projects.length}
+            disabled={status.read.loading || !projects.length}
           >
             {column.label}
           </Button>
@@ -90,7 +90,7 @@ const ProjectsTable = () => {
             sortBy={sortBy}
             sortOrder={sortOrder}
             resetSort={() => dispatch(resetSort())}
-            isDisabled={isLoading}
+            isDisabled={status.read.loading}
           />
         </Button.Group>
       )}
@@ -110,11 +110,11 @@ const ProjectsTable = () => {
   };
 
   const rows =
-    !isLoading &&
+    !status.read.loading &&
     projects.map((item) => (
       <Table.Tr key={item.id}>
         <Table.Td>{item.title}</Table.Td>
-        <Table.Td>{item.describe}</Table.Td>
+        <Table.Td>{item.description}</Table.Td>
         <Table.Td>
           <CollapseList totalItems={item.persons.length}>
             <ul>
@@ -147,7 +147,7 @@ const ProjectsTable = () => {
     <>
       <div className={classes.container} style={{ maxWidth: widthTable }}>
         <TableToolbar
-          isLoading={isLoading}
+          isLoading={status.read.loading}
           openedSaveForm={() => setIsOpenSaveProject(true)}
           buttons={{
             addButton: true,
@@ -176,7 +176,7 @@ const ProjectsTable = () => {
                 <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{!isLoading && rows}</Table.Tbody>
+            <Table.Tbody>{!status.read.loading && rows}</Table.Tbody>
           </Table>
           {loader}
           {noData}

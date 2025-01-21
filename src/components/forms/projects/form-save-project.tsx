@@ -12,9 +12,9 @@ import { useForm } from "@mantine/form";
 import { DatePicker, DatePickerProps } from "@mantine/dates";
 import { ButtonsDefaultFromForm } from "@/components";
 import { FC, useEffect, useState } from "react";
-import { TDistrict, TPerson, TProject } from "@/types";
 import "dayjs/locale/ru";
 import { formatDateToString } from "@/utils";
+import { TCalendar, TDistrict, TPerson, TProject } from "@/types";
 import exceptions from "@/constants/exceptions";
 import classes from "../forms.module.css";
 
@@ -27,7 +27,7 @@ type TFormSaveProject = {
 
 type TInitialValues = {
   title: string;
-  calendar: "default" | "range" | "multiple" | "undefined";
+  calendar: TCalendar;
   dates: string[];
   description: string;
   districts: TDistrict[];
@@ -57,9 +57,7 @@ const FormSaveProject: FC<TFormSaveProject> = ({
     null,
   ]); // диапазон дат
   const [datesMultiple, setDatesMultiple] = useState<Date[]>([]); // несколько дат (не линейно)
-  const [variantDate, setVariantDate] = useState<
-    "default" | "range" | "multiple" | "undefined"
-  >("default");
+  const [variantDate, setVariantDate] = useState<TCalendar>("default");
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
 
   const form = useForm({
