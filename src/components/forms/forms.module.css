@@ -74,10 +74,6 @@
 
 .fieldsetForDatePickerGroup {
   margin: 0 !important;
-  border-color: light-dark(
-    var(--mantine-color-gray-4),
-    var(--mantine-color-dark-4)
-  ) !important;
   background-color: light-dark(
     var(--mantine-color-white),
     var(--mantine-color-dark-8)
@@ -88,6 +84,10 @@
     flex-direction: column;
     gap: 20px;
   }
+}
+
+.fieldsetError {
+  border: 1px solid var(--mantine-color-error) !important;
 }
 
 .datePicker {
@@ -118,11 +118,4 @@
   );
   line-height: 1.2;
   word-wrap: break-word;
-}
-
-.fieldsetErrorForDatePickerGroup {
-  border-color: light-dark(
-    var(--mantine-color-error),
-    var(--mantine-color-error)
-  ) !important;
 }
