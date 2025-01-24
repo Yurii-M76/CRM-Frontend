@@ -6,7 +6,7 @@ export type TProject = {
   id: string;
   title: string;
   calendar: TCalendar;
-  dates: string[];
+  dates: Date[];
   description: string;
   districts: TDistrict[];
   persons: TPerson[];
