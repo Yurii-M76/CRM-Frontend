@@ -16,7 +16,7 @@ export const findAllProjects = createAsyncThunk(
 
 export const createProject = createAsyncThunk(
   "project/create",
-  async (data: TProject) => await createDataFromApi<TProject>(path, data)
+  async (data: Partial<TProject>) => await createDataFromApi<TProject>(path, data)
 );
 
 export const updateProject = createAsyncThunk(
