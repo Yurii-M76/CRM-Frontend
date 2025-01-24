@@ -1,7 +1,7 @@
-import { Button, Table } from "@mantine/core";
+import { Button, Pill, Table, Text } from "@mantine/core";
 import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
-import { findAllProjects } from "@/services/project/action";
+import { deleteProject, findAllProjects } from "@/services/project/action";
 import {
   getProjectsStatus,
   getProjects,
@@ -31,14 +31,18 @@ import { getPersons } from "@/services/person/reducer";
 import { getAllPersons } from "@/services/person/action";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
-import { FormSaveProject } from "../forms";
-import { Column, TProject } from "@/types";
+import { ButtonsFromDeleteForm, FormSaveProject } from "@components/forms";
+import { Column, TCalendar, TProject } from "@/types";
 import classes from "../table/table.module.css";
+import { formatDateToString } from "@/utils";
 
 const columns: Column<TProject>[] = [
-  { label: "Название", accessor: "title", size: 300, sorted: true },
-  { label: "Описание", accessor: "description", size: 400, sorted: true },
-  { label: "Участники", accessor: "persons", size: 320, sorted: false },
+  { label: "Дата", accessor: "dates", size: 124, sorted: true },
+  { label: "Название", accessor: "title", size: 220, sorted: true },
+  { label: "Описание", accessor: "description", size: 340, sorted: true },
+  { label: "Район", accessor: "districts", size: 240, sorted: false },
+  { label: "Участники", accessor: "persons", size: 250, sorted: true },
+  { label: "Примечание", accessor: "note", size: 250, sorted: false },
 ];
 
 const widthColumnFromCheckbox = 60;
@@ -58,9 +62,28 @@ const ProjectsTable = () => {
   const sortOrder = useSelector(getSortOrder);
   const countProjects = useSelector(getCountProjects);
   const rowsOnPage = useSelector(getRangeOnPage);
-  const [isOpenSaveProject, setIsOpenSaveProject] = useState<boolean>(false);
+  const [isOpenCreateForm, setIsOpenCreateForm] = useState<boolean>(false);
+  const [isOpenUpdateForm, setIsOpenUpdateForm] = useState<boolean>(false);
+  const [isOpenConfirmAction, setIsOpenConfirmAction] = useState(false);
+  const [projectData, setProjectData] = useState<TProject | undefined>(
+    undefined
+  );
+  const [projectId, setProjectId] = useState<string | null>(null);
   const loader = status.read.loading && <Loader />;
   const noData = !status.read.loading && !projects.length && <NoData />;
+  const emptyLineToCell = "-"; // заглушка для ячеек без данных
+
+  const updateClickHandler = (id: string) => {
+    setIsOpenUpdateForm(true);
+    setProjectId(id);
+    const dataToUpdate = projects.find((project) => project.id === id);
+    setProjectData(dataToUpdate);
+  };
+
+  const deleteClickHandler = (id: string) => {
+    setIsOpenConfirmAction(true);
+    setProjectId(id);
+  };
 
   const sortedColumn = (sortBy: keyof TProject) => {
     dispatch(
@@ -69,6 +92,28 @@ const ProjectsTable = () => {
         sortOrder: sortOrder === "asc" ? "desc" : "asc",
       })
     );
+  };
+
+  const formatDateToCell = (dates: Date[], calendar: TCalendar): string[] => {
+    const result: string[] = [];
+    const format = "day_month";
+
+    if (calendar === "default") {
+      result.push(formatDateToString(dates[0], format));
+    }
+    if (calendar === "range") {
+      const _range = dates
+        .map((date) => formatDateToString(date, format))
+        .join(" - ");
+      result.push(_range);
+    }
+    if (calendar === "multiple") {
+      const _multiple = dates
+        .map((date) => formatDateToString(date, format))
+        .join(", ");
+      result.push(_multiple);
+    }
+    return result;
   };
 
   const thead = columns.map((column, index) => (
@@ -97,41 +142,42 @@ const ProjectsTable = () => {
     </Table.Th>
   ));
 
-  const PersonFullName = (
-    surname: string,
-    name: string,
-    patronymic: string
-  ): string => {
-    const checkSurname = surname ? surname : "";
-    const checkName = name ? name : "";
-    const checkPatronymic = patronymic ? patronymic : "";
-    const result = `${checkSurname} ${checkName} ${checkPatronymic}`.trim();
-    return result;
-  };
-
   const rows =
     !status.read.loading &&
     projects.map((item) => (
       <Table.Tr key={item.id}>
+        <Table.Td>
+          <Pill.Group gap={3}>
+            {formatDateToCell(item.dates, item.calendar)}
+          </Pill.Group>
+        </Table.Td>
         <Table.Td>{item.title}</Table.Td>
-        <Table.Td>{item.description}</Table.Td>
+        <Table.Td>{item.description || emptyLineToCell}</Table.Td>
+        <Table.Td>
+          <Pill.Group gap={3}>
+            {item.districts.map((district) => (
+              <Pill key={district.id} mr={4} size="md">
+                {district.name}
+              </Pill>
+            ))}
+          </Pill.Group>
+        </Table.Td>
         <Table.Td>
           <CollapseList totalItems={item.persons.length}>
             <ul>
               {item.persons.length
-                ? item.persons.map((item) => (
-                    <li key={item.id}>
-                      {PersonFullName(item.surname, item.name, item.patronymic)}
-                    </li>
-                  ))
-                : "-"}
+                ? item.persons.map((item) => {
+                    return <li key={item.id}>{item.fullName}</li>;
+                  })
+                : emptyLineToCell}
             </ul>
           </CollapseList>
         </Table.Td>
+        <Table.Td>{item.note || emptyLineToCell}</Table.Td>
         <Table.Td>
           <ActionButtons
-            handleClickFromEdit={() => ""}
-            handleClickFromDelete={() => ""}
+            handleClickFromEdit={() => updateClickHandler(item.id)}
+            handleClickFromDelete={() => deleteClickHandler(item.id)}
           />
         </Table.Td>
       </Table.Tr>
@@ -143,12 +189,30 @@ const ProjectsTable = () => {
     dispatch(getAllDistricts());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (status.create.success) {
+      setIsOpenCreateForm(false);
+    }
+  }, [status.create.success]);
+
+  useEffect(() => {
+    if (status.update.success) {
+      setIsOpenUpdateForm(false);
+    }
+  }, [status.update.success]);
+
+  useEffect(() => {
+    if (status.delete.success) {
+      setIsOpenConfirmAction(false);
+    }
+  }, [status.delete.success]);
+
   return (
     <>
       <div className={classes.container} style={{ maxWidth: widthTable }}>
         <TableToolbar
           isLoading={status.read.loading}
-          openedSaveForm={() => setIsOpenSaveProject(true)}
+          openedSaveForm={() => setIsOpenCreateForm(true)}
           buttons={{
             addButton: true,
             downloadButton: false,
@@ -163,10 +227,12 @@ const ProjectsTable = () => {
         />
         <div className={classes.tableBox}>
           <Table
+            maw={widthTable}
+            miw={widthTable - 100}
             striped
             highlightOnHover
             horizontalSpacing="md"
-            withColumnBorders
+            // withColumnBorders
             withTableBorder
             className={classes.table}
           >
@@ -197,14 +263,56 @@ const ProjectsTable = () => {
       </div>
       <Modal
         title="Добавить запись"
-        opened={isOpenSaveProject}
-        close={() => setIsOpenSaveProject(false)}
+        opened={isOpenCreateForm}
+        close={() => setIsOpenCreateForm(false)}
         size="lg"
       >
         <FormSaveProject
           persons={persons}
           districts={districts}
-          onClose={() => setIsOpenSaveProject(false)}
+          onClose={() => setIsOpenCreateForm(false)}
+        />
+      </Modal>
+
+      <Modal
+        title="Редактировать запись"
+        opened={isOpenUpdateForm}
+        close={() => {
+          setIsOpenUpdateForm(false);
+          setProjectId(null);
+        }}
+        size="lg"
+      >
+        <FormSaveProject
+          updData={projectData}
+          persons={persons}
+          districts={districts}
+          onClose={() => setIsOpenUpdateForm(false)}
+        />
+      </Modal>
+
+      <Modal
+        title="Подтверждение действия"
+        opened={isOpenConfirmAction}
+        close={() => {
+          setIsOpenConfirmAction(!isOpenConfirmAction);
+          setProjectId(null);
+        }}
+        closeButton={false}
+        size="md"
+      >
+        <Text>
+          Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
+        </Text>
+        <ButtonsFromDeleteForm
+          loading={status.delete.loading}
+          onClickToCancel={() => {
+            setIsOpenConfirmAction(false);
+            setProjectId(null);
+          }}
+          onClickToDelete={() =>
+            projectId && dispatch(deleteProject(projectId))
+          }
         />
       </Modal>
     </>
