@@ -33,10 +33,12 @@ import {
   THeadSortButton,
   ButtonsFromDeleteForm,
 } from "@components";
-const TableToolbar = lazy(() => import("@components/table/table-toolbar/table-toolbar"));
+const TableToolbar = lazy(
+  () => import("@components/table/table-toolbar/table-toolbar")
+);
 const Paginator = lazy(() => import("@components/paginator/paginator"));
 import { FormSavePerson, Search } from "@components/forms";
-import { formatDateToString } from "@/utils/format-date";
+import { formatDateToString } from "@/utils/format-date-to-string";
 import { Column, TPerson } from "@/types";
 import { personRoles } from "./person-roles";
 import classes from "@components/table/table.module.css";
@@ -48,7 +50,7 @@ const columns: Column<TPerson>[] = [
   { label: "E-Mail", accessor: "email", size: 180, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: true },
-  { label: "Район", accessor: "districts", size: 200, sorted: false },
+  { label: "Район", accessor: "districts", size: 240, sorted: false },
 ];
 
 const widthColumnFromCheckbox = 60;
@@ -165,11 +167,13 @@ const PersonsTable = () => {
         </Table.Td>
         <Table.Td>{item.email || emptyLineForCell}</Table.Td>
         <Table.Td>
-          {item.roles.map((role, index) => (
-            <Pill key={index} mr={4}>
-              {PersonRoleLocale(role)}
-            </Pill>
-          ))}
+          <Pill.Group gap={3}>
+            {item.roles.map((role, index) => (
+              <Pill key={index} mr={4} size="md">
+                {PersonRoleLocale(role)}
+              </Pill>
+            ))}
+          </Pill.Group>
         </Table.Td>
         <Table.Td>
           <CollapseList totalItems={item.projects.length}>
@@ -183,11 +187,13 @@ const PersonsTable = () => {
           </CollapseList>
         </Table.Td>
         <Table.Td>
-          {item.districts.map((district) => (
-            <Pill key={district.id} mr={4}>
-              {district.name}
-            </Pill>
-          ))}
+          <Pill.Group gap={3}>
+            {item.districts.map((district) => (
+              <Pill key={district.id} mr={4} size="md">
+                {district.name}
+              </Pill>
+            ))}
+          </Pill.Group>
         </Table.Td>
         <Table.Td>
           <ActionButtons
