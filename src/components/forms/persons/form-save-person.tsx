@@ -140,7 +140,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     const filtered = (options as ComboboxItem[]).filter((option) =>
       option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
     );
-  
+
     filtered.sort((a, b) => a.label.localeCompare(b.label));
     return filtered;
   };
@@ -150,9 +150,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
       surname: formatName(form.getValues().surname) || undefined,
       name: formatName(form.getValues().name),
       patronymic: formatName(form.getValues().patronymic) || undefined,
-      birthday: form.getValues().birthday
-        ? formatDateToString(form.getValues().birthday, "desc")
-        : undefined,
+      birthday: formatDateToString(form.getValues().birthday, "YYYY-MM-DD"),
       phone: form.getValues().phone || undefined,
       email: form.getValues().email || undefined,
       roles: form.getValues().roles,
