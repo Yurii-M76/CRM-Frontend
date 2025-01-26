@@ -6,10 +6,12 @@
  * @returns результат сортирвки, если данные являются строкой / числом (в противном случае 0)
  */
 
+type TSortOrder = "asc" | "desc";
+
 export const sortData = <T>(
   data: T[],
   sortBy: keyof T,
-  sortOrder: "asc" | "desc"
+  sortOrder: TSortOrder
 ) => {
   if (!data.length) return data;
   return data.sort((a, b) => {
@@ -28,9 +30,24 @@ export const sortData = <T>(
     } else if (typeof aValue === "number" && typeof bValue === "number") {
       return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
     } else if (Array.isArray(aValue) && Array.isArray(bValue)) {
-      return sortOrder === "asc"
-        ? aValue.length - bValue.length
-        : bValue.length - aValue.length;
+      if (aValue.length === 0 && bValue.length === 0) return 0;
+      if (aValue.length === 0) return sortOrder === "asc" ? -1 : 1;
+      if (bValue.length === 0) return sortOrder === "asc" ? 1 : -1;
+
+      if (
+        aValue.every((item) => typeof item !== "object") &&
+        bValue.every((item) => typeof item !== "object")
+      ) {
+        return sortOrder === "asc"
+          ? Math.min(...aValue.map((item) => new Date(item).getTime())) -
+              Math.min(...bValue.map((item) => new Date(item).getTime()))
+          : Math.min(...bValue.map((item) => new Date(item).getTime())) -
+              Math.min(...aValue.map((item) => new Date(item).getTime()));
+      } else {
+        return sortOrder === "asc"
+          ? aValue.length - bValue.length
+          : bValue.length - aValue.length;
+      }
     } else if (typeof aValue === "object" && typeof bValue === "object") {
       return sortOrder === "asc"
         ? JSON.stringify(aValue).localeCompare(JSON.stringify(bValue))
