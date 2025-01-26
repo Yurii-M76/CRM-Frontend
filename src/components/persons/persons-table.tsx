@@ -162,7 +162,7 @@ const PersonsTable = () => {
         <Table.Td>{item.phone || emptyLineForCell}</Table.Td>
         <Table.Td>
           {item.birthday
-            ? formatDateToString(new Date(item.birthday), "asc")
+            ? formatDateToString(new Date(item.birthday), "DD.MM.YYYY")
             : emptyLineForCell}
         </Table.Td>
         <Table.Td>{item.email || emptyLineForCell}</Table.Td>
