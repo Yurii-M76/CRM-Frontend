@@ -40,9 +40,9 @@ const columns: Column<TProject>[] = [
   { label: "Дата", accessor: "dates", size: 124, sorted: true },
   { label: "Название", accessor: "title", size: 220, sorted: true },
   { label: "Описание", accessor: "description", size: 340, sorted: true },
-  { label: "Район", accessor: "districts", size: 240, sorted: false },
+  { label: "Район", accessor: "districts", size: 240, sorted: true },
   { label: "Участники", accessor: "persons", size: 250, sorted: true },
-  { label: "Примечание", accessor: "note", size: 250, sorted: false },
+  { label: "Примечание", accessor: "note", size: 250, sorted: true },
 ];
 
 const widthColumnFromCheckbox = 60;
@@ -232,7 +232,7 @@ const ProjectsTable = () => {
             striped
             highlightOnHover
             horizontalSpacing="md"
-            // withColumnBorders
+            withColumnBorders
             withTableBorder
             className={classes.table}
           >
