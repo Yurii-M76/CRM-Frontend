@@ -1,6 +1,7 @@
 .scrollBlock {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: flex-start;
   gap: 4px;
   min-width: 180px;
