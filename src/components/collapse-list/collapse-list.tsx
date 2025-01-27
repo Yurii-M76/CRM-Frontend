@@ -10,7 +10,7 @@ type TScrollBlock = {
 const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const count = totalItems > 3 && !expanded && (
+  const count = !expanded && totalItems > 1 && (
     <div className={classes.count}>
       <Tooltip label="Количество в списке">
         <Badge size="lg" variant="light" color="gray" circle>
@@ -23,7 +23,8 @@ const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
   return (
     <div className={classes.scrollBlock}>
       <Spoiler
-        maxHeight={72}
+        maxHeight={74}
+        w={"100%"}
         showLabel="[развернуть]"
         hideLabel="[свернуть]"
         onExpandedChange={setExpanded}

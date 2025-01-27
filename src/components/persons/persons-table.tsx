@@ -177,7 +177,7 @@ const PersonsTable = () => {
         </Table.Td>
         <Table.Td>
           <CollapseList totalItems={item.projects.length}>
-            <ul>
+            <ul className={classes.listItemsForCell}>
               {item.projects.length
                 ? item.projects.map((item) => {
                     return <li key={item.id}>{item.title}</li>;
