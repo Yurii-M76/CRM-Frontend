@@ -113,7 +113,7 @@ const ProjectsTable = () => {
         .join(", ");
       result.push(_multiple);
     }
-    return result;
+    return result.length ? result : ["не определена"];
   };
 
   const thead = columns.map((column, index) => (
