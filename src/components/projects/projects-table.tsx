@@ -16,12 +16,12 @@ import {
 } from "@/services/project/reducer";
 import {
   Loader,
-  CollapseList,
   ActionButtons,
   NoData,
   THeadSortButton,
   TableInfoBlock,
   Modal,
+  CollapsedList,
 } from "@components";
 const TableToolbar = lazy(
   () => import("@components/table/table-toolbar/table-toolbar")
@@ -32,9 +32,9 @@ import { getAllPersons } from "@/services/person/action";
 import { getDistricts } from "@/services/districts/reducer";
 import { getAllDistricts } from "@/services/districts/action";
 import { ButtonsFromDeleteForm, FormSaveProject } from "@components/forms";
-import { Column, TCalendar, TProject } from "@/types";
-import classes from "../table/table.module.css";
+import { Column, TCalendar, TPerson, TProject } from "@/types";
 import { formatDateToString } from "@/utils";
+import classes from "../table/table.module.css";
 
 const columns: Column<TProject>[] = [
   { label: "Дата", accessor: "dates", size: 124, sorted: true },
@@ -163,15 +163,11 @@ const ProjectsTable = () => {
           </Pill.Group>
         </Table.Td>
         <Table.Td>
-          <CollapseList totalItems={item.persons.length}>
-            <ul className={classes.listItemsForCell}>
-              {item.persons.length
-                ? item.persons.map((item) => {
-                    return <li key={item.id}>{item.fullName}</li>;
-                  })
-                : emptyLineToCell}
-            </ul>
-          </CollapseList>
+          <CollapsedList<TPerson>
+            data={item.persons}
+            limit={3}
+            field="fullName"
+          />
         </Table.Td>
         <Table.Td>{item.note || emptyLineToCell}</Table.Td>
         <Table.Td>

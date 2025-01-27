@@ -26,7 +26,7 @@ import { getDistricts } from "@/services/districts/reducer";
 import {
   Loader,
   Modal,
-  CollapseList,
+  CollapsedList,
   ActionButtons,
   NoData,
   TableInfoBlock,
@@ -39,7 +39,7 @@ const TableToolbar = lazy(
 const Paginator = lazy(() => import("@components/paginator/paginator"));
 import { FormSavePerson, Search } from "@components/forms";
 import { formatDateToString } from "@/utils/format-date-to-string";
-import { Column, TPerson } from "@/types";
+import { Column, TPerson, TProject } from "@/types";
 import { personRoles } from "./person-roles";
 import classes from "@components/table/table.module.css";
 
@@ -176,15 +176,11 @@ const PersonsTable = () => {
           </Pill.Group>
         </Table.Td>
         <Table.Td>
-          <CollapseList totalItems={item.projects.length}>
-            <ul className={classes.listItemsForCell}>
-              {item.projects.length
-                ? item.projects.map((item) => {
-                    return <li key={item.id}>{item.title}</li>;
-                  })
-                : emptyLineForCell}
-            </ul>
-          </CollapseList>
+          <CollapsedList<TProject>
+            data={item.projects}
+            field="title"
+            limit={3}
+          />
         </Table.Td>
         <Table.Td>
           <Pill.Group gap={3}>

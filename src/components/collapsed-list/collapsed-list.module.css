@@ -1,0 +1,32 @@
+.collapsed {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+
+.list {
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.list li {
+  display: flex;
+}
+
+.list li::before {
+  content: "»";
+  margin-right: 10px;
+  color: var(--mantine-color-dimmed);
+}
+
+.count {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
