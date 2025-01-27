@@ -54,7 +54,7 @@ const FormSaveProject: FC<TFormSaveProject> = ({
   const [selectedDatesForFormField, setSelectedDatesForFormField] = useState<
     string[]
   >([]); // для поля "выбранные даты"
-  const [isSubmit, setIsSubmit] = useState<boolean>(false);
+  const [isEmptyDateValue, setIsEmptyDateValue] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     title: updData?.title || "",
@@ -79,6 +79,17 @@ const FormSaveProject: FC<TFormSaveProject> = ({
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
       districtsIds: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
+      dates: (value) => {
+        if (!value.length) {
+          if (variantCalendar !== "undefined") {
+            setIsEmptyDateValue(true);
+            return true;
+          }
+        } else {
+          setIsEmptyDateValue(false);
+          return undefined;
+        }
+      },
     },
   });
 
@@ -172,9 +183,11 @@ const FormSaveProject: FC<TFormSaveProject> = ({
         );
       }
     }
-  };
 
-  const isEmptyDateValue = !selectedDatesForFormField.length && isSubmit;
+    if (variantCalendar === "undefined") {
+      setSelectedDatesForFormField(["-"]);
+    }
+  };
 
   const handleSubmit = () => {
     if (!isEmptyDateValue) {
@@ -230,7 +243,6 @@ const FormSaveProject: FC<TFormSaveProject> = ({
     setOneDate(null);
     setDatesRange([null, null]);
     setDatesMultiple([]);
-    setIsSubmit(false);
     setSelectedDatesForFormField([]);
     form.setFieldValue("dates", []);
     handleUpdDate();
@@ -239,6 +251,19 @@ const FormSaveProject: FC<TFormSaveProject> = ({
 
   useEffect(() => {
     handleSelectedDatesForFormField();
+    if (!oneDate && variantCalendar === "default") {
+      setSelectedDatesForFormField([]);
+      form.setFieldValue("dates", []);
+    }
+    if (!datesRange[1] && variantCalendar === "range") {
+      setSelectedDatesForFormField([]);
+      form.setFieldValue("dates", []);
+    }
+    if (!datesMultiple[1] && variantCalendar === "multiple") {
+      setSelectedDatesForFormField([]);
+      form.setFieldValue("dates", []);
+    }
+    setIsEmptyDateValue(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [oneDate, datesRange, datesMultiple]);
 
@@ -260,7 +285,7 @@ const FormSaveProject: FC<TFormSaveProject> = ({
         <div className={classes.datePickerGroup}>
           <Fieldset
             className={`${classes.fieldsetForDatePickerGroup} ${
-              isEmptyDateValue ? classes.fieldsetError : ""
+              isEmptyDateValue && classes.fieldsetError
             } `}
           >
             <div className={classes.datePickerSettingsAndCalendar}>
@@ -359,11 +384,7 @@ const FormSaveProject: FC<TFormSaveProject> = ({
           maxRows={8}
         />
       </div>
-      <ButtonsDefaultFromForm
-        loading={false}
-        onClose={onClose}
-        onClick={() => setIsSubmit(true)}
-      />
+      <ButtonsDefaultFromForm loading={false} onClose={onClose} />
     </form>
   );
 };
