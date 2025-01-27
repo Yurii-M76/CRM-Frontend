@@ -30,7 +30,7 @@ const CollapseList: FC<TScrollBlock> = ({ totalItems, children }) => {
       >
         <div className={expanded ? classes.scroll : undefined}>{children}</div>
       </Spoiler>
-      <div className={classes.count}>{count}</div>
+      {count}
     </div>
   );
 };
