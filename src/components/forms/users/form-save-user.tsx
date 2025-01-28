@@ -1,10 +1,4 @@
-import {
-  Anchor,
-  PasswordInput,
-  Select,
-  Switch,
-  TextInput,
-} from "@mantine/core";
+import { ActionIcon, Select, Switch, TextInput, Tooltip } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { UserRole } from "@/types";
@@ -13,6 +7,7 @@ import { createUser } from "@/services/users/actions";
 import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
 import { getStatusUsers } from "@/services/users/reducer";
 import exceptions from "@/constants/exceptions";
+import * as Icons from "@assets/icons";
 import classes from "../forms.module.css";
 
 type TFormSaveUser = {
@@ -26,6 +21,26 @@ type TInitialValues = {
   confirmPassword: string;
   role: UserRole | "";
   isBlocked: boolean;
+};
+
+const generatePassword = (): string => {
+  const length = 12;
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!'?@#$%^&*()_+";
+  const parts = 4;
+  const partLength = Math.floor(length / parts);
+  const passwordParts = Array(parts)
+    .fill(0)
+    .map(() => {
+      let part = "";
+      for (let i = 0; i < partLength; i++) {
+        part += characters.charAt(
+          Math.floor(Math.random() * characters.length)
+        );
+      }
+      return part;
+    });
+  return passwordParts.join("-");
 };
 
 const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
@@ -69,6 +84,10 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
     },
   });
 
+  const handleGeneratePassword = () => {
+    form.setFieldValue("password", generatePassword());
+  };
+
   const handleSubmit = () => {
     dispatch(createUser(form.getValues()));
   };
@@ -92,13 +111,23 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           key={form.key("email")}
           {...form.getInputProps("email")}
         />
-        <PasswordInput
+        <TextInput
           id="password"
           label="Пароль"
           key={form.key("password")}
           {...form.getInputProps("password")}
+          rightSection={
+            <Tooltip label="Сгенерировать пароль">
+              <ActionIcon
+                variant="subtle"
+                color="indigo"
+                onClick={handleGeneratePassword}
+              >
+                <Icons.IconbrandSupabase strokeWidth={1.5} />
+              </ActionIcon>
+            </Tooltip>
+          }
         />
-        <Anchor size="sm">Сгенерировать</Anchor>
         <Select
           id="role"
           label="Роль"
