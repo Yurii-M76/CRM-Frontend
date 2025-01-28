@@ -37,9 +37,9 @@ const CollapsedList = <T extends Record<string, any>>({
     <div className={classes.collapsed}>
       <div>
         <ul className={classes.list}>
-          <Box w={170}>
+          <Box w={length > limit ? 168 : "100%"}>
             <li>
-              <Text style={{fontSize: "inherit"}}>{data[0][field]}</Text>
+              <Text style={{ fontSize: "inherit" }}>{data[0][field]}</Text>
             </li>
           </Box>
           {data.slice(1, limit).map((item, index) => (
