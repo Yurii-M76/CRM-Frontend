@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ActionButtons } from "../table";
 import { ButtonsFromDeleteForm, FormSaveUser } from "@components/forms";
 import { Modal, Loader } from "@components";
+import { getMeData } from "@/services/auth/reducer";
 import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 
@@ -24,6 +25,7 @@ const widthTable =
 
 const Users = () => {
   const dispatch = useDispatch();
+  const currentUser = useSelector(getMeData);
   const users = useSelector(getUsers);
   const status = useSelector(getStatusUsers);
   const [isOpenCreateForm, setIsOpenCreateForm] = useState<boolean>(false);
@@ -31,6 +33,17 @@ const Users = () => {
   const [isOpenConfirmAction, setIsOpenConfirmAction] =
     useState<boolean>(false);
   const [userId, setUserId] = useState<string | undefined>(undefined);
+
+  const isForbiddenToDelete = (data: TUser): boolean => {
+    if (currentUser?.id === data.id || data.name === "admin") return true;
+    return false;
+  };
+
+  const isForbiddenToEdit = (data: TUser): boolean => {
+    if (currentUser?.id === data.id) return false;
+    if (data.name === "admin") return true;
+    return false;
+  };
 
   const thead = columns.map((column, index) => (
     <Table.Th w={column.size} key={index} className={classes.tableTh}>
@@ -65,8 +78,10 @@ const Users = () => {
             handleClickFromEdit={() => ""}
             handleClickFromDelete={() => {
               setUserId(item.id);
-              // setIsOpenConfirmAction(true);
+              setIsOpenConfirmAction(true);
             }}
+            disabledEditButton={isForbiddenToEdit(item)}
+            disabledDeleteButton={isForbiddenToDelete(item)}
           />
         </Table.Td>
       </Table.Tr>
