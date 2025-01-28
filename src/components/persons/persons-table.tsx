@@ -167,13 +167,16 @@ const PersonsTable = () => {
         </Table.Td>
         <Table.Td>{item.email || emptyLineForCell}</Table.Td>
         <Table.Td>
-          <Pill.Group gap={3}>
-            {item.roles.map((role, index) => (
-              <Pill key={index} mr={4} size="md">
-                {PersonRoleLocale(role)}
-              </Pill>
-            ))}
-          </Pill.Group>
+          {(item.roles.length && (
+            <Pill.Group gap={3}>
+              {item.roles.map((role, index) => (
+                <Pill key={index} mr={4} size="md">
+                  {PersonRoleLocale(role)}
+                </Pill>
+              ))}
+            </Pill.Group>
+          )) ||
+            emptyLineForCell}
         </Table.Td>
         <Table.Td>
           <CollapsedList<TProject>

@@ -120,11 +120,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
         (email && conflictEmail && exceptions.persons.forms.save.conflictEmail),
       districts: (value) =>
         !value.length ? exceptions.formValidate.all.requiredField : undefined,
-      roles: (value) => {
-        return !value.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined;
-      },
       car: (value) =>
         isDriver && !value.length
           ? exceptions.formValidate.all.requiredField
@@ -197,6 +192,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     } else {
       setConflictPhone(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conflictPhone, personIdOnPhoneChecking]);
 
   useEffect(() => {
@@ -212,6 +208,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     } else {
       setConflictEmail(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conflictEmail, personIdOnEmailChecking]);
 
   useEffect(() => {
@@ -329,7 +326,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             }))}
             key={form.key("roles")}
             {...form.getInputProps("roles")}
-            required
+            clearable
           />
           {isDriver && (
             <TextInput

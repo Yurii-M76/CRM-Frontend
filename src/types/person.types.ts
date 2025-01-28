@@ -21,7 +21,6 @@ export type TPerson = {
 // export type TPersonRoles = (keyof typeof Role)[]; // массив ключей Role
 
 export enum Role {
-  GUEST = "Участник",
   VOLUNTEER = "Волонтер",
   DRIVER = "Водитель",
   DELEGATE = "Представитель",
