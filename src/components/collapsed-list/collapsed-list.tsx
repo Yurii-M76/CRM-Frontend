@@ -19,7 +19,7 @@ const CollapsedList = <T extends Record<string, any>>({
   const length = data.length;
 
   const count = !opened && length > 1 && (
-    <div className={classes.count}>
+    <div className={classes.countBadge}>
       <Tooltip label="Количество в списке">
         <Badge size="md" variant="default">
           {length}
