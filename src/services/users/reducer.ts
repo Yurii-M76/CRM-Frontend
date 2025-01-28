@@ -8,14 +8,35 @@ import {
 } from "./actions";
 import { TUser } from "@/types";
 
-type TInitialState = {
+type TStatus = {
   loading: boolean;
+  success: boolean;
+};
+
+type TStatuses = {
+  create: TStatus;
+  read: TStatus;
+  update: TStatus;
+  delete: TStatus;
+};
+
+type TInitialState = {
+  status: TStatuses;
   error?: string | null;
   items: TUser[];
 };
 
+const defaultStatus = { loading: false, success: false };
+const statusPending = { loading: true, success: false };
+const statusFulfilled = { loading: false, success: true };
+
 const initialState: TInitialState = {
-  loading: false,
+  status: {
+    create: defaultStatus,
+    read: defaultStatus,
+    update: defaultStatus,
+    delete: defaultStatus,
+  },
   error: null,
   items: [],
 };
@@ -25,51 +46,51 @@ export const usersSlice = createSlice({
   initialState,
   reducers: {},
   selectors: {
-    getIsLoadingUsers: (state) => state.loading,
+    getStatusUsers: (state) => state.status,
     getUsers: (state) => state.items,
   },
   extraReducers(builder) {
     builder
       // create
       .addCase(createUser.pending, (state) => {
+        state.status.create = statusPending;
         state.error = null;
-        state.loading = true;
       })
       .addCase(createUser.fulfilled, (state, action) => {
+        state.status.create = statusFulfilled;
         state.error = null;
-        state.loading = false;
         state.items = [...state.items, action.payload];
       })
       .addCase(createUser.rejected, (state, action) => {
-        state.loading = false;
+        state.status.create = defaultStatus;
         state.error = action.error.message;
       });
 
     builder
       // find all
       .addCase(findAllUsers.pending, (state) => {
+        state.status.read = statusPending;
         state.error = null;
-        state.loading = true;
       })
       .addCase(findAllUsers.fulfilled, (state, action) => {
+        state.status.read = statusFulfilled;
         state.error = null;
-        state.loading = false;
         state.items = action.payload;
       })
       .addCase(findAllUsers.rejected, (state, action) => {
-        state.loading = false;
+        state.status.read = defaultStatus;
         state.error = action.error.message;
       });
 
     builder
       // find one
       .addCase(findOneUser.pending, (state) => {
+        state.status.read = statusPending;
         state.error = null;
-        state.loading = true;
       })
       .addCase(findOneUser.fulfilled, (state, action) => {
+        state.status.read = statusFulfilled;
         state.error = null;
-        state.loading = false;
         const index = state.items.findIndex(
           (item) => item.id === action.payload.id
         );
@@ -80,19 +101,19 @@ export const usersSlice = createSlice({
         }
       })
       .addCase(findOneUser.rejected, (state, action) => {
-        state.loading = false;
+        state.status.read = defaultStatus;
         state.error = action.error.message;
       });
 
     builder
       // update
       .addCase(updateUser.pending, (state) => {
+        state.status.update = statusPending;
         state.error = null;
-        state.loading = true;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
+        state.status.update = statusFulfilled;
         state.error = null;
-        state.loading = false;
         const index = state.items.findIndex(
           (item) => item.id === action.payload.id
         );
@@ -101,28 +122,29 @@ export const usersSlice = createSlice({
         }
       })
       .addCase(updateUser.rejected, (state, action) => {
-        state.loading = false;
+        state.status.update = defaultStatus;
         state.error = action.error.message;
       });
 
     builder
       // delete
       .addCase(deleteUser.pending, (state) => {
+        state.status.delete = statusPending;
         state.error = null;
-        state.loading = true;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
+        state.status.delete = statusFulfilled;
         state.error = null;
-        state.loading = false;
-        state.items.filter((item) => item.id !== action.payload.id);
+        state.items = state.items.filter(
+          (item) => item.id !== action.payload.id
+        );
       })
       .addCase(deleteUser.rejected, (state, action) => {
-        state.loading = false;
+        state.status.delete = defaultStatus;
         state.error = action.error.message;
       });
   },
 });
 
-// export const {} = nameSlice.actions;
-export const { getIsLoadingUsers, getUsers } = usersSlice.selectors;
+export const { getStatusUsers, getUsers } = usersSlice.selectors;
 export default usersSlice;
