@@ -65,8 +65,15 @@
   padding: 10px 0;
 }
 
+.listItemsForCell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 ul {
   margin: 0;
   padding: 0;
+  color: inherit;
   list-style: none;
 }

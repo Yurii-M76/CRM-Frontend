@@ -3,11 +3,13 @@ import { FC } from "react";
 
 type TButtonsDefaultFromForm = {
   loading?: boolean;
+  onClick?: () => void;
   onClose?: () => void;
 };
 
 const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
   loading,
+  onClick,
   onClose,
 }) => {
   return (
@@ -20,7 +22,7 @@ const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
       >
         Отменить
       </Button>
-      <Button variant="filled" color="green" type="submit" loading={loading}>
+      <Button variant="filled" color="green" type="submit" loading={loading} onClick={onClick}>
         Сохранить
       </Button>
     </Group>

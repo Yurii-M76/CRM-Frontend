@@ -1,0 +1,33 @@
+.collapsed {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 200px;
+  max-width: 100%;
+}
+
+.list {
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.list li {
+  display: flex;
+}
+
+.list li::before {
+  content: "»";
+  margin-right: 10px;
+  color: var(--mantine-color-dimmed);
+}
+
+.countBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

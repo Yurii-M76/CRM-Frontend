@@ -39,3 +39,83 @@
   justify-content: center;
   height: 36px;
 }
+
+.datePickerSettingsAndCalendar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.datePickerSettings {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  height: 198px;
+  margin-top: 24px;
+
+  @media (max-width: 500px) {
+    height: fit-content;
+  }
+}
+
+.datePickerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldsetForDatePickerGroup {
+  margin: 0 !important;
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-8)
+  ) !important;
+
+  @media (max-width: 500px) {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.fieldsetError {
+  border: 1px solid var(--mantine-color-error) !important;
+}
+
+.datePicker {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 6px;
+
+  @media (max-width: 500px) {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    border: 1px solid
+      light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-4));
+    border-radius: 4px;
+  }
+}
+
+.datePickerGroupError {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: var(--mantine-color-error);
+  font-size: var(
+    --input-error-size,
+    calc(var(--mantine-font-size-sm) - calc(0.125rem * var(--mantine-scale)))
+  );
+  line-height: 1.2;
+  word-wrap: break-word;
+}
