@@ -18,3 +18,4 @@ export { default as IconIconAdjustmentsAlt } from "./adjustments-alt.svg?react";
 export { default as IconSearch} from "./search.svg?react";
 export { default as IconArrowRight} from "./arrow-right.svg?react";
 export { default as IconX} from "./x.svg?react";
+export { default as IconbrandSupabase} from "./brand-supabase.svg?react";
