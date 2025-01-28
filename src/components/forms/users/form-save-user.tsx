@@ -8,9 +8,10 @@ import {
 import { useForm } from "@mantine/form";
 import { FC } from "react";
 import { UserRole } from "@/types";
-import { useDispatch } from "@/services/store";
+import { useDispatch, useSelector } from "@/services/store";
 import { createUser } from "@/services/users/actions";
 import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
+import { getStatusUsers } from "@/services/users/reducer";
 import exceptions from "@/constants/exceptions";
 import classes from "../forms.module.css";
 
@@ -29,6 +30,9 @@ type TInitialValues = {
 
 const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
   const dispatch = useDispatch();
+  const status = useSelector(getStatusUsers);
+  const isLoadingCreate = status.create.loading;
+  // const isLoadingUpdate = status.update.loading;
 
   const initialValues: TInitialValues = {
     name: "",
@@ -112,7 +116,7 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           className={classes.inputHeight}
         />
       </div>
-      <ButtonsDefaultFromForm onClose={onClose} />
+      <ButtonsDefaultFromForm onClose={onClose} loading={isLoadingCreate} />
     </form>
   );
 };
