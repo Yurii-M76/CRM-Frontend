@@ -50,7 +50,7 @@ const columns: Column<TPerson>[] = [
   { label: "E-Mail", accessor: "email", size: 180, sorted: true },
   { label: "Роль", accessor: "roles", size: 140, sorted: false },
   { label: "Проекты", accessor: "projects", size: 260, sorted: true },
-  { label: "Район", accessor: "districts", size: 240, sorted: false },
+  { label: "Район", accessor: "districts", size: 240, sorted: true },
 ];
 
 const widthColumnFromCheckbox = 60;
