@@ -44,10 +44,15 @@ const initialState: TInitialState = {
 export const usersSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    resetErrors: (state) => {
+      state.error = null;
+    },
+  },
   selectors: {
     getStatusUsers: (state) => state.status,
     getUsers: (state) => state.items,
+    getErrors: (state) => state.error,
   },
   extraReducers(builder) {
     builder
@@ -146,5 +151,6 @@ export const usersSlice = createSlice({
   },
 });
 
-export const { getStatusUsers, getUsers } = usersSlice.selectors;
+export const { resetErrors } = usersSlice.actions;
+export const { getStatusUsers, getUsers, getErrors } = usersSlice.selectors;
 export default usersSlice;
