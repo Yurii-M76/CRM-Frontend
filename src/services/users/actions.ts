@@ -10,7 +10,7 @@ import { TUser } from "@/types";
 
 export const createUser = createAsyncThunk(
   "users/create",
-  async (data: TUser) => await createDataFromApi<TUser>("users", data)
+  async (data: Partial<TUser>) => await createDataFromApi<TUser>("users", data)
 );
 
 export const findAllUsers = createAsyncThunk(
@@ -25,7 +25,7 @@ export const findOneUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "users/update",
-  async ({ id, data }: { id: string; data: TUser }) =>
+  async ({ id, data }: { id: string; data: Partial<TUser> }) =>
     await updateDataFromApi<TUser>("users", id, data)
 );
 
