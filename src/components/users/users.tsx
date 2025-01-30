@@ -1,6 +1,11 @@
 import { useDispatch, useSelector } from "@/services/store";
 import { deleteUser, findAllUsers } from "@/services/users/actions";
-import { getStatusUsers, getUsers } from "@/services/users/reducer";
+import {
+  getErrors,
+  getStatusUsers,
+  getUsers,
+  resetErrors,
+} from "@/services/users/reducer";
 import { Column, TUser } from "@/types";
 import { Button, Switch, Table, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
@@ -28,12 +33,12 @@ const Users = () => {
   const currentUser = useSelector(getMeData);
   const users = useSelector(getUsers);
   const status = useSelector(getStatusUsers);
-  const [isOpenCreateForm, setIsOpenCreateForm] = useState<boolean>(false);
-  // const [isOpenUpdateForm, setIsOpenUpdateForm] = useState<boolean>(false);
+  const errors = useSelector(getErrors);
+  const [isOpenSaveForm, setIsOpenSaveForm] = useState<boolean>(false);
   const [isOpenConfirmAction, setIsOpenConfirmAction] =
     useState<boolean>(false);
   const [userId, setUserId] = useState<string | undefined>(undefined);
-
+  const [updData, setUpdData] = useState<TUser | undefined>(undefined);
   const isForbiddenToDelete = (data: TUser): boolean => {
     if (currentUser?.id === data.id || data.name === "admin") return true;
     return false;
@@ -75,7 +80,11 @@ const Users = () => {
         </Table.Td>
         <Table.Td>
           <ActionButtons
-            handleClickFromEdit={() => ""}
+            handleClickFromEdit={() => {
+              setUserId(item.id);
+              setIsOpenSaveForm(true);
+              setUpdData(users.find((user) => user.id === item.id));
+            }}
             handleClickFromDelete={() => {
               setUserId(item.id);
               setIsOpenConfirmAction(true);
@@ -92,12 +101,28 @@ const Users = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setIsOpenCreateForm(false);
-  }, [status.create.success]);
+    if (!errors && status.create.success) {
+      setIsOpenSaveForm(false);
+    }
+  }, [errors, status.create.success]);
 
   useEffect(() => {
-    setIsOpenConfirmAction(false);
-  }, [status.delete.success]);
+    if (!errors && status.update.success) {
+      setIsOpenSaveForm(false);
+      setUpdData(undefined);
+    }
+  }, [errors, status.update.success]);
+
+  useEffect(() => {
+    if (!errors && status.delete.success) {
+      setIsOpenConfirmAction(false);
+    }
+  }, [errors, status.delete.success]);
+
+  useEffect(() => {
+    dispatch(resetErrors());
+    setUserId(undefined);
+  }, [dispatch, isOpenSaveForm]);
 
   return (
     <>
@@ -107,7 +132,7 @@ const Users = () => {
           <Button
             variant="light"
             leftSection={<Icons.IconPlus className={classes.icon} />}
-            onClick={() => setIsOpenCreateForm(true)}
+            onClick={() => setIsOpenSaveForm(true)}
           >
             Добавить
           </Button>
@@ -135,21 +160,28 @@ const Users = () => {
         </div>
       </div>
       <Modal
-        title="Новый пользователь"
-        opened={isOpenCreateForm}
-        close={() => setIsOpenCreateForm(false)}
+        title={!updData ? "Новый пользователь" : "Редактировать запись"}
+        opened={isOpenSaveForm}
+        close={() => {
+          setUpdData(undefined);
+          setIsOpenSaveForm(false);
+        }}
         size="sm"
       >
-        <FormSaveUser onClose={() => setIsOpenCreateForm(false)} />
+        <FormSaveUser
+          onClose={() => {
+            setUpdData(undefined);
+            setIsOpenSaveForm(false);
+          }}
+          updData={updData}
+          errors={errors}
+        />
       </Modal>
 
       <Modal
         title="Подтверждение действия"
         opened={isOpenConfirmAction}
-        close={() => {
-          setIsOpenConfirmAction(!isOpenConfirmAction);
-          setUserId(undefined);
-        }}
+        close={() => setIsOpenConfirmAction(false)}
         closeButton={false}
         size="md"
       >
@@ -158,10 +190,7 @@ const Users = () => {
         </Text>
         <ButtonsFromDeleteForm
           loading={status.delete.loading}
-          onClickToCancel={() => {
-            setIsOpenConfirmAction(false);
-            setUserId(undefined);
-          }}
+          onClickToCancel={() => setIsOpenConfirmAction(false)}
           onClickToDelete={() => userId && dispatch(deleteUser(userId))}
         />
       </Modal>
