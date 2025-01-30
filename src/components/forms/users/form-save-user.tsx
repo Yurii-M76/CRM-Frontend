@@ -5,20 +5,14 @@ import {
   Switch,
   TextInput,
   Tooltip,
-  Center,
-  Alert,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC, useEffect } from "react";
+import { FC, useState } from "react";
 import { TUser, UserRole } from "@/types";
 import { useDispatch, useSelector } from "@/services/store";
-import { createUser } from "@/services/users/actions";
-import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
-import {
-  getErrors,
-  getStatusUsers,
-  resetErrors,
-} from "@/services/users/reducer";
+import { createUser, updateUser } from "@/services/users/actions";
+import { ButtonsDefaultFromForm, Alert } from "@/components";
+import { getStatusUsers } from "@/services/users/reducer";
 import exceptions from "@/constants/exceptions";
 import * as Icons from "@assets/icons";
 import classes from "../forms.module.css";
@@ -26,6 +20,7 @@ import classes from "../forms.module.css";
 type TFormSaveUser = {
   onClose?: () => void;
   updData?: TUser;
+  errors?: string | null;
 };
 
 type TInitialValues = {
@@ -56,16 +51,16 @@ const generatePassword = (): string => {
   return passwordParts.join("-");
 };
 
-const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData }) => {
+const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData, errors }) => {
   const dispatch = useDispatch();
   const status = useSelector(getStatusUsers);
   const isLoading = status.create.loading || status.update.loading;
-  const errorMessage = useSelector(getErrors);
+  const [isChangePassword, setIsChangePassword] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
     name: updData?.name || "",
     email: updData?.email || "",
-    password: (updData && "**********") || "",
+    password: updData?.password || "",
     role: updData?.role || "",
     isBlocked: updData?.isBlocked || false,
   };
@@ -90,7 +85,9 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData }) => {
           ? null
           : exceptions.formValidate.all.invalidInput,
       password: (value) =>
-        value.length < 6
+        updData
+          ? null
+          : value.length < 6
           ? exceptions.formValidate.users.moreLetters.password
           : null,
       role: (value) =>
@@ -103,12 +100,25 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData }) => {
   };
 
   const handleSubmit = () => {
-    dispatch(createUser(form.getValues()));
-  };
+    const sendData = {
+      name: form.getValues().name,
+      email: form.getValues().email,
+      password: form.getValues().password || undefined,
+      role: form.getValues().role,
+      isBlocked: form.getValues().isBlocked,
+    };
 
-  useEffect(() => {
-    dispatch(resetErrors());
-  }, [dispatch, form.values]);
+    if (updData) {
+      dispatch(
+        updateUser({
+          id: updData.id,
+          data: sendData,
+        })
+      );
+    } else {
+      dispatch(createUser(form.getValues()));
+    }
+  };
 
   return (
     <form
@@ -128,29 +138,37 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData }) => {
           label="Email"
           key={form.key("email")}
           {...form.getInputProps("email")}
-          disabled={isUpdData}
         />
-        {isUpdData && <Anchor size="sm">Изменить email</Anchor>}
         <TextInput
           id="password"
-          label="Пароль"
+          label={isChangePassword ? "Новый пароль" : "Пароль"}
           key={form.key("password")}
           {...form.getInputProps("password")}
-          disabled={isUpdData}
+          disabled={isUpdData && !isChangePassword}
           rightSection={
             <Tooltip label={"Сгенерировать"}>
               <ActionIcon
                 variant="subtle"
                 color="indigo"
                 onClick={handleGeneratePassword}
-                disabled={isUpdData}
+                disabled={isUpdData && !isChangePassword}
               >
                 <Icons.IconBrandSupabase strokeWidth={1.5} />
               </ActionIcon>
             </Tooltip>
           }
         />
-        {isUpdData && <Anchor size="sm">Изменить пароль</Anchor>}
+        {isUpdData && (
+          <Anchor
+            size="sm"
+            onClick={() => {
+              setIsChangePassword(!isChangePassword);
+              form.setFieldValue("password", "");
+            }}
+          >
+            {!isChangePassword ? "Изменить пароль" : "Отменить"}
+          </Anchor>
+        )}
         <Select
           id="role"
           label="Роль"
@@ -161,27 +179,16 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData }) => {
         {isUpdData && (
           <Switch
             id="isBlocked"
-            label="Заблокировать"
+            label="Заблокирован"
             key={form.key("isBlocked")}
             {...form.getInputProps("isBlocked")}
-            defaultChecked={false}
+            defaultChecked={updData?.isBlocked}
             color="red"
             className={classes.inputHeight}
           />
         )}
       </div>
-      {errorMessage && (
-        <Center>
-          <Alert
-            variant="light"
-            color="red"
-            title="Ошибка"
-            icon={<Icons.IconExclamationCircle strokeWidth={2} />}
-          >
-            {errorMessage}
-          </Alert>
-        </Center>
-      )}
+      {errors && <Alert type="error" message={errors} />}
       <ButtonsDefaultFromForm onClose={onClose} loading={isLoading} />
     </form>
   );
