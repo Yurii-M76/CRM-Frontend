@@ -31,7 +31,13 @@ export const Alert: FC<TAlert> = ({ type, message }) => {
 
   return (
     <Center>
-      <MantineAlert variant="light" color={color} title={title} icon={icon}>
+      <MantineAlert
+        variant="light"
+        color={color}
+        title={title}
+        icon={icon}
+        w="100%"
+      >
         {message}
       </MantineAlert>
     </Center>
