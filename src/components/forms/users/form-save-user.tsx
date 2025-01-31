@@ -1,43 +1,71 @@
 import {
+  ActionIcon,
   Anchor,
-  PasswordInput,
   Select,
   Switch,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC } from "react";
-import { UserRole } from "@/types";
-import { useDispatch } from "@/services/store";
-import { createUser } from "@/services/users/actions";
-import { ButtonsDefaultFromForm } from "@/components/forms/elements/buttons";
+import { FC, useState } from "react";
+import { TUser, UserRole } from "@/types";
+import { useDispatch, useSelector } from "@/services/store";
+import { createUser, updateUser } from "@/services/users/actions";
+import { ButtonsDefaultFromForm, Alert } from "@/components";
+import { getStatusUsers } from "@/services/users/reducer";
 import exceptions from "@/constants/exceptions";
+import * as Icons from "@assets/icons";
 import classes from "../forms.module.css";
 
 type TFormSaveUser = {
   onClose?: () => void;
+  updData?: TUser;
+  errors?: string | null;
 };
 
 type TInitialValues = {
   name: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  role: UserRole | "";
+  role: string | "";
   isBlocked: boolean;
 };
 
-const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
+const generatePassword = (): string => {
+  const length = 12;
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!'?@#$%^&*()_+";
+  const parts = 4;
+  const partLength = Math.floor(length / parts);
+  const passwordParts = Array(parts)
+    .fill(0)
+    .map(() => {
+      let part = "";
+      for (let i = 0; i < partLength; i++) {
+        part += characters.charAt(
+          Math.floor(Math.random() * characters.length)
+        );
+      }
+      return part;
+    });
+  return passwordParts.join("-");
+};
+
+const FormSaveUser: FC<TFormSaveUser> = ({ onClose, updData, errors }) => {
   const dispatch = useDispatch();
+  const status = useSelector(getStatusUsers);
+  const isLoading = status.create.loading || status.update.loading;
+  const [isChangePassword, setIsChangePassword] = useState<boolean>(false);
 
   const initialValues: TInitialValues = {
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "",
-    isBlocked: false,
+    name: updData?.name || "",
+    email: updData?.email || "",
+    password: updData?.password || "",
+    role: updData?.role || "",
+    isBlocked: updData?.isBlocked || false,
   };
+
+  const isUpdData = updData ? true : false;
 
   const roles = Object.entries(UserRole).map(([key, label]) => ({
     value: key,
@@ -45,7 +73,7 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
   }));
 
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: initialValues,
     validate: {
       name: (value) =>
@@ -57,7 +85,9 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           ? null
           : exceptions.formValidate.all.invalidInput,
       password: (value) =>
-        value.length < 6
+        updData
+          ? null
+          : value.length < 6
           ? exceptions.formValidate.users.moreLetters.password
           : null,
       role: (value) =>
@@ -65,8 +95,29 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
     },
   });
 
+  const handleGeneratePassword = () => {
+    form.setFieldValue("password", generatePassword());
+  };
+
   const handleSubmit = () => {
-    dispatch(createUser(form.getValues()));
+    const sendData = {
+      name: form.getValues().name,
+      email: form.getValues().email,
+      password: form.getValues().password || undefined,
+      role: form.getValues().role,
+      isBlocked: form.getValues().isBlocked,
+    };
+
+    if (updData) {
+      dispatch(
+        updateUser({
+          id: updData.id,
+          data: sendData,
+        })
+      );
+    } else {
+      dispatch(createUser(form.getValues()));
+    }
   };
 
   return (
@@ -88,13 +139,36 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           key={form.key("email")}
           {...form.getInputProps("email")}
         />
-        <PasswordInput
+        <TextInput
           id="password"
-          label="Пароль"
+          label={isChangePassword ? "Новый пароль" : "Пароль"}
           key={form.key("password")}
           {...form.getInputProps("password")}
+          disabled={isUpdData && !isChangePassword}
+          rightSection={
+            <Tooltip label={"Сгенерировать"}>
+              <ActionIcon
+                variant="subtle"
+                color="indigo"
+                onClick={handleGeneratePassword}
+                disabled={isUpdData && !isChangePassword}
+              >
+                <Icons.IconBrandSupabase strokeWidth={1.5} />
+              </ActionIcon>
+            </Tooltip>
+          }
         />
-        <Anchor size="sm">Сгенерировать</Anchor>
+        {isUpdData && (
+          <Anchor
+            size="sm"
+            onClick={() => {
+              setIsChangePassword(!isChangePassword);
+              form.setFieldValue("password", "");
+            }}
+          >
+            {!isChangePassword ? "Изменить пароль" : "Отменить"}
+          </Anchor>
+        )}
         <Select
           id="role"
           label="Роль"
@@ -102,17 +176,20 @@ const FormSaveUser: FC<TFormSaveUser> = ({ onClose }) => {
           {...form.getInputProps("role")}
           data={roles}
         ></Select>
-        <Switch
-          id="isBlocked"
-          label="Заблокирован"
-          key={form.key("isBlocked")}
-          {...form.getInputProps("isBlocked")}
-          defaultChecked={false}
-          color="red"
-          className={classes.inputHeight}
-        />
+        {isUpdData && (
+          <Switch
+            id="isBlocked"
+            label="Заблокирован"
+            key={form.key("isBlocked")}
+            {...form.getInputProps("isBlocked")}
+            defaultChecked={updData?.isBlocked}
+            color="red"
+            className={classes.inputHeight}
+          />
+        )}
       </div>
-      <ButtonsDefaultFromForm onClose={onClose} />
+      {errors && <Alert type="error" message={errors} />}
+      <ButtonsDefaultFromForm onClose={onClose} loading={isLoading} />
     </form>
   );
 };

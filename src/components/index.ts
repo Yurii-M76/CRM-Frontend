@@ -7,6 +7,12 @@ export { default as DistrictsTable } from "./districts/districts-table";
 export { default as Modal } from "./modal/modal";
 export { default as Users } from "./users/users";
 export { default as CRM_Notification } from "./notification/notification";
+export { default as Alert } from "./alert/alert";
 
 export { ButtonsFromDeleteForm, ButtonsDefaultFromForm } from "./forms";
-export { ActionButtons, THeadSortButton, TableInfoBlock, NoData } from "./table";
+export {
+  ActionButtons,
+  THeadSortButton,
+  TableInfoBlock,
+  NoData,
+} from "./table";

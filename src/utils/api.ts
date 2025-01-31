@@ -155,10 +155,10 @@ export const getAllDataFromApi = async <T>(path: string): Promise<T> => {
 
 export const getOneDataFromApi = async <T>(
   path: string,
-  id: string
+  idOrEmail: string
 ): Promise<T> => {
   try {
-    const response = await fetch(`${URL}/api/${path}`, {
+    const response = await fetch(`${URL}/api/${path}/${idOrEmail}`, {
       mode: "cors",
       method: "GET",
       headers: {
@@ -166,7 +166,6 @@ export const getOneDataFromApi = async <T>(
         authorization: await getValidAccessToken(),
       } as HeadersInit,
       credentials: "include",
-      body: JSON.stringify(id),
     });
     return await checkResponse<T>(response);
   } catch (error) {

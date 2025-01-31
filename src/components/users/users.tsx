@@ -1,19 +1,24 @@
 import { useDispatch, useSelector } from "@/services/store";
-import { findAllUsers } from "@/services/users/actions";
-import { getIsLoadingUsers, getUsers } from "@/services/users/reducer";
+import { deleteUser, findAllUsers } from "@/services/users/actions";
+import {
+  getErrors,
+  getStatusUsers,
+  getUsers,
+  resetErrors,
+} from "@/services/users/reducer";
 import { Column, TUser } from "@/types";
-import { Button, Switch, Table } from "@mantine/core";
-import { useEffect } from "react";
+import { Button, Switch, Table, Text } from "@mantine/core";
+import { useEffect, useState } from "react";
 import { ActionButtons } from "../table";
-import { useDisclosure } from "@mantine/hooks";
-import { FormSaveUser } from "@components/forms";
-import Modal from "@components/modal/modal";
+import { ButtonsFromDeleteForm, FormSaveUser } from "@components/forms";
+import { Modal, Loader } from "@components";
+import { getMeData } from "@/services/auth/reducer";
 import * as Icons from "@assets/icons";
 import classes from "../table/table.module.css";
 
 const columns: Column<TUser>[] = [
   { label: "Имя", accessor: "name", size: 200, sorted: true },
-  { label: "Email", accessor: "email", size: 200, sorted: true },
+  { label: "Email", accessor: "email", size: 260, sorted: true },
   { label: "Роль", accessor: "role", size: 140, sorted: true },
   { label: "Активен", accessor: "isBlocked", size: 60, sorted: true },
 ];
@@ -24,10 +29,26 @@ const widthTable =
   widthColumnFromActionButtons;
 
 const Users = () => {
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(getMeData);
   const users = useSelector(getUsers);
-  const isLoading = useSelector(getIsLoadingUsers);
-  const [opened, { open, close }] = useDisclosure(false);
+  const status = useSelector(getStatusUsers);
+  const errors = useSelector(getErrors);
+  const [isOpenSaveForm, setIsOpenSaveForm] = useState<boolean>(false);
+  const [isOpenConfirmAction, setIsOpenConfirmAction] =
+    useState<boolean>(false);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [updData, setUpdData] = useState<TUser | undefined>(undefined);
+  const isForbiddenToDelete = (data: TUser): boolean => {
+    if (currentUser?.id === data.id || data.name === "admin") return true;
+    return false;
+  };
+
+  const isForbiddenToEdit = (data: TUser): boolean => {
+    if (currentUser?.id === data.id) return false;
+    if (data.name === "admin") return true;
+    return false;
+  };
 
   const thead = columns.map((column, index) => (
     <Table.Th w={column.size} key={index} className={classes.tableTh}>
@@ -38,7 +59,7 @@ const Users = () => {
             color={column.sorted ? "blue" : "violet"}
             size="compact-sm"
             m={0}
-            disabled={isLoading || !users.length}
+            disabled={status.read.loading || !users.length}
           >
             {column.label}
           </Button>
@@ -48,7 +69,7 @@ const Users = () => {
   ));
 
   const rows =
-    !isLoading &&
+    !status.read.loading &&
     users.map((item) => (
       <Table.Tr key={item.id}>
         <Table.Td>{item.name}</Table.Td>
@@ -59,16 +80,49 @@ const Users = () => {
         </Table.Td>
         <Table.Td>
           <ActionButtons
-            handleClickFromEdit={() => ""}
-            handleClickFromDelete={() => ""}
+            handleClickFromEdit={() => {
+              setUserId(item.id);
+              setIsOpenSaveForm(true);
+              setUpdData(users.find((user) => user.id === item.id));
+            }}
+            handleClickFromDelete={() => {
+              setUserId(item.id);
+              setIsOpenConfirmAction(true);
+            }}
+            disabledEditButton={isForbiddenToEdit(item)}
+            disabledDeleteButton={isForbiddenToDelete(item)}
           />
         </Table.Td>
       </Table.Tr>
     ));
 
   useEffect(() => {
-    dispath(findAllUsers());
-  }, [dispath]);
+    dispatch(findAllUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!errors && status.create.success) {
+      setIsOpenSaveForm(false);
+    }
+  }, [errors, status.create.success]);
+
+  useEffect(() => {
+    if (!errors && status.update.success) {
+      setIsOpenSaveForm(false);
+      setUpdData(undefined);
+    }
+  }, [errors, status.update.success]);
+
+  useEffect(() => {
+    if (!errors && status.delete.success) {
+      setIsOpenConfirmAction(false);
+    }
+  }, [errors, status.delete.success]);
+
+  useEffect(() => {
+    dispatch(resetErrors());
+    setUserId(undefined);
+  }, [dispatch, isOpenSaveForm]);
 
   return (
     <>
@@ -78,13 +132,15 @@ const Users = () => {
           <Button
             variant="light"
             leftSection={<Icons.IconPlus className={classes.icon} />}
-            onClick={open}
+            onClick={() => setIsOpenSaveForm(true)}
           >
             Добавить
           </Button>
         </div>
         <div className={classes.tableBox}>
           <Table
+            maw={widthTable}
+            miw={widthTable - 100}
             striped
             highlightOnHover
             horizontalSpacing="md"
@@ -98,12 +154,45 @@ const Users = () => {
                 <Table.Th w={widthColumnFromActionButtons}>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{!isLoading && rows}</Table.Tbody>
+            <Table.Tbody>{!status.read.loading && rows}</Table.Tbody>
           </Table>
+          {status.read.loading && <Loader />}
         </div>
       </div>
-      <Modal title="Новый пользователь" opened={opened} close={close} size="sm">
-        <FormSaveUser onClose={close} />
+      <Modal
+        title={!updData ? "Новый пользователь" : "Редактировать запись"}
+        opened={isOpenSaveForm}
+        close={() => {
+          setUpdData(undefined);
+          setIsOpenSaveForm(false);
+        }}
+        size="sm"
+      >
+        <FormSaveUser
+          onClose={() => {
+            setUpdData(undefined);
+            setIsOpenSaveForm(false);
+          }}
+          updData={updData}
+          errors={errors}
+        />
+      </Modal>
+
+      <Modal
+        title="Подтверждение действия"
+        opened={isOpenConfirmAction}
+        close={() => setIsOpenConfirmAction(false)}
+        closeButton={false}
+        size="md"
+      >
+        <Text>
+          Вы уверены, что хотите удалить запись? Это действие нельзя отменить.
+        </Text>
+        <ButtonsFromDeleteForm
+          loading={status.delete.loading}
+          onClickToCancel={() => setIsOpenConfirmAction(false)}
+          onClickToDelete={() => userId && dispatch(deleteUser(userId))}
+        />
       </Modal>
     </>
   );

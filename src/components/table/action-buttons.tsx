@@ -6,11 +6,15 @@ import classes from "@components/table/table.module.css";
 type TActionButtons = {
   handleClickFromEdit: () => void;
   handleClickFromDelete: () => void;
+  disabledEditButton?: boolean;
+  disabledDeleteButton?: boolean;
 };
 
 const ActionButtons: FC<TActionButtons> = ({
   handleClickFromEdit,
   handleClickFromDelete,
+  disabledEditButton,
+  disabledDeleteButton,
 }) => {
   return (
     <div className={classes.actionButtons}>
@@ -20,6 +24,7 @@ const ActionButtons: FC<TActionButtons> = ({
         radius="xl"
         color="orange"
         onClick={handleClickFromEdit}
+        disabled={disabledEditButton}
       >
         <Icons.IconEdit className={classes.iconActionButtons} />
       </ActionIcon>
@@ -29,6 +34,7 @@ const ActionButtons: FC<TActionButtons> = ({
         radius="xl"
         color="red"
         onClick={handleClickFromDelete}
+        disabled={disabledDeleteButton}
       >
         <Icons.IconTrash className={classes.iconActionButtons} />
       </ActionIcon>

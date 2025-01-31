@@ -22,7 +22,13 @@ const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
       >
         Отменить
       </Button>
-      <Button variant="filled" color="green" type="submit" loading={loading} onClick={onClick}>
+      <Button
+        variant="filled"
+        color="green"
+        type="submit"
+        loading={loading}
+        onClick={onClick}
+      >
         Сохранить
       </Button>
     </Group>
