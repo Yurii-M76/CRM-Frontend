@@ -21,6 +21,9 @@ const Modal: FC<TModal> = ({
   centered,
   children,
 }) => {
+
+  const screenWidth = screen.width;
+
   return (
     <MantineModal
       opened={opened}
@@ -29,6 +32,7 @@ const Modal: FC<TModal> = ({
       centered={centered}
       title={title}
       size={size ? size : "md"}
+      fullScreen={screenWidth <= 400 ? true : false}
     >
       {children}
     </MantineModal>
