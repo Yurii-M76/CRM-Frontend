@@ -22,12 +22,14 @@ type TTableToolbar = {
   buttons: TButtons;
   disabledButtons?: TDisabledButtons;
   openedSaveForm?: () => void;
+  openedFiltersForm?: () => void;
   search?: ReactNode;
 };
 
 const TableToolbar: FC<TTableToolbar> = ({
   isLoading,
   openedSaveForm,
+  openedFiltersForm,
   buttons,
   disabledButtons,
   search,
@@ -82,9 +84,10 @@ const TableToolbar: FC<TTableToolbar> = ({
 
   const filterButton = buttons.filterButton && (
     <Button
-      variant="default"
+      variant="outline"
       rightSection={<Icons.IconFliter className={classes.icon} />}
       disabled={disabledButtons?.filterButton}
+      onClick={openedFiltersForm}
     >
       Фильтры
     </Button>
