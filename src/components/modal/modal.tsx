@@ -32,7 +32,7 @@ const Modal: FC<TModal> = ({
       centered={centered}
       title={title}
       size={size ? size : "md"}
-      fullScreen={screenWidth <= 400 ? true : false}
+      fullScreen={screenWidth <= 500 ? true : false}
     >
       {children}
     </MantineModal>
