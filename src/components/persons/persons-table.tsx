@@ -245,7 +245,7 @@ const PersonsTable = () => {
             addButton: false,
             downloadButton: true,
             uploadButton: true,
-            filterButton: false,
+            filterButton: true,
           }}
           search={
             <Search
