@@ -13,6 +13,8 @@
       "@assets/*": ["src/assets/*"],
       "@components": ["src/components"],
       "@components/*": ["src/components/*"],
+      "@forms": ["src/components/forms"],
+      "@forms/*": ["src/components/forms/*"],
       "@pages": ["src/pages"],
       "@pages/*": ["src/pages/*"],
       "@services": ["src/services"],
