@@ -25,3 +25,38 @@ export enum Role {
   DRIVER = "Водитель",
   DELEGATE = "Представитель",
 }
+
+export type TPersonsFilters = {
+  surname: string;
+  name: string;
+  patronymic: string;
+  birthday: string;
+  phone: string;
+  email: string;
+  districts: TDistrict[];
+  roles: string[];
+  projects: TProject[];
+  car: string;
+  organization: string;
+  note: string;
+  isNotEmptySurname: boolean;
+  isNotEmptyPatronymic: boolean;
+  isNotEmptyBirthday: boolean;
+  isNotEmptyPhone: boolean;
+  isNotEmptyEmail: boolean;
+  isNotEmptyRoles: boolean;
+  isNotEmptyProjects: boolean;
+  isNotEmptyCar: boolean;
+  isNotEmptyOrganization: boolean;
+  isNotEmptyNote: boolean;
+  isEmptySurname: boolean;
+  isEmptyPatronymic: boolean;
+  isEmptyBirthday: boolean;
+  isEmptyPhone: boolean;
+  isEmptyEmail: boolean;
+  isEmptyRoles: boolean;
+  isEmptyProjects: boolean;
+  isEmptyCar: boolean;
+  isEmptyOrganization: boolean;
+  isEmptyNote: boolean;
+};
