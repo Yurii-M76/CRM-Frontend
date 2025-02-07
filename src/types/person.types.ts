@@ -26,19 +26,8 @@ export enum Role {
   DELEGATE = "Представитель",
 }
 
-export type TPersonsFilters = {
-  surname: string;
-  name: string;
-  patronymic: string;
-  birthday: string;
-  phone: string;
-  email: string;
-  districts: TDistrict[];
-  roles: string[];
-  projects: TProject[];
-  car: string;
-  organization: string;
-  note: string;
+export interface TPersonsFilters
+  extends Omit<TPerson, "id" | "fullName" | "createdAt"> {
   isNotEmptySurname: boolean;
   isNotEmptyPatronymic: boolean;
   isNotEmptyBirthday: boolean;
@@ -59,4 +48,4 @@ export type TPersonsFilters = {
   isEmptyCar: boolean;
   isEmptyOrganization: boolean;
   isEmptyNote: boolean;
-};
+}
