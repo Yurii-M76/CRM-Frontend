@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button, Tooltip } from "@mantine/core";
 import { FC, ReactNode } from "react";
 import * as Icons from "@assets/icons";
 import classes from "./table-toolbar.module.css";
@@ -8,6 +8,8 @@ type TButtons = {
   downloadButton: boolean;
   uploadButton: boolean;
   filterButton: boolean;
+  isFiltered?: boolean;
+  resetFilters?: () => void;
 };
 
 type TDisabledButtons = {
@@ -83,14 +85,31 @@ const TableToolbar: FC<TTableToolbar> = ({
   );
 
   const filterButton = buttons.filterButton && (
-    <Button
-      variant="outline"
-      rightSection={<Icons.IconFliter className={classes.icon} />}
-      disabled={disabledButtons?.filterButton}
-      onClick={openedFiltersForm}
-    >
-      Фильтры
-    </Button>
+    <Button.Group>
+      <Button
+        variant="light"
+        color="blue"
+        rightSection={<Icons.IconFliter className={classes.icon} />}
+        disabled={disabledButtons?.filterButton}
+        onClick={openedFiltersForm}
+      >
+        Фильтры
+      </Button>
+      {buttons.isFiltered && (
+        <Tooltip label="Сбросить фильтрацию">
+          <Button
+            variant="light"
+            color="red"
+            w={36}
+            p={0}
+            m={0}
+            onClick={buttons.resetFilters}
+          >
+            <Icons.IconX className={classes.icon} />
+          </Button>
+        </Tooltip>
+      )}
+    </Button.Group>
   );
 
   const isRightButtonsGroup = Object.values(buttons).some(
