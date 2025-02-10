@@ -7,9 +7,14 @@ import {
   getAllPersons,
   updatePerson,
 } from "./action";
-import { TPerson } from "../../types/person.types";
-import { filterData, pagination, sortData } from "../../utils/index";
+import {
+  filterData,
+  formatDateToString,
+  pagination,
+  sortData,
+} from "@utils/index";
 import { handleAllChecked, handleOneChecked } from "./checked-handlers";
+import { TPerson, TPersonsFilters, TDistrict, TProject } from "@/types";
 
 type TStatus = {
   loading: boolean;
@@ -23,7 +28,7 @@ type TStatuses = {
   delete: TStatus;
 };
 
-type TInitialStateTable = {
+type TInitialState = {
   status: TStatuses;
   count: number;
   items: TPerson[];
@@ -36,13 +41,15 @@ type TInitialStateTable = {
   error?: string | null;
   checkPhone: { id: string } | null;
   checkEmail: { id: string } | null;
+  isFiltered: boolean;
+  filterValues: Partial<TPersonsFilters> | undefined;
 };
 
 const defaultStatus = { loading: false, success: false };
 const statusPending = { loading: true, success: false };
 const statusFulfilled = { loading: false, success: true };
 
-const initialState: TInitialStateTable = {
+const initialState: TInitialState = {
   status: {
     create: defaultStatus,
     read: defaultStatus,
@@ -60,9 +67,44 @@ const initialState: TInitialStateTable = {
   error: null,
   checkPhone: null,
   checkEmail: null,
+  isFiltered: false,
+  filterValues: {
+    surname: "",
+    name: "",
+    patronymic: "",
+    birthday: "",
+    phone: "",
+    email: "",
+    districts: [],
+    roles: [],
+    projects: [],
+    car: "",
+    organization: "",
+    note: "",
+    isNotEmptySurname: false,
+    isNotEmptyPatronymic: false,
+    isNotEmptyBirthday: false,
+    isNotEmptyPhone: false,
+    isNotEmptyEmail: false,
+    isNotEmptyRoles: false,
+    isNotEmptyProjects: false,
+    isNotEmptyCar: false,
+    isNotEmptyOrganization: false,
+    isNotEmptyNote: false,
+    isEmptySurname: false,
+    isEmptyPatronymic: false,
+    isEmptyBirthday: false,
+    isEmptyPhone: false,
+    isEmptyEmail: false,
+    isEmptyRoles: false,
+    isEmptyProjects: false,
+    isEmptyCar: false,
+    isEmptyOrganization: false,
+    isEmptyNote: false,
+  },
 };
 
-const currentState = (state: TInitialStateTable) => {
+const currentState = (state: TInitialState) => {
   return pagination(
     sortData(state.originalItems, state.sortBy, state.sortOrder),
     state.activePage,
@@ -81,7 +123,12 @@ const formatPhoneNumber = (number: string) => {
   const phoneNumber = number.split("");
   const phoneFormatNumber = `(${phoneNumber[0]}${phoneNumber[1]}${phoneNumber[2]}) ${phoneNumber[3]}${phoneNumber[4]}${phoneNumber[5]}-${phoneNumber[6]}${phoneNumber[7]}-${phoneNumber[8]}${phoneNumber[9]}`;
   return phoneFormatNumber;
-}
+};
+
+const normalizedString = (query: string): string => {
+  if (!query) return "";
+  return query.trim().toLowerCase();
+};
 
 export const PersonSlice = createSlice({
   name: "person",
@@ -136,6 +183,117 @@ export const PersonSlice = createSlice({
       state.checkedIds = [];
       state.items = currentState(state);
     },
+    setFilters: (state, action: PayloadAction<TPersonsFilters>) => {
+      const query = action.payload;
+      console.log(query);
+      const filteredItems = [...state.originalItems].filter((item) => {
+        const conditions = [
+          query.isNotEmptySurname
+            ? item.surname
+            : query.isEmptySurname
+            ? !item.surname
+            : query.surname
+            ? normalizedString(item.surname) === normalizedString(query.surname)
+            : true,
+          query.name
+            ? normalizedString(item.name) === normalizedString(query.name)
+            : true,
+          query.isNotEmptyPatronymic
+            ? item.patronymic
+            : query.isEmptyPatronymic
+            ? !item.patronymic
+            : query.patronymic
+            ? normalizedString(item.patronymic) ===
+              normalizedString(query.patronymic)
+            : true,
+          query.isNotEmptyBirthday
+            ? item.birthday
+            : query.isEmptyBirthday
+            ? !item.birthday
+            : query.birthday
+            ? item.birthday ===
+              formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
+            : true,
+            query.isNotEmptyPhone
+            ? item.phone
+            : query.isEmptyPhone
+            ? !item.phone
+            : query.phone
+            ? item.phone === query.phone
+            : true,
+          query.isNotEmptyEmail
+            ? item.email
+            : query.isEmptyEmail
+            ? !item.email
+            : query.email
+            ? normalizedString(item.email) === normalizedString(query.email)
+            : true,
+          query.districts?.length
+            ? item.districts.some((district) =>
+                query.districts?.some(
+                  (d: TDistrict) => d.toString() === district.id.toString()
+                )
+              )
+            : true,
+          query.isNotEmptyRoles
+            ? item.roles.length > 0
+            : query.isEmptyRoles
+            ? !item.roles.length
+            : query.roles?.length
+            ? item.roles.some((role) => query.roles?.some((r) => r === role))
+            : true,
+          query.isNotEmptyProjects
+            ? item.projects.length > 0
+            : query.isEmptyProjects
+            ? !item.projects.length
+            : query.projects?.length
+            ? item.projects.some((project) =>
+                query.projects?.some(
+                  (p: TProject) => p.toString() === project.id.toString()
+                )
+              )
+            : true,
+          query.isNotEmptyCar
+            ? item.car
+            : query.isEmptyCar
+            ? !item.car
+            : query.car
+            ? item.car &&
+              normalizedString(item.car).includes(normalizedString(query.car))
+            : true,
+          query.isNotEmptyOrganization
+            ? item.organization
+            : query.isEmptyOrganization
+            ? !item.organization
+            : query.organization
+            ? item.organization &&
+              normalizedString(item.organization).includes(
+                normalizedString(query.organization)
+              )
+            : true,
+          query.isNotEmptyNote
+            ? item.note
+            : query.isEmptyNote
+            ? !item.note
+            : query.note
+            ? item.note &&
+              normalizedString(item.note).includes(normalizedString(query.note))
+            : true,
+        ];
+        state.isFiltered = true;
+        return conditions.every((condition) => condition);
+      });
+
+      state.items = filteredItems;
+      state.count = filteredItems.length;
+      state.filterValues = query;
+    },
+    resetFilters: (state) => {
+      state.items = currentState(state);
+      state.count = state.originalItems.length;
+      state.isFiltered = false;
+      state.filterValues = undefined;
+    },
   },
   selectors: {
     getPersonsStatus: (state) => state.status,
@@ -149,6 +307,8 @@ export const PersonSlice = createSlice({
     getErrors: (state) => state.error,
     getCheckPhone: (state) => state.checkPhone,
     getCheckEmail: (state) => state.checkEmail,
+    getIsFiltered: (state) => state.isFiltered,
+    getFilterValues: (state) => state.filterValues,
   },
   extraReducers(builder) {
     builder // Create
@@ -251,6 +411,8 @@ export const {
   setOneChecked,
   setAllChecked,
   resetAllChecked,
+  setFilters,
+  resetFilters,
 } = PersonSlice.actions;
 export const {
   getPersonsStatus,
@@ -264,5 +426,7 @@ export const {
   getErrors,
   getCheckPhone,
   getCheckEmail,
+  getIsFiltered,
+  getFilterValues,
 } = PersonSlice.selectors;
 export default PersonSlice;
