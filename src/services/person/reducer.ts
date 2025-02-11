@@ -180,13 +180,13 @@ export const PersonSlice = createSlice({
         "email",
         "birthday",
       ]);
-      state.items = currentState(state);
+      state.items = state.searchedItems;
       state.count = state.items.length;
     },
     resetSearch: (state) => {
       state.searchedItems = [];
       resetSorting(state);
-      state.items = state.originalItems;
+      state.items = currentState(state);
       state.count = state.originalItems.length;
     },
     setActivePage: (state, action: PayloadAction<number>) => {
@@ -203,6 +203,7 @@ export const PersonSlice = createSlice({
       state.checkedIds = [];
       state.items = currentState(state);
     },
+
     setFilters: (state, action: PayloadAction<TPersonsFilters>) => {
       const query = action.payload;
 
@@ -307,7 +308,7 @@ export const PersonSlice = createSlice({
       });
 
       state.filteredItems = filteredItems;
-      state.items = currentState(state);
+      state.items = state.filteredItems;
       state.count = filteredItems.length;
       state.filterValues = query;
     },
