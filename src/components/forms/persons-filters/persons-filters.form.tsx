@@ -9,11 +9,13 @@ import {
   Badge,
   InputBase,
   Chip,
+  OptionsFilter,
+  ComboboxItem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
 import { IMaskInput } from "react-imask";
-import { FC, useEffect } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import {
   validationEmail,
   validationName,
@@ -21,51 +23,23 @@ import {
   validationPhone,
   validationSurname,
 } from "@forms";
-import { Role, TDistrict, TProject } from "@/types";
+import { useDispatch, useSelector } from "@/services/store";
+import {
+  getFilterValues,
+  resetFilters,
+  setFilters,
+} from "@/services/person/reducer";
+import { Role, TDistrict, TPersonsFilters, TProject } from "@/types";
 import classes from "../forms.module.css";
 
 type TPersonsFiltersForm = {
-  roles: {
+  rolesData: {
     value: string;
     label: Role;
   }[];
-  projects: TProject[];
-  districts: TDistrict[];
-};
-
-type TInitialValues = {
-  surname: string;
-  name: string;
-  patronymic: string;
-  birthday: Date | null;
-  phone: string;
-  email: string;
-  districts: string[];
-  roles: string[];
-  projects: string[];
-  car: string;
-  organization: string;
-  note: string;
-  isNotEmptySurname: boolean;
-  isNotEmptyPatronymic: boolean;
-  isNotEmptyBirthday: boolean;
-  isNotEmptyPhone: boolean;
-  isNotEmptyEmail: boolean;
-  isNotEmptyRoles: boolean;
-  isNotEmptyProjects: boolean;
-  isNotEmptyCar: boolean;
-  isNotEmptyOrganization: boolean;
-  isNotEmptyNote: boolean;
-  isEmptySurname: boolean;
-  isEmptyPatronymic: boolean;
-  isEmptyBirthday: boolean;
-  isEmptyPhone: boolean;
-  isEmptyEmail: boolean;
-  isEmptyRoles: boolean;
-  isEmptyProjects: boolean;
-  isEmptyCar: boolean;
-  isEmptyOrganization: boolean;
-  isEmptyNote: boolean;
+  projectsData: TProject[];
+  districtsData: TDistrict[];
+  onClickFiltered: () => void;
 };
 
 enum fieldNames {
@@ -84,15 +58,19 @@ enum fieldNames {
 }
 
 const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
-  roles,
-  projects,
-  districts,
+  rolesData,
+  projectsData,
+  districtsData,
+  onClickFiltered,
 }) => {
-  const initialValues: TInitialValues = {
+  const dispatch = useDispatch();
+  const filterValues = useSelector(getFilterValues);
+
+  const initialValues: TPersonsFilters = {
     surname: "",
     name: "",
     patronymic: "",
-    birthday: null,
+    birthday: "",
     phone: "",
     email: "",
     districts: [],
@@ -130,140 +108,124 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
       surname: (value) => validationSurname(value),
       name: (value) => validationName(value),
       patronymic: (value) => validationPatronymic(value),
-      phone: (value) => validationPhone(value, 18),
+      phone: (value) => validationPhone(value, 15),
       email: (value) => validationEmail(value),
     },
   });
 
-  const isExistValues = Object.values(form.getDirty()).some((item) =>
-    Array.isArray(item) ? item.length > 0 : item
-  );
+  const {
+    surname,
+    name,
+    patronymic,
+    birthday,
+    phone,
+    email,
+    districts,
+    roles,
+    projects,
+    car,
+    organization,
+    note,
+    isNotEmptySurname,
+    isNotEmptyPatronymic,
+    isNotEmptyBirthday,
+    isNotEmptyPhone,
+    isNotEmptyEmail,
+    isNotEmptyRoles,
+    isNotEmptyProjects,
+    isNotEmptyCar,
+    isNotEmptyOrganization,
+    isNotEmptyNote,
+    isEmptySurname,
+    isEmptyPatronymic,
+    isEmptyBirthday,
+    isEmptyPhone,
+    isEmptyEmail,
+    isEmptyRoles,
+    isEmptyProjects,
+    isEmptyCar,
+    isEmptyOrganization,
+    isEmptyNote,
+  } = form.getValues();
 
-  const isNotEmptySurname: boolean = form.getValues().isNotEmptySurname;
-  const isEmptySurname: boolean = form.getValues().isEmptySurname;
-  const isChipsOnSurname: boolean = isNotEmptySurname || isEmptySurname;
-  const surnameValue: string = form.getValues().surname;
+  const isChipsOnSurname = isNotEmptySurname || isEmptySurname;
+  const isChipsOnPatronymic = isNotEmptyPatronymic || isEmptyPatronymic;
+  const isChipsOnBirthday = isNotEmptyBirthday || isEmptyBirthday;
+  const isChipsOnPhone = isNotEmptyPhone || isEmptyPhone;
+  const isChipsOnEmail = isNotEmptyEmail || isEmptyEmail;
+  const isChipsOnRoles = isNotEmptyRoles || isEmptyRoles;
+  const isChipsOnProjects = isNotEmptyProjects || isEmptyProjects;
+  const isChipsOnCar = isNotEmptyCar || isEmptyCar;
+  const isChipsOnOrganization = isNotEmptyOrganization || isEmptyOrganization;
+  const isChipsOnNote = isNotEmptyNote || isEmptyNote;
 
-  const nameValue: string = form.getValues().name;
+  const isFormFiledValues = Object.values(form.getValues()).some((item) => {
+    if (!item) return false;
+    if (typeof item === "string" && item.trim() !== "") {
+      return true;
+    }
+    if (typeof item === "object" && Object.values(item).length > 0) {
+      return true;
+    }
+    if (typeof item === "boolean" && item === true) {
+      return true;
+    }
+  });
 
-  const isNotEmptyPatronymic: boolean = form.getValues().isNotEmptyPatronymic;
-  const isEmptyPatronymic: boolean = form.getValues().isEmptyPatronymic;
-  const isChipsOnPatronymic: boolean =
-    isNotEmptyPatronymic || isEmptyPatronymic;
-  const patronymicValue: string = form.getValues().patronymic;
+  const setBadgeForFilteredFileld = (
+    value: string | number | Date | null,
+    label: string,
+    isChips?: boolean
+  ): ReactNode => {
+    return (
+      (value || isChips) && (
+        <Badge variant="light" color="blue">
+          {label}
+        </Badge>
+      )
+    );
+  };
 
-  const isNotEmptyBirthday: boolean = form.getValues().isNotEmptyBirthday;
-  const isEmptyBirthday: boolean = form.getValues().isEmptyBirthday;
-  const isChipsOnBirthday: boolean = isNotEmptyBirthday || isEmptyBirthday;
-  const birthdayValue: Date | null = form.getValues().birthday;
-
-  const isNotEmptyPhone: boolean = form.getValues().isNotEmptyPhone;
-  const isEmptyPhone: boolean = form.getValues().isEmptyPhone;
-  const isChipsOnPhone: boolean = isNotEmptyPhone || isEmptyPhone;
-  const phoneValue: string = form.getValues().phone;
-
-  const isNotEmptyEmail: boolean = form.getValues().isNotEmptyEmail;
-  const isEmptyEmail: boolean = form.getValues().isEmptyEmail;
-  const isChipsOnEmail: boolean = isNotEmptyEmail || isEmptyEmail;
-  const emailValue: string = form.getValues().email;
-
-  const districtValue: string[] = form.getValues().districts;
-
-  const isNotEmptyRoles: boolean = form.getValues().isNotEmptyRoles;
-  const isEmptyRoles: boolean = form.getValues().isEmptyRoles;
-  const isChipsOnRoles: boolean = isNotEmptyRoles || isEmptyRoles;
-  const rolesValue: string[] = form.getValues().roles;
-
-  const isNotEmptyProjects: boolean = form.getValues().isNotEmptyProjects;
-  const isEmptyProjects: boolean = form.getValues().isEmptyProjects;
-  const isChipsOnProjects: boolean = isNotEmptyProjects || isEmptyProjects;
-  const projectsValue: string[] = form.getValues().projects;
-
-  const isNotEmptyCar: boolean = form.getValues().isNotEmptyCar;
-  const isEmptyCar: boolean = form.getValues().isEmptyCar;
-  const isChipsOnCar: boolean = isNotEmptyCar || isEmptyCar;
-  const carValue: string = form.getValues().car;
-
-  const isNotEmptyOrganization: boolean =
-    form.getValues().isNotEmptyOrganization;
-  const isEmptyOrganization: boolean = form.getValues().isEmptyOrganization;
-  const isChipsOnOrganization: boolean =
-    isNotEmptyOrganization || isEmptyOrganization;
-  const organizationValue: string = form.getValues().organization;
-
-  const isNotEmptyNote: boolean = form.getValues().isNotEmptyNote;
-  const isEmptyNote: boolean = form.getValues().isEmptyNote;
-  const isChipsOnNote: boolean = isNotEmptyNote || isEmptyNote;
-  const noteValue: string = form.getValues().note;
-
-  const fieldValues = (
+  const filteredFilelds = (
     <Group gap={4}>
-      {(surnameValue || isChipsOnSurname) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.surname}
-        </Badge>
+      {setBadgeForFilteredFileld(surname, fieldNames.surname, isChipsOnSurname)}
+      {setBadgeForFilteredFileld(name, fieldNames.name)}
+      {setBadgeForFilteredFileld(
+        patronymic,
+        fieldNames.patronymic,
+        isChipsOnPatronymic
       )}
-      {nameValue && (
-        <Badge variant="light" color="blue">
-          {fieldNames.name}
-        </Badge>
+      {setBadgeForFilteredFileld(
+        birthday,
+        fieldNames.birthday,
+        isChipsOnBirthday
       )}
-      {(patronymicValue || isChipsOnPatronymic) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.patronymic}
-        </Badge>
+      {setBadgeForFilteredFileld(phone, fieldNames.phone, isChipsOnPhone)}
+      {setBadgeForFilteredFileld(email, fieldNames.email, isChipsOnEmail)}
+      {setBadgeForFilteredFileld(districts.length, fieldNames.districts)}
+      {setBadgeForFilteredFileld(
+        roles.length,
+        fieldNames.roles,
+        isChipsOnRoles
       )}
-      {(birthdayValue || isChipsOnBirthday) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.birthday}
-        </Badge>
+      {setBadgeForFilteredFileld(
+        projects.length,
+        fieldNames.projects,
+        isChipsOnProjects
       )}
-      {(phoneValue || isChipsOnPhone) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.phone}
-        </Badge>
+      {setBadgeForFilteredFileld(car, fieldNames.car, isChipsOnCar)}
+      {setBadgeForFilteredFileld(
+        organization,
+        fieldNames.organization,
+        isChipsOnOrganization
       )}
-      {(emailValue || isChipsOnEmail) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.email}
-        </Badge>
-      )}
-      {districtValue.length && (
-        <Badge variant="light" color="blue">
-          {fieldNames.districts}
-        </Badge>
-      )}
-      {(rolesValue.length || isChipsOnRoles) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.roles}
-        </Badge>
-      )}
-      {(projectsValue.length || isChipsOnProjects) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.projects}
-        </Badge>
-      )}
-      {(carValue || isChipsOnCar) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.car}
-        </Badge>
-      )}
-      {(organizationValue || isChipsOnOrganization) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.organization}
-        </Badge>
-      )}
-      {(noteValue || isChipsOnNote) && (
-        <Badge variant="light" color="blue">
-          {fieldNames.note}
-        </Badge>
-      )}
+      {setBadgeForFilteredFileld(note, fieldNames.note, isChipsOnNote)}
     </Group>
   );
 
   const chipsGroup = (
-    keyNotEmpty: keyof TInitialValues,
-    keyEmpty: keyof TInitialValues,
+    keyNotEmpty: keyof Omit<TPersonsFilters, "id">,
+    keyEmpty: keyof Omit<TPersonsFilters, "id">,
     notEmpty: boolean | undefined,
     empty: boolean | undefined
   ) => {
@@ -297,24 +259,41 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
     );
   };
 
+  const optionsFilter: OptionsFilter = ({ options, search }) => {
+    const filtered = (options as ComboboxItem[]).filter((option) =>
+      option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
+    );
+
+    filtered.sort((a, b) => a.label.localeCompare(b.label));
+    return filtered;
+  };
+
+  const handleSubmit = () => {
+    dispatch(setFilters(form.getValues()));
+  };
+
+  const handleReset = () => {
+    dispatch(resetFilters());
+    form.reset();
+  };
+
   useEffect(() => {
-    if (isChipsOnSurname) form.setFieldValue("surname", "");
-    if (isChipsOnPatronymic) form.setFieldValue("patronymic", "");
-    if (isChipsOnBirthday) form.setFieldValue("birthday", null);
-    if (isChipsOnPhone) form.setFieldValue("phone", "");
-    if (isChipsOnEmail) form.setFieldValue("email", "");
-    if (isChipsOnRoles) form.setFieldValue("roles", []);
-    if (isChipsOnProjects) form.setFieldValue("projects", []);
-    if (isChipsOnCar) form.setFieldValue("car", "");
-    if (isChipsOnOrganization) form.setFieldValue("organization", "");
-    if (isChipsOnNote) form.setFieldValue("note", "");
+    if (filterValues) {
+      // установка значений в поля формы при активном фильтре
+      Object.keys(initialValues).forEach((key) => {
+        const value = filterValues[key as keyof TPersonsFilters];
+        if (value !== undefined) {
+          form.setFieldValue(key, value);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.getValues()]);
+  }, [filterValues]);
 
   return (
     <form
       className={classes.form}
-      onSubmit={form.onSubmit((values) => console.log(values))}
+      onSubmit={form.onSubmit(handleSubmit)}
       onReset={form.reset}
     >
       <Tabs defaultValue="basic">
@@ -386,10 +365,21 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
                     label={fieldNames.birthday}
                     valueFormat="DD.MM.YYYY"
                     key={form.key("birthday")}
-                    {...form.getInputProps("birthday")}
+                    onChange={(value) => {
+                      if (value !== null) {
+                        form.setFieldValue("birthday", String(value));
+                      } else {
+                        form.setFieldValue("birthday", null);
+                      }
+                    }}
+                    defaultValue={
+                      filterValues?.birthday
+                        ? new Date(filterValues?.birthday)
+                        : undefined
+                    }
                     className={classes.formInput}
                     disabled={isChipsOnBirthday}
-                    clearable
+                    clearable={!isChipsOnBirthday}
                   />
                   {chipsGroup(
                     "isNotEmptyBirthday",
@@ -454,12 +444,13 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
               <MultiSelect
                 label={fieldNames.districts}
                 key={form.key("districts")}
-                data={districts.map((item) => ({
+                data={districtsData.map((item) => ({
                   value: item.id,
                   label: item.name,
                 }))}
                 {...form.getInputProps("districts")}
                 className={classes.formInput}
+                filter={optionsFilter}
                 clearable
               />
             </div>
@@ -476,7 +467,7 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
                 <MultiSelect
                   label={fieldNames.roles}
                   key={form.key("roles")}
-                  data={roles}
+                  data={rolesData}
                   {...form.getInputProps("roles")}
                   className={classes.formInput}
                   disabled={isChipsOnRoles}
@@ -496,7 +487,7 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
                 <MultiSelect
                   label={fieldNames.projects}
                   key={form.key("projects")}
-                  data={projects.map((item) => ({
+                  data={projectsData.map((item) => ({
                     value: item.id,
                     label: item.title,
                   }))}
@@ -577,8 +568,8 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
         </Tabs.Panel>
       </Tabs>
 
-      {isExistValues && (
-        <Fieldset legend="Фильтруемые поля">{fieldValues}</Fieldset>
+      {isFormFiledValues && (
+        <Fieldset legend="Фильтруемые поля">{filteredFilelds}</Fieldset>
       )}
 
       <Group mt="lg" justify="flex-end" gap={8}>
@@ -586,11 +577,15 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
           type="reset"
           variant="subtle"
           color="gray"
-          disabled={!isExistValues}
+          onClick={handleReset}
         >
           Очистить
         </Button>
-        <Button type="submit" disabled={!isExistValues}>
+        <Button
+          type="submit"
+          disabled={!isFormFiledValues}
+          onClick={form.isValid() ? onClickFiltered : undefined}
+        >
           Фильтровать
         </Button>
       </Group>

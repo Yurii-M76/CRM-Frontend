@@ -19,6 +19,8 @@ import {
   resetSort,
   resetAllChecked,
   getPersonsStatus,
+  getIsFiltered,
+  resetFilters,
 } from "@/services/person/reducer";
 import { resetSearch, setSearch } from "@/services/person/reducer";
 import { getProjects } from "@/services/project/reducer";
@@ -71,6 +73,7 @@ const PersonsTable = () => {
   const checkedIds = useSelector(getOneChecked);
   const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
+  const isFiltered = useSelector(getIsFiltered);
   const [isOpenCreateForm, setIsOpenCreateForm] = useState(false);
   const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
   const [isOpenFiltersForm, setIsOpenFiltersForm] = useState(false);
@@ -240,12 +243,14 @@ const PersonsTable = () => {
             downloadButton: true,
             uploadButton: true,
             filterButton: true,
+            isFiltered: isFiltered,
+            resetFilters: () => dispatch(resetFilters()),
           }}
           disabledButtons={{
             addButton: false,
             downloadButton: true,
             uploadButton: true,
-            filterButton: true,
+            filterButton: false,
           }}
           search={
             <Search
@@ -362,9 +367,10 @@ const PersonsTable = () => {
         size="lg"
       >
         <PersonsFiltersForm
-          roles={personRoles}
-          districts={districts}
-          projects={projects}
+          rolesData={personRoles}
+          districtsData={districts}
+          projectsData={projects}
+          onClickFiltered={() => setIsOpenFiltersForm(false)}
         />
       </Modal>
     </>
