@@ -96,7 +96,7 @@ const TableToolbar: FC<TTableToolbar> = ({
         Фильтры
       </Button>
       {buttons.isFiltered && (
-        <Tooltip label="Сбросить фильтрацию">
+        <Tooltip label="Сбросить фильтры">
           <Button
             variant="light"
             color="red"
