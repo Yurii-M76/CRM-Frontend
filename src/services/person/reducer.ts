@@ -120,13 +120,13 @@ const updatedData = (items: TPerson[], action: PayloadAction<TPerson>) => {
 };
 
 const formatPhoneNumber = (number: string) => {
-  const phoneNumber = number.split("");
-  const phoneFormatNumber = `(${phoneNumber[0]}${phoneNumber[1]}${phoneNumber[2]}) ${phoneNumber[3]}${phoneNumber[4]}${phoneNumber[5]}-${phoneNumber[6]}${phoneNumber[7]}-${phoneNumber[8]}${phoneNumber[9]}`;
+  const phoneNumber = number.replace(/\D+/g, '');
+  const phoneFormatNumber = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 8)}-${phoneNumber.slice(8, 10)}`;
   return phoneFormatNumber;
 };
 
-const normalizedString = (query: string): string => {
-  if (!query) return "";
+const normalizedString = (query: string | undefined): string | undefined => {
+  if (!query) return undefined;
   return query.trim().toLowerCase();
 };
 
@@ -185,49 +185,73 @@ export const PersonSlice = createSlice({
     },
     setFilters: (state, action: PayloadAction<TPersonsFilters>) => {
       const query = action.payload;
-      console.log(query);
+
+      const checkCondition = (
+        itemValue: string | undefined,
+        queryValue: string | undefined,
+        isNotEmpty: boolean,
+        isEmpty: boolean
+      ) => {
+        if (isNotEmpty) return !!itemValue;
+        if (isEmpty) return !itemValue;
+        return queryValue
+          ? normalizedString(itemValue) === normalizedString(queryValue)
+          : true;
+      };
+
       const filteredItems = [...state.originalItems].filter((item) => {
         const conditions = [
-          query.isNotEmptySurname
-            ? item.surname
-            : query.isEmptySurname
-            ? !item.surname
-            : query.surname
-            ? normalizedString(item.surname) === normalizedString(query.surname)
-            : true,
-          query.name
-            ? normalizedString(item.name) === normalizedString(query.name)
-            : true,
-          query.isNotEmptyPatronymic
-            ? item.patronymic
-            : query.isEmptyPatronymic
-            ? !item.patronymic
-            : query.patronymic
-            ? normalizedString(item.patronymic) ===
-              normalizedString(query.patronymic)
-            : true,
-          query.isNotEmptyBirthday
-            ? item.birthday
-            : query.isEmptyBirthday
-            ? !item.birthday
-            : query.birthday
-            ? item.birthday ===
-              formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
-            : true,
-            query.isNotEmptyPhone
-            ? item.phone
-            : query.isEmptyPhone
-            ? !item.phone
-            : query.phone
-            ? item.phone === query.phone
-            : true,
-          query.isNotEmptyEmail
-            ? item.email
-            : query.isEmptyEmail
-            ? !item.email
-            : query.email
-            ? normalizedString(item.email) === normalizedString(query.email)
-            : true,
+          checkCondition(
+            item.surname,
+            query.surname,
+            query.isNotEmptySurname,
+            query.isEmptySurname
+          ),
+          checkCondition(item.name, query.name, false, false),
+          checkCondition(
+            item.patronymic,
+            query.patronymic,
+            query.isNotEmptyPatronymic,
+            query.isEmptyPatronymic
+          ),
+          checkCondition(
+            String(item.birthday),
+            query.birthday
+              ? formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
+              : undefined,
+            query.isNotEmptyBirthday,
+            query.isEmptyBirthday
+          ),
+          checkCondition(
+            item.phone,
+            query.phone,
+            query.isNotEmptyPhone,
+            query.isEmptyPhone
+          ),
+          checkCondition(
+            item.email,
+            query.email,
+            query.isNotEmptyEmail,
+            query.isEmptyEmail
+          ),
+          checkCondition(
+            item.car,
+            query.car,
+            query.isNotEmptyCar,
+            query.isEmptyCar
+          ),
+          checkCondition(
+            item.organization,
+            query.organization,
+            query.isNotEmptyOrganization,
+            query.isEmptyOrganization
+          ),
+          checkCondition(
+            item.note,
+            query.note,
+            query.isNotEmptyNote,
+            query.isEmptyNote
+          ),
           query.districts?.length
             ? item.districts.some((district) =>
                 query.districts?.some(
@@ -236,48 +260,22 @@ export const PersonSlice = createSlice({
               )
             : true,
           query.isNotEmptyRoles
-            ? item.roles.length > 0
+            ? item.roles.length
             : query.isEmptyRoles
             ? !item.roles.length
             : query.roles?.length
             ? item.roles.some((role) => query.roles?.some((r) => r === role))
             : true,
           query.isNotEmptyProjects
-            ? item.projects.length > 0
+            ? item.projects.length
             : query.isEmptyProjects
             ? !item.projects.length
             : query.projects?.length
             ? item.projects.some((project) =>
                 query.projects?.some(
-                  (p: TProject) => p.toString() === project.id.toString()
+                  (d: TProject) => d.toString() === project.id.toString()
                 )
               )
-            : true,
-          query.isNotEmptyCar
-            ? item.car
-            : query.isEmptyCar
-            ? !item.car
-            : query.car
-            ? item.car &&
-              normalizedString(item.car).includes(normalizedString(query.car))
-            : true,
-          query.isNotEmptyOrganization
-            ? item.organization
-            : query.isEmptyOrganization
-            ? !item.organization
-            : query.organization
-            ? item.organization &&
-              normalizedString(item.organization).includes(
-                normalizedString(query.organization)
-              )
-            : true,
-          query.isNotEmptyNote
-            ? item.note
-            : query.isEmptyNote
-            ? !item.note
-            : query.note
-            ? item.note &&
-              normalizedString(item.note).includes(normalizedString(query.note))
             : true,
         ];
         state.isFiltered = true;
