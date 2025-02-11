@@ -6,7 +6,7 @@ export type TPerson = {
   name: string;
   patronymic: string;
   fullName: string;
-  birthday: string;
+  birthday: string | Date | null;
   phone: string;
   email: string;
   roles: string[];
