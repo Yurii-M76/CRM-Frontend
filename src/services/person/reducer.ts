@@ -32,6 +32,8 @@ type TInitialState = {
   status: TStatuses;
   count: number;
   items: TPerson[];
+  searchedItems: TPerson[];
+  filteredItems: TPerson[];
   originalItems: TPerson[];
   sortBy: keyof TPerson;
   sortOrder: "asc" | "desc";
@@ -58,6 +60,8 @@ const initialState: TInitialState = {
   },
   count: 0,
   items: [],
+  searchedItems: [],
+  filteredItems: [],
   originalItems: [],
   checkedIds: [],
   sortBy: "createdAt",
@@ -105,8 +109,14 @@ const initialState: TInitialState = {
 };
 
 const currentState = (state: TInitialState) => {
+  const items = state.searchedItems.length
+    ? state.searchedItems
+    : state.filteredItems.length
+    ? state.filteredItems
+    : state.originalItems;
+
   return pagination(
-    sortData(state.originalItems, state.sortBy, state.sortOrder),
+    sortData(items, state.sortBy, state.sortOrder),
     state.activePage,
     state.rangeOnPage
   );
@@ -133,6 +143,11 @@ const normalizedString = (query: string | undefined): string | undefined => {
   return query.trim().toLowerCase();
 };
 
+const resetSorting = (state: TInitialState) => {
+  state.sortBy = "createdAt";
+  state.sortOrder = "desc";
+};
+
 export const PersonSlice = createSlice({
   name: "person",
   initialState,
@@ -150,8 +165,7 @@ export const PersonSlice = createSlice({
       state.items = currentState(state);
     },
     resetSort: (state) => {
-      state.sortBy = "createdAt";
-      state.sortOrder = "desc";
+      resetSorting(state);
       state.items = currentState(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
@@ -160,16 +174,19 @@ export const PersonSlice = createSlice({
       const isPhone = regex.test(query);
       const search = isPhone ? formatPhoneNumber(query) : query;
 
-      state.items = filterData([...state.originalItems], search, [
+      state.searchedItems = filterData([...state.originalItems], search, [
         "fullName",
         "phone",
         "email",
         "birthday",
       ]);
+      state.items = currentState(state);
       state.count = state.items.length;
     },
     resetSearch: (state) => {
-      state.items = currentState(state);
+      state.searchedItems = [];
+      resetSorting(state);
+      state.items = state.originalItems;
       state.count = state.originalItems.length;
     },
     setActivePage: (state, action: PayloadAction<number>) => {
@@ -289,11 +306,14 @@ export const PersonSlice = createSlice({
         return conditions.every((condition) => condition);
       });
 
-      state.items = filteredItems;
+      state.filteredItems = filteredItems;
+      state.items = currentState(state);
       state.count = filteredItems.length;
       state.filterValues = query;
     },
     resetFilters: (state) => {
+      state.filteredItems = [];
+      resetSorting(state);
       state.items = currentState(state);
       state.count = state.originalItems.length;
       state.isFiltered = false;
@@ -351,10 +371,9 @@ export const PersonSlice = createSlice({
 
     builder // Find all
       .addCase(getAllPersons.pending, (state) => {
+        resetSorting(state);
         state.status.read = statusPending;
         state.error = null;
-        state.sortBy = "createdAt";
-        state.sortOrder = "desc";
       })
       .addCase(getAllPersons.fulfilled, (state, action) => {
         state.status.read = statusFulfilled;
