@@ -92,6 +92,7 @@ const TableToolbar: FC<TTableToolbar> = ({
         rightSection={<Icons.IconFliter className={classes.icon} />}
         disabled={disabledButtons?.filterButton}
         onClick={openedFiltersForm}
+        m={0}
       >
         Фильтры
       </Button>
