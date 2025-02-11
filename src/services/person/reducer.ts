@@ -120,8 +120,11 @@ const updatedData = (items: TPerson[], action: PayloadAction<TPerson>) => {
 };
 
 const formatPhoneNumber = (number: string) => {
-  const phoneNumber = number.replace(/\D+/g, '');
-  const phoneFormatNumber = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 8)}-${phoneNumber.slice(8, 10)}`;
+  const phoneNumber = number.replace(/\D+/g, "");
+  const phoneFormatNumber = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
+    3,
+    6
+  )}-${phoneNumber.slice(6, 8)}-${phoneNumber.slice(8, 10)}`;
   return phoneFormatNumber;
 };
 
@@ -214,14 +217,18 @@ export const PersonSlice = createSlice({
             query.isNotEmptyPatronymic,
             query.isEmptyPatronymic
           ),
-          checkCondition(
-            String(item.birthday),
-            query.birthday
-              ? formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
-              : undefined,
-            query.isNotEmptyBirthday,
-            query.isEmptyBirthday
-          ),
+          query.isNotEmptyBirthday
+            ? item.birthday
+            : query.isEmptyBirthday
+            ? !item.birthday
+            : checkCondition(
+                String(item.birthday),
+                query.birthday
+                  ? formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
+                  : undefined,
+                false,
+                false
+              ),
           checkCondition(
             item.phone,
             query.phone,
