@@ -19,6 +19,8 @@ import {
   resetSort,
   resetAllChecked,
   getPersonsStatus,
+  getIsFiltered,
+  resetFilters,
 } from "@/services/person/reducer";
 import { resetSearch, setSearch } from "@/services/person/reducer";
 import { getProjects } from "@/services/project/reducer";
@@ -37,7 +39,7 @@ const TableToolbar = lazy(
   () => import("@components/table/table-toolbar/table-toolbar")
 );
 const Paginator = lazy(() => import("@components/paginator/paginator"));
-import { FormSavePerson, Search } from "@components/forms";
+import { FormSavePerson, PersonsFiltersForm, Search } from "@components/forms";
 import { formatDateToString } from "@/utils/format-date-to-string";
 import { Column, TPerson, TProject } from "@/types";
 import { personRoles } from "./person-roles";
@@ -71,8 +73,10 @@ const PersonsTable = () => {
   const checkedIds = useSelector(getOneChecked);
   const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
+  const isFiltered = useSelector(getIsFiltered);
   const [isOpenCreateForm, setIsOpenCreateForm] = useState(false);
   const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
+  const [isOpenFiltersForm, setIsOpenFiltersForm] = useState(false);
   const [isOpenConfirmAction, setIsOpenConfirmAction] = useState(false);
   const [personData, setPersonData] = useState<TPerson | undefined>(undefined);
   const [personId, setPersonId] = useState<string | null>(null);
@@ -233,17 +237,20 @@ const PersonsTable = () => {
         <TableToolbar
           isLoading={isLoading}
           openedSaveForm={() => setIsOpenCreateForm(true)}
+          openedFiltersForm={() => setIsOpenFiltersForm(true)}
           buttons={{
             addButton: true,
             downloadButton: true,
             uploadButton: true,
             filterButton: true,
+            isFiltered: isFiltered,
+            resetFilters: () => dispatch(resetFilters()),
           }}
           disabledButtons={{
             addButton: false,
             downloadButton: true,
             uploadButton: true,
-            filterButton: true,
+            filterButton: false,
           }}
           search={
             <Search
@@ -350,6 +357,20 @@ const PersonsTable = () => {
             setPersonId(null);
           }}
           onClickToDelete={() => personId && dispatch(deletePerson(personId))}
+        />
+      </Modal>
+
+      <Modal
+        title="Фильтры"
+        opened={isOpenFiltersForm}
+        close={() => setIsOpenFiltersForm(false)}
+        size="lg"
+      >
+        <PersonsFiltersForm
+          rolesData={personRoles}
+          districtsData={districts}
+          projectsData={projects}
+          onClickFiltered={() => setIsOpenFiltersForm(false)}
         />
       </Modal>
     </>

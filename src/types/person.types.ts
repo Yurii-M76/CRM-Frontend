@@ -6,7 +6,7 @@ export type TPerson = {
   name: string;
   patronymic: string;
   fullName: string;
-  birthday: string;
+  birthday: string | Date | null;
   phone: string;
   email: string;
   roles: string[];
@@ -24,4 +24,28 @@ export enum Role {
   VOLUNTEER = "Волонтер",
   DRIVER = "Водитель",
   DELEGATE = "Представитель",
+}
+
+export interface TPersonsFilters
+  extends Omit<TPerson, "id" | "fullName" | "createdAt"> {
+  isNotEmptySurname: boolean;
+  isNotEmptyPatronymic: boolean;
+  isNotEmptyBirthday: boolean;
+  isNotEmptyPhone: boolean;
+  isNotEmptyEmail: boolean;
+  isNotEmptyRoles: boolean;
+  isNotEmptyProjects: boolean;
+  isNotEmptyCar: boolean;
+  isNotEmptyOrganization: boolean;
+  isNotEmptyNote: boolean;
+  isEmptySurname: boolean;
+  isEmptyPatronymic: boolean;
+  isEmptyBirthday: boolean;
+  isEmptyPhone: boolean;
+  isEmptyEmail: boolean;
+  isEmptyRoles: boolean;
+  isEmptyProjects: boolean;
+  isEmptyCar: boolean;
+  isEmptyOrganization: boolean;
+  isEmptyNote: boolean;
 }

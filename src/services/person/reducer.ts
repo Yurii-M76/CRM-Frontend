@@ -7,9 +7,14 @@ import {
   getAllPersons,
   updatePerson,
 } from "./action";
-import { TPerson } from "../../types/person.types";
-import { filterData, pagination, sortData } from "../../utils/index";
+import {
+  filterData,
+  formatDateToString,
+  pagination,
+  sortData,
+} from "@utils/index";
 import { handleAllChecked, handleOneChecked } from "./checked-handlers";
+import { TPerson, TPersonsFilters, TDistrict, TProject } from "@/types";
 
 type TStatus = {
   loading: boolean;
@@ -23,10 +28,12 @@ type TStatuses = {
   delete: TStatus;
 };
 
-type TInitialStateTable = {
+type TInitialState = {
   status: TStatuses;
   count: number;
   items: TPerson[];
+  searchedItems: TPerson[];
+  filteredItems: TPerson[];
   originalItems: TPerson[];
   sortBy: keyof TPerson;
   sortOrder: "asc" | "desc";
@@ -36,13 +43,15 @@ type TInitialStateTable = {
   error?: string | null;
   checkPhone: { id: string } | null;
   checkEmail: { id: string } | null;
+  isFiltered: boolean;
+  filterValues: Partial<TPersonsFilters> | undefined;
 };
 
 const defaultStatus = { loading: false, success: false };
 const statusPending = { loading: true, success: false };
 const statusFulfilled = { loading: false, success: true };
 
-const initialState: TInitialStateTable = {
+const initialState: TInitialState = {
   status: {
     create: defaultStatus,
     read: defaultStatus,
@@ -51,6 +60,8 @@ const initialState: TInitialStateTable = {
   },
   count: 0,
   items: [],
+  searchedItems: [],
+  filteredItems: [],
   originalItems: [],
   checkedIds: [],
   sortBy: "createdAt",
@@ -60,11 +71,52 @@ const initialState: TInitialStateTable = {
   error: null,
   checkPhone: null,
   checkEmail: null,
+  isFiltered: false,
+  filterValues: {
+    surname: "",
+    name: "",
+    patronymic: "",
+    birthday: "",
+    phone: "",
+    email: "",
+    districts: [],
+    roles: [],
+    projects: [],
+    car: "",
+    organization: "",
+    note: "",
+    isNotEmptySurname: false,
+    isNotEmptyPatronymic: false,
+    isNotEmptyBirthday: false,
+    isNotEmptyPhone: false,
+    isNotEmptyEmail: false,
+    isNotEmptyRoles: false,
+    isNotEmptyProjects: false,
+    isNotEmptyCar: false,
+    isNotEmptyOrganization: false,
+    isNotEmptyNote: false,
+    isEmptySurname: false,
+    isEmptyPatronymic: false,
+    isEmptyBirthday: false,
+    isEmptyPhone: false,
+    isEmptyEmail: false,
+    isEmptyRoles: false,
+    isEmptyProjects: false,
+    isEmptyCar: false,
+    isEmptyOrganization: false,
+    isEmptyNote: false,
+  },
 };
 
-const currentState = (state: TInitialStateTable) => {
+const currentState = (state: TInitialState) => {
+  const items = state.searchedItems.length
+    ? state.searchedItems
+    : state.filteredItems.length
+    ? state.filteredItems
+    : state.originalItems;
+
   return pagination(
-    sortData(state.originalItems, state.sortBy, state.sortOrder),
+    sortData(items, state.sortBy, state.sortOrder),
     state.activePage,
     state.rangeOnPage
   );
@@ -78,10 +130,23 @@ const updatedData = (items: TPerson[], action: PayloadAction<TPerson>) => {
 };
 
 const formatPhoneNumber = (number: string) => {
-  const phoneNumber = number.split("");
-  const phoneFormatNumber = `(${phoneNumber[0]}${phoneNumber[1]}${phoneNumber[2]}) ${phoneNumber[3]}${phoneNumber[4]}${phoneNumber[5]}-${phoneNumber[6]}${phoneNumber[7]}-${phoneNumber[8]}${phoneNumber[9]}`;
+  const phoneNumber = number.replace(/\D+/g, "");
+  const phoneFormatNumber = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(
+    3,
+    6
+  )}-${phoneNumber.slice(6, 8)}-${phoneNumber.slice(8, 10)}`;
   return phoneFormatNumber;
-}
+};
+
+const normalizedString = (query: string | undefined): string | undefined => {
+  if (!query) return undefined;
+  return query.trim().toLowerCase();
+};
+
+const resetSorting = (state: TInitialState) => {
+  state.sortBy = "createdAt";
+  state.sortOrder = "desc";
+};
 
 export const PersonSlice = createSlice({
   name: "person",
@@ -100,8 +165,7 @@ export const PersonSlice = createSlice({
       state.items = currentState(state);
     },
     resetSort: (state) => {
-      state.sortBy = "createdAt";
-      state.sortOrder = "desc";
+      resetSorting(state);
       state.items = currentState(state);
     },
     setSearch: (state, action: PayloadAction<string>) => {
@@ -110,16 +174,19 @@ export const PersonSlice = createSlice({
       const isPhone = regex.test(query);
       const search = isPhone ? formatPhoneNumber(query) : query;
 
-      state.items = filterData([...state.originalItems], search, [
+      state.searchedItems = filterData([...state.originalItems], search, [
         "fullName",
         "phone",
         "email",
         "birthday",
       ]);
+      state.items = currentState(state);
       state.count = state.items.length;
     },
     resetSearch: (state) => {
-      state.items = currentState(state);
+      state.searchedItems = [];
+      resetSorting(state);
+      state.items = state.originalItems;
       state.count = state.originalItems.length;
     },
     setActivePage: (state, action: PayloadAction<number>) => {
@@ -136,6 +203,122 @@ export const PersonSlice = createSlice({
       state.checkedIds = [];
       state.items = currentState(state);
     },
+    setFilters: (state, action: PayloadAction<TPersonsFilters>) => {
+      const query = action.payload;
+
+      const checkCondition = (
+        itemValue: string | undefined,
+        queryValue: string | undefined,
+        isNotEmpty: boolean,
+        isEmpty: boolean
+      ) => {
+        if (isNotEmpty) return !!itemValue;
+        if (isEmpty) return !itemValue;
+        return queryValue
+          ? normalizedString(itemValue) === normalizedString(queryValue)
+          : true;
+      };
+
+      const filteredItems = [...state.originalItems].filter((item) => {
+        const conditions = [
+          checkCondition(
+            item.surname,
+            query.surname,
+            query.isNotEmptySurname,
+            query.isEmptySurname
+          ),
+          checkCondition(item.name, query.name, false, false),
+          checkCondition(
+            item.patronymic,
+            query.patronymic,
+            query.isNotEmptyPatronymic,
+            query.isEmptyPatronymic
+          ),
+          query.isNotEmptyBirthday
+            ? item.birthday
+            : query.isEmptyBirthday
+            ? !item.birthday
+            : checkCondition(
+                String(item.birthday),
+                query.birthday
+                  ? formatDateToString(new Date(query.birthday), "YYYY-MM-DD")
+                  : undefined,
+                false,
+                false
+              ),
+          checkCondition(
+            item.phone,
+            query.phone,
+            query.isNotEmptyPhone,
+            query.isEmptyPhone
+          ),
+          checkCondition(
+            item.email,
+            query.email,
+            query.isNotEmptyEmail,
+            query.isEmptyEmail
+          ),
+          checkCondition(
+            item.car,
+            query.car,
+            query.isNotEmptyCar,
+            query.isEmptyCar
+          ),
+          checkCondition(
+            item.organization,
+            query.organization,
+            query.isNotEmptyOrganization,
+            query.isEmptyOrganization
+          ),
+          checkCondition(
+            item.note,
+            query.note,
+            query.isNotEmptyNote,
+            query.isEmptyNote
+          ),
+          query.districts?.length
+            ? item.districts.some((district) =>
+                query.districts?.some(
+                  (d: TDistrict) => d.toString() === district.id.toString()
+                )
+              )
+            : true,
+          query.isNotEmptyRoles
+            ? item.roles.length
+            : query.isEmptyRoles
+            ? !item.roles.length
+            : query.roles?.length
+            ? item.roles.some((role) => query.roles?.some((r) => r === role))
+            : true,
+          query.isNotEmptyProjects
+            ? item.projects.length
+            : query.isEmptyProjects
+            ? !item.projects.length
+            : query.projects?.length
+            ? item.projects.some((project) =>
+                query.projects?.some(
+                  (d: TProject) => d.toString() === project.id.toString()
+                )
+              )
+            : true,
+        ];
+        state.isFiltered = true;
+        return conditions.every((condition) => condition);
+      });
+
+      state.filteredItems = filteredItems;
+      state.items = currentState(state);
+      state.count = filteredItems.length;
+      state.filterValues = query;
+    },
+    resetFilters: (state) => {
+      state.filteredItems = [];
+      resetSorting(state);
+      state.items = currentState(state);
+      state.count = state.originalItems.length;
+      state.isFiltered = false;
+      state.filterValues = undefined;
+    },
   },
   selectors: {
     getPersonsStatus: (state) => state.status,
@@ -149,6 +332,8 @@ export const PersonSlice = createSlice({
     getErrors: (state) => state.error,
     getCheckPhone: (state) => state.checkPhone,
     getCheckEmail: (state) => state.checkEmail,
+    getIsFiltered: (state) => state.isFiltered,
+    getFilterValues: (state) => state.filterValues,
   },
   extraReducers(builder) {
     builder // Create
@@ -186,10 +371,9 @@ export const PersonSlice = createSlice({
 
     builder // Find all
       .addCase(getAllPersons.pending, (state) => {
+        resetSorting(state);
         state.status.read = statusPending;
         state.error = null;
-        state.sortBy = "createdAt";
-        state.sortOrder = "desc";
       })
       .addCase(getAllPersons.fulfilled, (state, action) => {
         state.status.read = statusFulfilled;
@@ -251,6 +435,8 @@ export const {
   setOneChecked,
   setAllChecked,
   resetAllChecked,
+  setFilters,
+  resetFilters,
 } = PersonSlice.actions;
 export const {
   getPersonsStatus,
@@ -264,5 +450,7 @@ export const {
   getErrors,
   getCheckPhone,
   getCheckEmail,
+  getIsFiltered,
+  getFilterValues,
 } = PersonSlice.selectors;
 export default PersonSlice;

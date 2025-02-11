@@ -1,4 +1,4 @@
-import { Anchor, Badge, Collapse, Tooltip, Text, Box } from "@mantine/core";
+import { Anchor, Badge, Collapse, Tooltip, Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./collapsed-list.module.css";
 
@@ -38,9 +38,7 @@ const CollapsedList = <T extends Record<string, any>>({
       <div>
         <ul className={classes.list}>
           <Box w={length > limit ? 168 : "100%"}>
-            <li>
-              <Text style={{ fontSize: "inherit" }}>{data[0][field]}</Text>
-            </li>
+            <li>{data[0][field]}</li>
           </Box>
           {data.slice(1, limit).map((item, index) => (
             <li key={index}>{item[field]}</li>

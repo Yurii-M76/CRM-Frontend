@@ -29,12 +29,13 @@ import {
 import { personRoles } from "../../persons/person-roles";
 import { TProject, TDistrict, TPerson } from "@/types";
 import {
+  validationDefault,
   validationEmail,
   validationName,
   validationPatronymic,
   validationPhone,
   validationSurname,
-} from "./validation";
+} from "@forms";
 import { formatDateToString } from "@/utils";
 import { formatName } from "@/utils/format-name";
 import { ButtonsDefaultFromForm } from "@/components/";
@@ -110,24 +111,17 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     initialValues: initialValues,
     validate: {
       surname: (value) => validationSurname(value),
-      name: (value) => validationName(value),
+      name: (value) => validationName(value, true),
       patronymic: (value) => validationPatronymic(value),
       phone: (value) =>
-        validationPhone(value, !email, correctPhoneLength) ||
+        validationPhone(value, correctPhoneLength, !email) ||
         (phone && conflictPhone && exceptions.persons.forms.save.conflictPhone),
       email: (value) =>
         validationEmail(value, !phone) ||
         (email && conflictEmail && exceptions.persons.forms.save.conflictEmail),
-      districts: (value) =>
-        !value.length ? exceptions.formValidate.all.requiredField : undefined,
-      car: (value) =>
-        isDriver && !value.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined,
-      organization: (value) =>
-        isDelegate && !value.length
-          ? exceptions.formValidate.all.requiredField
-          : undefined,
+      districts: (value) => validationDefault(value, true),
+      car: (value) => validationDefault(value, isDriver),
+      organization: (value) => validationDefault(value, isDelegate),
     },
   });
 
@@ -192,7 +186,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     } else {
       setConflictPhone(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conflictPhone, personIdOnPhoneChecking]);
 
   useEffect(() => {
@@ -208,7 +202,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
     } else {
       setConflictEmail(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conflictEmail, personIdOnEmailChecking]);
 
   useEffect(() => {
@@ -277,7 +271,6 @@ const FormSavePerson: FC<TFormSavePerson> = ({
               label="Телефон"
               description="Обязательно, при отсутствии email"
               type="tel"
-              placeholder="(###) ###-##-##"
               component={IMaskInput}
               mask="(000) 000-00-00"
               onAccept={(value) => form.setFieldValue("phone", value)}
