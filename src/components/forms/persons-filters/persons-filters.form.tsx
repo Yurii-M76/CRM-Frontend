@@ -365,6 +365,13 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
                     label={fieldNames.birthday}
                     valueFormat="DD.MM.YYYY"
                     key={form.key("birthday")}
+                    value={
+                      !isFormFiledValues
+                        ? null
+                        : birthday
+                        ? new Date(birthday)
+                        : undefined
+                    }
                     onChange={(value) => {
                       if (value !== null) {
                         form.setFieldValue("birthday", String(value));
@@ -372,11 +379,6 @@ const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
                         form.setFieldValue("birthday", null);
                       }
                     }}
-                    defaultValue={
-                      filterValues?.birthday
-                        ? new Date(filterValues?.birthday)
-                        : undefined
-                    }
                     className={classes.formInput}
                     disabled={isChipsOnBirthday}
                     clearable={!isChipsOnBirthday}
