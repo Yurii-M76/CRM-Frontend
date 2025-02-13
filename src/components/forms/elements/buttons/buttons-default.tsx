@@ -3,12 +3,14 @@ import { FC } from "react";
 
 type TButtonsDefaultFromForm = {
   loading?: boolean;
+  saveButtonLabel?: string;
   onClick?: () => void;
   onClose?: () => void;
 };
 
 const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
   loading,
+  saveButtonLabel = "Сохранить",
   onClick,
   onClose,
 }) => {
@@ -29,7 +31,7 @@ const ButtonsDefaultFromForm: FC<TButtonsDefaultFromForm> = ({
         loading={loading}
         onClick={onClick}
       >
-        Сохранить
+        {saveButtonLabel}
       </Button>
     </Group>
   );
