@@ -50,22 +50,24 @@ const TableToolbar: FC<TTableToolbar> = ({
     </Button>
   );
 
-  const downloadButton = buttons.downloadButton && (
+  const downloadButton = buttons.uploadButton && (
     <Button
-      variant="default"
+      variant="light"
+      color="violet"
       rightSection={<Icons.IconUpload className={classes.icon} />}
-      disabled={disabledButtons?.downloadButton}
+      disabled={isLoading ||disabledButtons?.uploadButton}
       m={0}
     >
       Загрузить
     </Button>
   );
 
-  const uploadButton = buttons.uploadButton && (
+  const uploadButton = buttons.downloadButton && (
     <Button
-      variant="default"
+      variant="light"
+      color="violet"
       rightSection={<Icons.IconDownload className={classes.icon} />}
-      disabled={disabledButtons?.uploadButton}
+      disabled={isLoading ||disabledButtons?.downloadButton}
       m={0}
     >
       Скачать
@@ -90,7 +92,7 @@ const TableToolbar: FC<TTableToolbar> = ({
         variant="light"
         color="blue"
         rightSection={<Icons.IconFliter className={classes.icon} />}
-        disabled={disabledButtons?.filterButton}
+        disabled={isLoading || disabledButtons?.filterButton}
         onClick={openedFiltersForm}
         m={0}
       >
