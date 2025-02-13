@@ -22,3 +22,4 @@ export { default as IconBrandSupabase } from "./brand-supabase.svg?react";
 export { default as IconExclamationCircle } from "./exclamation-circle.svg?react";
 export { default as IconWarningCircle } from "./warning-circle.svg?react";
 export { default as IconInfoCircle } from "./info-circle.svg?react";
+export { default as IconFileExcel } from "./file-excel.svg?react";
