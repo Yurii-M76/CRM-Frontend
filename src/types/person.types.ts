@@ -49,3 +49,18 @@ export interface TPersonsFilters
   isEmptyOrganization: boolean;
   isEmptyNote: boolean;
 }
+
+export enum fieldNames {
+  surname = "Фамилия",
+  name = "Имя",
+  patronymic = "Отчество",
+  birthday = "Дата рождения",
+  phone = "Телефон",
+  email = "Email",
+  districts = "Район",
+  roles = "Роль",
+  projects = "Проекты",
+  car = "Автомобиль",
+  organization = "Органиция",
+  note = "Примечание",
+}
