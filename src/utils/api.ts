@@ -257,3 +257,26 @@ export const findEmailOnPersonsFromApi = async <T>(
     return Promise.reject(error);
   }
 };
+
+export const uploadFileOnApi = async (
+  path: string,
+  file: File
+): Promise<File> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${URL}/api/${path}`, {
+      mode: "cors",
+      method: "POST",
+      headers: {
+        authorization: await getValidAccessToken(),
+      } as HeadersInit,
+      credentials: "include",
+      body: formData,
+    });
+    return await checkResponse(response);
+  } catch (error) {
+    console.error(`Request failed (${path} upload file):`, error);
+    return Promise.reject(error);
+  }
+};
