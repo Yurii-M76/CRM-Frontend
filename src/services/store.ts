@@ -9,6 +9,7 @@ import PersonSlice from "./person/reducer";
 import projectSlice from "./project/reducer";
 import districtsSlice from "./districts/reducer";
 import usersSlice from "./users/reducer";
+import filesSlice from "./files/reducer";
 
 export const rootReducer = combineReducers({
   [authSlice.reducerPath]: authSlice.reducer,
@@ -16,6 +17,7 @@ export const rootReducer = combineReducers({
   [projectSlice.reducerPath]: projectSlice.reducer,
   [districtsSlice.reducerPath]: districtsSlice.reducer,
   [usersSlice.reducerPath]: usersSlice.reducer,
+  [filesSlice.reducerPath]: filesSlice.reducer,
 });
 
 const store = configureStore({
