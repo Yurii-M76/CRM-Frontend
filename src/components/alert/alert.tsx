@@ -1,13 +1,24 @@
-import { Alert as MantineAlert, Center } from "@mantine/core";
-import { FC } from "react";
+import { Alert as MantineAlert, Center, Divider } from "@mantine/core";
+import { FC, ReactNode } from "react";
 import * as Icons from "@assets/icons";
 
 type TAlert = {
   type: "error" | "warning" | "info";
   message: string;
+  variant?: "default" | "filled" | "light" | "outline";
+  disabledTitle?: boolean;
+  disabledIcon?: boolean;
+  children?: ReactNode;
 };
 
-export const Alert: FC<TAlert> = ({ type, message }) => {
+export const Alert: FC<TAlert> = ({
+  type,
+  message,
+  variant = "light",
+  disabledTitle,
+  disabledIcon,
+  children,
+}) => {
   const title = {
     error: "Ошибка",
     warning: "Предупреждение",
@@ -32,13 +43,15 @@ export const Alert: FC<TAlert> = ({ type, message }) => {
   return (
     <Center>
       <MantineAlert
-        variant="light"
+        variant={variant}
         color={color}
-        title={title}
-        icon={icon}
+        title={!disabledTitle && title}
+        icon={!disabledIcon && icon}
         w="100%"
       >
         {message}
+        {children && <Divider mt={10} mb={10} />}
+        {children}
       </MantineAlert>
     </Center>
   );
