@@ -27,7 +27,7 @@ import {
   updatePerson,
 } from "@/services/person/action";
 import { personRoles } from "../../persons/person-roles";
-import { TProject, TDistrict, TPerson } from "@/types";
+import { TProject, TDistrict, TPerson, fieldNames } from "@/types";
 import {
   validationDefault,
   validationEmail,
@@ -225,14 +225,14 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           <div className={classes.inputsGroupOnRow}>
             <TextInput
               id="surname"
-              label="Фамилия"
+              label={fieldNames.surname}
               key={form.key("surname")}
               {...form.getInputProps("surname")}
               className={classes.formInput}
             />
             <TextInput
               id="name"
-              label="Имя"
+              label={fieldNames.name}
               key={form.key("name")}
               {...form.getInputProps("name")}
               className={classes.formInput}
@@ -242,14 +242,14 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           <div className={classes.inputsGroupOnRow}>
             <TextInput
               id="patronymic"
-              label="Отчество"
+              label={fieldNames.patronymic}
               key={form.key("patronymic")}
               {...form.getInputProps("patronymic")}
               className={classes.formInput}
             />
             <DateInput
               id="birthday"
-              label="Дата рождения"
+              label={fieldNames.birthday}
               maxDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
               minDate={dayjs(new Date()).add(-100, "year").toDate()}
               defaultDate={dayjs(new Date()).add(-correctAge, "year").toDate()}
@@ -268,7 +268,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           <div className={classes.inputsGroupOnRow}>
             <InputBase
               id="phone"
-              label="Телефон"
+              label={fieldNames.phone}
               description="Обязательно, при отсутствии email"
               type="tel"
               component={IMaskInput}
@@ -281,7 +281,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
             />
             <TextInput
               id="email"
-              label="Email"
+              label={fieldNames.email}
               type="email"
               description="Обязательно, при отсутствии телефона"
               key={form.key("email")}
@@ -296,7 +296,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
         <div className={classes.fieldset}>
           <MultiSelect
             id="districts"
-            label="Район"
+            label={fieldNames.districts}
             data={districts.map((item) => ({
               value: item.id,
               label: item.name,
@@ -312,7 +312,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
         <div className={classes.fieldset}>
           <MultiSelect
             id="roles"
-            label="Роль"
+            label={fieldNames.roles}
             data={personRoles.map((role) => ({
               value: role.value,
               label: role.label,
@@ -324,7 +324,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           {isDriver && (
             <TextInput
               id="car"
-              label="Данные по автомобилю"
+              label={fieldNames.car}
               key={form.key("car")}
               {...form.getInputProps("car")}
               required={isDriver}
@@ -333,7 +333,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           {isDelegate && (
             <TextInput
               id="organization"
-              label="Организация"
+              label={fieldNames.organization}
               key={form.key("organization")}
               {...form.getInputProps("organization")}
               required={isDelegate}
@@ -341,7 +341,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           )}
           <MultiSelect
             id="projects"
-            label="Проекты"
+            label={fieldNames.projects}
             data={projects.map((item) => ({
               value: item.id,
               label: item.title,
@@ -355,7 +355,7 @@ const FormSavePerson: FC<TFormSavePerson> = ({
           />
           <Textarea
             id="note"
-            label="Примечание"
+            label={fieldNames.note}
             key={form.key("note")}
             {...form.getInputProps("note")}
             autosize
