@@ -26,6 +26,7 @@ type TTableToolbar = {
   openedSaveForm?: () => void;
   openedFiltersForm?: () => void;
   openedUploadFileForm?: () => void;
+  exportFn?: () => void;
   search?: ReactNode;
 };
 
@@ -36,6 +37,7 @@ const TableToolbar: FC<TTableToolbar> = ({
   openedUploadFileForm,
   buttons,
   disabledButtons,
+  exportFn,
   search,
 }) => {
   const addButton = buttons.addButton && (
@@ -69,6 +71,7 @@ const TableToolbar: FC<TTableToolbar> = ({
       variant="light"
       color="violet"
       rightSection={<Icons.IconDownload className={classes.icon} />}
+      onClick={exportFn}
       disabled={isLoading || disabledButtons?.downloadButton}
       m={0}
     >
