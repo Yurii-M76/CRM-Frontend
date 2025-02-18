@@ -37,7 +37,7 @@ export const Alert: FC<TAlert> = ({
   const color = {
     error: "red",
     warning: "orange",
-    info: "blue",
+    info: "gray",
   }[type];
 
   return (
