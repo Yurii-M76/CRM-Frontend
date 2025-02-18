@@ -1,4 +1,4 @@
-import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
+import { Anchor, Button, Checkbox, Pill, Table, Text } from "@mantine/core";
 import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
@@ -25,6 +25,7 @@ import {
 import { resetSearch, setSearch } from "@/services/person/reducer";
 import { getProjects } from "@/services/project/reducer";
 import { getDistricts } from "@/services/districts/reducer";
+import { getStatusFile } from "@/services/files/reducer";
 import {
   Loader,
   Modal,
@@ -34,13 +35,19 @@ import {
   TableInfoBlock,
   THeadSortButton,
   ButtonsFromDeleteForm,
+  Alert,
 } from "@components";
 const TableToolbar = lazy(
   () => import("@components/table/table-toolbar/table-toolbar")
 );
 const Paginator = lazy(() => import("@components/paginator/paginator"));
-import { FormSavePerson, PersonsFiltersForm, Search } from "@components/forms";
-import { formatDateToString } from "@/utils/format-date-to-string";
+import {
+  FormSavePerson,
+  PersonsFiltersForm,
+  Search,
+  UploadFilesForm,
+} from "@components/forms";
+import { formatDateToString, exportToExcel } from "@/utils";
 import { Column, TPerson, TProject } from "@/types";
 import { personRoles } from "./person-roles";
 import classes from "@components/table/table.module.css";
@@ -74,10 +81,12 @@ const PersonsTable = () => {
   const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
   const isFiltered = useSelector(getIsFiltered);
+  const statusFile = useSelector(getStatusFile);
   const [isOpenCreateForm, setIsOpenCreateForm] = useState(false);
   const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
   const [isOpenFiltersForm, setIsOpenFiltersForm] = useState(false);
   const [isOpenConfirmAction, setIsOpenConfirmAction] = useState(false);
+  const [isOpenUploadFile, setIsOpenUploadFile] = useState(false);
   const [personData, setPersonData] = useState<TPerson | undefined>(undefined);
   const [personId, setPersonId] = useState<string | null>(null);
 
@@ -208,28 +217,59 @@ const PersonsTable = () => {
     ));
 
   useEffect(() => {
-    dispatch(getAllPersons());
-    dispatch(findAllProjects());
-    dispatch(getAllDistricts());
+    const fetchInitialData = async () => {
+      await Promise.all([
+        dispatch(getAllPersons()),
+        dispatch(findAllProjects()),
+        dispatch(getAllDistricts()),
+      ]);
+    };
+    fetchInitialData();
   }, [dispatch]);
 
   useEffect(() => {
-    if (status.create.success) {
-      setIsOpenCreateForm(false);
-    }
-  }, [status.create.success]);
+    const statuses = [
+      status.create,
+      status.update,
+      status.delete,
+      statusFile.upload,
+    ];
+    const modals = [
+      setIsOpenCreateForm,
+      setIsOpenUpdateForm,
+      setIsOpenConfirmAction,
+      setIsOpenUploadFile,
+    ];
+    statuses.forEach((status, index) => {
+      if (status.success) {
+        modals[index](false);
+      }
+    });
+  }, [
+    status.create,
+    status.update,
+    status.delete,
+    statusFile.upload,
+    setIsOpenCreateForm,
+    setIsOpenUpdateForm,
+    setIsOpenConfirmAction,
+    setIsOpenUploadFile,
+  ]);
 
-  useEffect(() => {
-    if (status.update.success) {
-      setIsOpenUpdateForm(false);
-    }
-  }, [status.update.success]);
-
-  useEffect(() => {
-    if (status.delete.success) {
-      setIsOpenConfirmAction(false);
-    }
-  }, [status.delete.success]);
+  const headerForUploadPersonsForm = [
+    { header: "Фамилия", key: "surname", width: 15 },
+    { header: "Имя", key: "name", width: 15 },
+    { header: "Отчество", key: "patronymic", width: 15 },
+    { header: "Дата рождения", key: "birthday", width: 12 },
+    { header: "Телефон", key: "phone", width: 15 },
+    { header: "Email", key: "email", width: 20 },
+    { header: "Роль", key: "roles", width: 20 },
+    { header: "Район", key: "districts", width: 25 },
+    { header: "Проекты", key: "projects", width: 30 },
+    { header: "Автомобиль", key: "car", width: 15 },
+    { header: "Организация", key: "organization", width: 20 },
+    { header: "Примечание", key: "note", width: 30 },
+  ];
 
   return (
     <>
@@ -237,7 +277,20 @@ const PersonsTable = () => {
         <TableToolbar
           isLoading={isLoading}
           openedSaveForm={() => setIsOpenCreateForm(true)}
+          openedUploadFileForm={() => setIsOpenUploadFile(true)}
           openedFiltersForm={() => setIsOpenFiltersForm(true)}
+          exportFn={() =>
+            exportToExcel(
+              persons,
+              headerForUploadPersonsForm,
+              [
+                { key: "districts", label: "name" },
+                { key: "projects", label: "title" },
+              ],
+              true,
+              "persons"
+            )
+          }
           buttons={{
             addButton: true,
             downloadButton: true,
@@ -248,8 +301,8 @@ const PersonsTable = () => {
           }}
           disabledButtons={{
             addButton: false,
-            downloadButton: true,
-            uploadButton: true,
+            uploadButton: false,
+            downloadButton: false,
             filterButton: false,
           }}
           search={
@@ -318,6 +371,40 @@ const PersonsTable = () => {
           districts={districts}
           onClose={() => setIsOpenCreateForm(false)}
         />
+      </Modal>
+
+      <Modal
+        title="Загрузить файл"
+        opened={isOpenUploadFile}
+        close={() => setIsOpenUploadFile(false)}
+        size="md"
+      >
+        <UploadFilesForm
+          fileType="excel"
+          onClose={() => setIsOpenUploadFile(false)}
+        >
+          <Alert
+            message="Прикрепите файл Excel с расширением .xls или .xlsx, размером не более 5 мегабайт, по форме, предложенной ниже."
+            type="info"
+            variant="light"
+            disabledTitle={true}
+          >
+            <Anchor
+              size="sm"
+              onClick={() =>
+                exportToExcel(
+                  [],
+                  headerForUploadPersonsForm,
+                  [],
+                  true,
+                  "import_persons_form"
+                )
+              }
+            >
+              Форма для загрузки персоналий
+            </Anchor>
+          </Alert>
+        </UploadFilesForm>
       </Modal>
 
       <Modal
