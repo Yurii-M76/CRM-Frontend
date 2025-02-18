@@ -55,7 +55,12 @@ const UploadFilesForm: FC<TUploadFilesForm> = ({
   useEffect(() => {
     if (error) dispatch(resetFilesErrors());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, form.getDirty()]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) form.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   return (
     <form className={classes.form} onSubmit={form.onSubmit(handleSubmit)}>
