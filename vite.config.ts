@@ -19,4 +19,26 @@ export default defineConfig({
       "@styles": path.resolve(__dirname, "./src/styles"),
     },
   },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            "react",
+            "react-dom",
+            "react-imask",
+            "react-router-dom",
+          ],
+          redux: ["react-redux"],
+          dayjs: ["dayjs"],
+          exceljs: ["exceljs"],
+          jwtDecode: ["jwt-decode"],
+          utils: ["./src/utils"],
+          types: ["./src/types"],
+          store: ["./src/services/store.ts"],
+        },
+      },
+    },
+  },
 });
