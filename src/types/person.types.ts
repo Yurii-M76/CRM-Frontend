@@ -61,6 +61,6 @@ export enum fieldNames {
   roles = "Роль",
   projects = "Проекты",
   car = "Автомобиль",
-  organization = "Органиция",
+  organization = "Организация",
   note = "Примечание",
 }
