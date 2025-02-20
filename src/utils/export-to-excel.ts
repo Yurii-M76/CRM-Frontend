@@ -1,7 +1,7 @@
 import ExcelJS, { Column } from "exceljs";
 
 /**
- * 
+ *
  * @param data - unknow[]
  * @param columns - { header: string, key: string, width: number }[]
  * @param nestedLists - { key: string, label: string }[]
@@ -39,7 +39,10 @@ export const exportToExcel = async <T>(
       theme: "TableStyleLight15",
       showRowStripes: false,
     },
-    columns: columns.map((column) => ({ name: column.header as keyof Column })),
+    columns: columns.map((column) => ({
+      name: column.header as keyof Column,
+      filterButton: true,
+    })),
     rows: !dataLength
       ? [[]]
       : data.map((item) =>
