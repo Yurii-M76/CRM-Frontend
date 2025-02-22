@@ -49,10 +49,8 @@ export async function excelToJson<T>(
               switch (typeof value) {
                 case "string":
                   if (isDate(value)) {
-                    rowData[header] = formatDateToString(
-                      new Date(String(value)),
-                      formatDate
-                    ) as T[keyof T];
+                    const [day, month, year] = value.split(".");
+                    rowData[header] = `${year}-${month}-${day}` as T[keyof T];
                   } else {
                     rowData[header] = value as T[keyof T];
                   }
