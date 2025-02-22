@@ -88,7 +88,7 @@ export const validationDistricts = (
   value: string[] | undefined,
   isRequired?: boolean
 ) => {
-  if (isRequired && !value?.length)
+  if ((isRequired && !value?.length) || (value && value[0] === undefined))
     return exceptions.formValidate.all.requiredField;
   if (!value?.length) return undefined;
 };
