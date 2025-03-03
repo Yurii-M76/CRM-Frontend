@@ -1,4 +1,4 @@
-import { Anchor, Button, Checkbox, Pill, Table, Text } from "@mantine/core";
+import { Button, Checkbox, Pill, Table, Text } from "@mantine/core";
 import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "@/services/store";
 import { deletePerson, getAllPersons } from "@/services/person/action";
@@ -35,37 +35,26 @@ import {
   TableInfoBlock,
   THeadSortButton,
   ButtonsFromDeleteForm,
-  Alert,
 } from "@components";
 const TableToolbar = lazy(
   () => import("@components/table/table-toolbar/table-toolbar")
 );
 const Paginator = lazy(() => import("@components/paginator/paginator"));
-import {
-  FormSavePerson,
-  PersonsFiltersForm,
-  Search,
-  UploadFilesForm,
-} from "@components/forms";
+import { FormSavePerson, PersonsFiltersForm, Search } from "@forms";
 import { formatDateToString, exportToExcel } from "@/utils";
-import { Column, TPerson, TProject } from "@/types";
-import { personRoles } from "./person-roles";
+import {
+  columnsToPersonsTable,
+  columnsToUploadData,
+  UploadPersons,
+  personRoles,
+} from "./index";
+import { TPerson, TProject } from "@/types";
 import classes from "@components/table/table.module.css";
-
-const columns: Column<TPerson>[] = [
-  { label: "ФИО", accessor: "fullName", size: 200, sorted: true },
-  { label: "Телефон", accessor: "phone", size: 180, sorted: true },
-  { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
-  { label: "E-Mail", accessor: "email", size: 180, sorted: true },
-  { label: "Роль", accessor: "roles", size: 140, sorted: false },
-  { label: "Проекты", accessor: "projects", size: 260, sorted: true },
-  { label: "Район", accessor: "districts", size: 240, sorted: true },
-];
 
 const widthColumnFromCheckbox = 60;
 const widthColumnFromActionButtons = 60;
 const widthTable =
-  columns.reduce((sum, column) => sum + column.size, 0) +
+  columnsToPersonsTable.reduce((sum, column) => sum + column.size, 0) +
   widthColumnFromCheckbox +
   widthColumnFromActionButtons;
 
@@ -125,7 +114,7 @@ const PersonsTable = () => {
     checkedIds.length > 0 && checkedIds.length < countPersons;
   const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
-  const thead = columns.map((column, index) => (
+  const thead = columnsToPersonsTable.map((column, index) => (
     <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label && (
         <Button.Group>
@@ -256,21 +245,6 @@ const PersonsTable = () => {
     setIsOpenUploadFile,
   ]);
 
-  const headerForUploadPersonsForm = [
-    { header: "Фамилия", key: "surname", width: 15 },
-    { header: "Имя", key: "name", width: 15 },
-    { header: "Отчество", key: "patronymic", width: 15 },
-    { header: "Дата рождения", key: "birthday", width: 12 },
-    { header: "Телефон", key: "phone", width: 15 },
-    { header: "Email", key: "email", width: 20 },
-    { header: "Роль", key: "roles", width: 20 },
-    { header: "Район", key: "districts", width: 25 },
-    { header: "Проекты", key: "projects", width: 30 },
-    { header: "Автомобиль", key: "car", width: 15 },
-    { header: "Организация", key: "organization", width: 20 },
-    { header: "Примечание", key: "note", width: 30 },
-  ];
-
   return (
     <>
       <div className={classes.container} style={{ maxWidth: widthTable }}>
@@ -282,7 +256,7 @@ const PersonsTable = () => {
           exportFn={() =>
             exportToExcel(
               persons,
-              headerForUploadPersonsForm,
+              columnsToUploadData,
               [
                 { key: "districts", label: "name" },
                 { key: "projects", label: "title" },
@@ -379,32 +353,11 @@ const PersonsTable = () => {
         close={() => setIsOpenUploadFile(false)}
         size="md"
       >
-        <UploadFilesForm
-          fileType="excel"
-          onClose={() => setIsOpenUploadFile(false)}
-        >
-          <Alert
-            message="Прикрепите файл Excel с расширением .xls или .xlsx, размером не более 5 мегабайт, по форме, предложенной ниже."
-            type="info"
-            variant="light"
-            disabledTitle={true}
-          >
-            <Anchor
-              size="sm"
-              onClick={() =>
-                exportToExcel(
-                  [],
-                  headerForUploadPersonsForm,
-                  [],
-                  true,
-                  "import_persons_form"
-                )
-              }
-            >
-              Форма для загрузки персоналий
-            </Anchor>
-          </Alert>
-        </UploadFilesForm>
+        <UploadPersons
+          headers={columnsToUploadData}
+          setIsOpenUpload={() => setIsOpenUploadFile(false)}
+          isOpenUpload={isOpenUploadFile}
+        ></UploadPersons>
       </Modal>
 
       <Modal
