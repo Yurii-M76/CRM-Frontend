@@ -4,3 +4,4 @@ export * from './person.types';
 export * from './table.types';
 export * from './project.types';
 export * from './district.types';
+export * from './upload.types';
