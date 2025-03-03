@@ -8,7 +8,7 @@ export const formatDateToString = (
   date: Date | undefined,
   format: "DD.MM.YYYY" | "YYYY-MM-DD" | "day_month" | "day_month_year"
 ): string => {
-  if (!date) return "";
+  if (!date || String(date) === "Invalid Date") return "";
   const day = new Date(date).getDate().toString().padStart(2, "0");
   const month = (new Date(date).getMonth() + 1).toString().padStart(2, "0");
   const year = new Date(date).getFullYear();
