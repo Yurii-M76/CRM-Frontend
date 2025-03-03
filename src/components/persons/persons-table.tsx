@@ -25,6 +25,7 @@ import {
 import { resetSearch, setSearch } from "@/services/person/reducer";
 import { getProjects } from "@/services/project/reducer";
 import { getDistricts } from "@/services/districts/reducer";
+import { getStatusFile } from "@/services/files/reducer";
 import {
   Loader,
   Modal,
@@ -39,26 +40,21 @@ const TableToolbar = lazy(
   () => import("@components/table/table-toolbar/table-toolbar")
 );
 const Paginator = lazy(() => import("@components/paginator/paginator"));
-import { FormSavePerson, PersonsFiltersForm, Search } from "@components/forms";
-import { formatDateToString } from "@/utils/format-date-to-string";
-import { Column, TPerson, TProject } from "@/types";
-import { personRoles } from "./person-roles";
+import { FormSavePerson, PersonsFiltersForm, Search } from "@forms";
+import { formatDateToString, exportToExcel } from "@/utils";
+import {
+  columnsToPersonsTable,
+  columnsToUploadData,
+  UploadPersons,
+  personRoles,
+} from "./index";
+import { TPerson, TProject } from "@/types";
 import classes from "@components/table/table.module.css";
-
-const columns: Column<TPerson>[] = [
-  { label: "ФИО", accessor: "fullName", size: 200, sorted: true },
-  { label: "Телефон", accessor: "phone", size: 180, sorted: true },
-  { label: "Дата рождения", accessor: "birthday", size: 180, sorted: true },
-  { label: "E-Mail", accessor: "email", size: 180, sorted: true },
-  { label: "Роль", accessor: "roles", size: 140, sorted: false },
-  { label: "Проекты", accessor: "projects", size: 260, sorted: true },
-  { label: "Район", accessor: "districts", size: 240, sorted: true },
-];
 
 const widthColumnFromCheckbox = 60;
 const widthColumnFromActionButtons = 60;
 const widthTable =
-  columns.reduce((sum, column) => sum + column.size, 0) +
+  columnsToPersonsTable.reduce((sum, column) => sum + column.size, 0) +
   widthColumnFromCheckbox +
   widthColumnFromActionButtons;
 
@@ -74,10 +70,12 @@ const PersonsTable = () => {
   const countPersons = useSelector(getCountPersons);
   const rowsOnPage = useSelector(getRangeOnPage);
   const isFiltered = useSelector(getIsFiltered);
+  const statusFile = useSelector(getStatusFile);
   const [isOpenCreateForm, setIsOpenCreateForm] = useState(false);
   const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
   const [isOpenFiltersForm, setIsOpenFiltersForm] = useState(false);
   const [isOpenConfirmAction, setIsOpenConfirmAction] = useState(false);
+  const [isOpenUploadFile, setIsOpenUploadFile] = useState(false);
   const [personData, setPersonData] = useState<TPerson | undefined>(undefined);
   const [personId, setPersonId] = useState<string | null>(null);
 
@@ -116,7 +114,7 @@ const PersonsTable = () => {
     checkedIds.length > 0 && checkedIds.length < countPersons;
   const isAllCheched = countPersons !== 0 && checkedIds.length === countPersons;
 
-  const thead = columns.map((column, index) => (
+  const thead = columnsToPersonsTable.map((column, index) => (
     <Table.Th w={column.size} key={index} className={classes.tableTh}>
       {column.label && (
         <Button.Group>
@@ -208,28 +206,44 @@ const PersonsTable = () => {
     ));
 
   useEffect(() => {
-    dispatch(getAllPersons());
-    dispatch(findAllProjects());
-    dispatch(getAllDistricts());
+    const fetchInitialData = async () => {
+      await Promise.all([
+        dispatch(getAllPersons()),
+        dispatch(findAllProjects()),
+        dispatch(getAllDistricts()),
+      ]);
+    };
+    fetchInitialData();
   }, [dispatch]);
 
   useEffect(() => {
-    if (status.create.success) {
-      setIsOpenCreateForm(false);
-    }
-  }, [status.create.success]);
-
-  useEffect(() => {
-    if (status.update.success) {
-      setIsOpenUpdateForm(false);
-    }
-  }, [status.update.success]);
-
-  useEffect(() => {
-    if (status.delete.success) {
-      setIsOpenConfirmAction(false);
-    }
-  }, [status.delete.success]);
+    const statuses = [
+      status.create,
+      status.update,
+      status.delete,
+      statusFile.upload,
+    ];
+    const modals = [
+      setIsOpenCreateForm,
+      setIsOpenUpdateForm,
+      setIsOpenConfirmAction,
+      setIsOpenUploadFile,
+    ];
+    statuses.forEach((status, index) => {
+      if (status.success) {
+        modals[index](false);
+      }
+    });
+  }, [
+    status.create,
+    status.update,
+    status.delete,
+    statusFile.upload,
+    setIsOpenCreateForm,
+    setIsOpenUpdateForm,
+    setIsOpenConfirmAction,
+    setIsOpenUploadFile,
+  ]);
 
   return (
     <>
@@ -237,7 +251,20 @@ const PersonsTable = () => {
         <TableToolbar
           isLoading={isLoading}
           openedSaveForm={() => setIsOpenCreateForm(true)}
+          openedUploadFileForm={() => setIsOpenUploadFile(true)}
           openedFiltersForm={() => setIsOpenFiltersForm(true)}
+          exportFn={() =>
+            exportToExcel(
+              persons,
+              columnsToUploadData,
+              [
+                { key: "districts", label: "name" },
+                { key: "projects", label: "title" },
+              ],
+              true,
+              "persons"
+            )
+          }
           buttons={{
             addButton: true,
             downloadButton: true,
@@ -248,8 +275,8 @@ const PersonsTable = () => {
           }}
           disabledButtons={{
             addButton: false,
-            downloadButton: true,
-            uploadButton: true,
+            uploadButton: false,
+            downloadButton: false,
             filterButton: false,
           }}
           search={
@@ -318,6 +345,19 @@ const PersonsTable = () => {
           districts={districts}
           onClose={() => setIsOpenCreateForm(false)}
         />
+      </Modal>
+
+      <Modal
+        title="Загрузить файл"
+        opened={isOpenUploadFile}
+        close={() => setIsOpenUploadFile(false)}
+        size="md"
+      >
+        <UploadPersons
+          headers={columnsToUploadData}
+          setIsOpenUpload={() => setIsOpenUploadFile(false)}
+          isOpenUpload={isOpenUploadFile}
+        ></UploadPersons>
       </Modal>
 
       <Modal

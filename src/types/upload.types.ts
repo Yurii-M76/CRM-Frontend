@@ -1,0 +1,1 @@
+export type TUploadErrorsLog = { row: number; error: string };

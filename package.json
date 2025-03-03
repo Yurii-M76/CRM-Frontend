@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "@types/react-redux": "^7.1.34",
     "dayjs": "^1.11.13",
+    "exceljs": "^4.4.0",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

@@ -29,7 +29,7 @@ import {
   resetFilters,
   setFilters,
 } from "@/services/person/reducer";
-import { Role, TDistrict, TPersonsFilters, TProject } from "@/types";
+import { fieldNames, Role, TDistrict, TPersonsFilters, TProject } from "@/types";
 import classes from "../forms.module.css";
 
 type TPersonsFiltersForm = {
@@ -41,21 +41,6 @@ type TPersonsFiltersForm = {
   districtsData: TDistrict[];
   onClickFiltered: () => void;
 };
-
-enum fieldNames {
-  surname = "Фамилия",
-  name = "Имя",
-  patronymic = "Отчество",
-  birthday = "Дата рождения",
-  phone = "Телефон",
-  email = "Email",
-  districts = "Район",
-  roles = "Роль",
-  projects = "Проекты",
-  car = "Автомобиль",
-  organization = "Органиция",
-  note = "Примечание",
-}
 
 const PersonsFiltersForm: FC<TPersonsFiltersForm> = ({
   rolesData,

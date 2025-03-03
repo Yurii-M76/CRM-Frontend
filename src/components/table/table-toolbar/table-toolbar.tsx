@@ -25,6 +25,8 @@ type TTableToolbar = {
   disabledButtons?: TDisabledButtons;
   openedSaveForm?: () => void;
   openedFiltersForm?: () => void;
+  openedUploadFileForm?: () => void;
+  exportFn?: () => void;
   search?: ReactNode;
 };
 
@@ -32,8 +34,10 @@ const TableToolbar: FC<TTableToolbar> = ({
   isLoading,
   openedSaveForm,
   openedFiltersForm,
+  openedUploadFileForm,
   buttons,
   disabledButtons,
+  exportFn,
   search,
 }) => {
   const addButton = buttons.addButton && (
@@ -44,28 +48,31 @@ const TableToolbar: FC<TTableToolbar> = ({
       onClick={openedSaveForm}
       disabled={isLoading || disabledButtons?.addButton}
       m={0}
-      title="Добавить"
     >
       Добавить
     </Button>
   );
 
-  const downloadButton = buttons.downloadButton && (
+  const downloadButton = buttons.uploadButton && (
     <Button
-      variant="default"
+      variant="light"
+      color="violet"
       rightSection={<Icons.IconUpload className={classes.icon} />}
-      disabled={disabledButtons?.downloadButton}
+      onClick={openedUploadFileForm}
+      disabled={isLoading || disabledButtons?.uploadButton}
       m={0}
     >
       Загрузить
     </Button>
   );
 
-  const uploadButton = buttons.uploadButton && (
+  const uploadButton = buttons.downloadButton && (
     <Button
-      variant="default"
+      variant="light"
+      color="violet"
       rightSection={<Icons.IconDownload className={classes.icon} />}
-      disabled={disabledButtons?.uploadButton}
+      onClick={exportFn}
+      disabled={isLoading || disabledButtons?.downloadButton}
       m={0}
     >
       Скачать
@@ -90,7 +97,7 @@ const TableToolbar: FC<TTableToolbar> = ({
         variant="light"
         color="blue"
         rightSection={<Icons.IconFliter className={classes.icon} />}
-        disabled={disabledButtons?.filterButton}
+        disabled={isLoading || disabledButtons?.filterButton}
         onClick={openedFiltersForm}
         m={0}
       >
