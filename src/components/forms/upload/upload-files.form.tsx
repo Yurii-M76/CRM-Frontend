@@ -1,15 +1,16 @@
-import { FileInput } from "@mantine/core";
+import { Button, FileInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC, ReactNode, useEffect } from "react";
 import { Alert, ButtonsDefaultFromForm } from "@/components";
-import { useDispatch, useSelector } from "@/services/store";
-import { uploadFile } from "@/services/files/actions";
-import { getStatusFile, resetFilesErrors } from "@/services/files/reducer";
+import { excelToJson } from "@/utils/excel-to-json";
+import { fieldNames, TUploadErrorsLog } from "@/types";
 import { IconFileExcel } from "@assets/icons";
 import classes from "../forms.module.css";
 
 type TUploadFilesForm = {
-  fileType: "excel" | "image";
+  data: (json: unknown[] | undefined) => void;
+  validData?: unknown[];
+  errorsLog?: TUploadErrorsLog[];
   onClose?: () => void;
   children?: ReactNode;
 };
@@ -18,26 +19,22 @@ type TInitialValues = {
   file: File | null;
 };
 
-const fileTypes = {
-  excel: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  image: "image/png,image/jpeg",
-};
+const type =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 const UploadFilesForm: FC<TUploadFilesForm> = ({
   onClose,
-  fileType,
+  data,
+  validData,
+  errorsLog,
   children,
 }) => {
-  const dispatch = useDispatch();
-  const { upload, error } = useSelector(getStatusFile);
+  // TODO: доработать механизм импорта валидных данных
+  // TODO: доработать экспорт лога ошибок импорта
 
-  const type =
-    fileType === "excel"
-      ? fileTypes.excel
-      : fileType === "image"
-      ? fileTypes.image
-      : "";
-
+  console.log(errorsLog);
+  console.log(validData);
+  
   const initialValues: TInitialValues = {
     file: null,
   };
@@ -49,18 +46,33 @@ const UploadFilesForm: FC<TUploadFilesForm> = ({
 
   const handleSubmit = () => {
     const { file } = form.getValues();
-    if (file) dispatch(uploadFile(file));
+    excelToJson(file, fieldNames)
+      .then((json) => {
+        data(json);
+      })
+      .catch((error) => {
+        console.error(`Upload file error: ${error}`);
+        form.reset();
+      });
   };
 
-  useEffect(() => {
-    if (error) dispatch(resetFilesErrors());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  const errors = errorsLog?.length ? (
+    <Alert
+      type="warning"
+      variant="outline"
+      disabledTitle
+      message={`Найдены не валидные данные (количество строк: ${errorsLog?.length})`}
+    >
+      <Button variant="light" color="red" w="100%">
+        Скачать лог ошибок
+      </Button>
+    </Alert>
+  ) : null;
 
   useEffect(() => {
-    if (error) form.reset();
+    form.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
+  }, [errorsLog?.length]);
 
   return (
     <form className={classes.form} onSubmit={form.onSubmit(handleSubmit)}>
@@ -74,12 +86,16 @@ const UploadFilesForm: FC<TUploadFilesForm> = ({
           {...form.getInputProps("file")}
           clearable
         />
-        {error && <Alert message={error} type="error" />}
-        <ButtonsDefaultFromForm
-          loading={upload.loading}
-          onClose={onClose}
-          saveButtonLabel="Загрузить"
-        />
+        {errors}
+        {!validData ? (
+          <ButtonsDefaultFromForm
+            // loading={upload.loading}
+            onClose={onClose}
+            saveButtonLabel="Загрузить"
+          />
+        ) : (
+          ""
+        )}
       </div>
     </form>
   );
